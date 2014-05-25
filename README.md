@@ -3,6 +3,15 @@
 MiniGL is a minimal Game Library, available as a Ruby gem, and built on top of
 the [Gosu](http://www.libgosu.org/) gem.
 
+It provides the following features:
+  * Resource management (images, sounds, ...)
+  * Input manipulation (keyboard, mouse, ...)
+  * UI (text, buttons, text fields, ...)
+  * Basic physics and collision checking
+  * Animated objects
+
+More functionalities are coming. Feel free to contribute! 
+
 Please note:
 
   * The test package is not complete! Most of the functionality
