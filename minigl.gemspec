@@ -1,9 +1,9 @@
 Gem::Specification.new do |s|
 	s.name                  = 'minigl'
-	s.version               = '1.0.1'
-	s.date                  = '2014-05-25'
+	s.version               = '1.1.0'
+	s.date                  = '2014-06-03'
 	s.summary               = "MiniGL"
-	s.description           = "A minimal Game Library built on top of the Gosu gem."
+	s.description           = "A minimal 2D Game Library built on top of the Gosu gem."
 	s.authors               = ["Victor David Santos"]
 	s.email                 = 'victordavidsantos@gmail.com'
 	s.files                 = Dir["lib/*.rb", "lib/minigl/*.rb", "data/*", "data/*/*", "Rakefile", "LICENSE", "README.md"]

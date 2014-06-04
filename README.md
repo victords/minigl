@@ -1,7 +1,7 @@
 # MiniGL
 
-MiniGL is a minimal Game Library, available as a Ruby gem, and built on top of
-the [Gosu](http://www.libgosu.org/) gem.
+MiniGL is a minimal **2D Game** Library, available as a Ruby gem, and built on
+top of the [Gosu](http://www.libgosu.org/) gem.
 
 It provides the following features:
   * Resource management (images, sounds, ...)

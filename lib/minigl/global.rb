@@ -166,6 +166,8 @@ module AGL
 			@@global_imgs = Hash.new
 			@@sounds = Hash.new
 			@@global_sounds = Hash.new
+			@@fonts = Hash.new
+			@@global_fonts = Hash.new
 		end
 	
 		def self.img id, global = false, tileable = false, ext = ".png"
@@ -192,20 +194,28 @@ module AGL
 			a[id] = tileset
 		end
 	
-		def self.sound id, global = false
+		def self.sound id, global = false, ext = ".wav"
 			if global; a = @@global_sounds; else; a = @@sounds; end
 			return a[id] if a[id]
-			s = "data/sound/se/" + id.to_s.split('_').join('/') + ".wav"
+			s = "data/sound/se/" + id.to_s.split('_').join('/') + ext
 			sound = Gosu::Sample.new Game.window, s
 			a[id] = sound
 		end
 	
-		def self.song id, global = false
+		def self.song id, global = false, ext = ".ogg"
 			if global; a = @@global_sounds; else; a = @@sounds; end
 			return a[id] if a[id]
-			s = "data/sound/bgm/" + id.to_s.split('_').join('/') + ".ogg"
+			s = "data/sound/bgm/" + id.to_s.split('_').join('/') + ext
 			song = Gosu::Song.new Game.window, s
 			a[id] = song
+		end
+		
+		def self.font id, size, global = true, ext = ".ttf"
+			if global; a = @@global_fonts; else; a = @@fonts; end
+			return a[id] if a[id]
+			s = "data/font/" + id.to_s.split('_').join('/') + ext
+			font = Gosu::Font.new Game.window, s, size
+			a[id] = font
 		end
 	
 #		def self.text id
@@ -213,8 +223,9 @@ module AGL
 #		end
 	
 		def self.clear
-			@imgs.clear
-			@sounds.clear
+			@@imgs.clear
+			@@sounds.clear
+			@@fonts.clear
 		end
 	end
 end
