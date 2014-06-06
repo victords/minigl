@@ -164,6 +164,8 @@ module AGL
 		def self.initialize
 			@@imgs = Hash.new
 			@@global_imgs = Hash.new
+			@@tilesets = Hash.new
+			@@global_tilesets = Hash.new
 			@@sounds = Hash.new
 			@@global_sounds = Hash.new
 			@@fonts = Hash.new
@@ -186,18 +188,18 @@ module AGL
 			a[id] = imgs
 		end
 	
-		def self.tileset id, global = false
-			if global; a = @@global_imgs; else; a = @@imgs; end
+		def self.tileset id, tile_width = 32, tile_height = 32, global = false, ext = ".png"
+			if global; a = @@global_tilesets; else; a = @@tilesets; end
 			return a[id] if a[id]
-			s = "data/img/tileset/#{id}.png"
-			tileset = Gosu::Image.load_tiles Game.window, s, C::TileSize, C::TileSize, true
+			s = "data/tileset/" + id.to_s.split('_').join('/') + ext
+			tileset = Gosu::Image.load_tiles Game.window, s, tile_width, tile_height, true
 			a[id] = tileset
 		end
 	
 		def self.sound id, global = false, ext = ".wav"
 			if global; a = @@global_sounds; else; a = @@sounds; end
 			return a[id] if a[id]
-			s = "data/sound/se/" + id.to_s.split('_').join('/') + ext
+			s = "data/sound/" + id.to_s.split('_').join('/') + ext
 			sound = Gosu::Sample.new Game.window, s
 			a[id] = sound
 		end
@@ -205,7 +207,7 @@ module AGL
 		def self.song id, global = false, ext = ".ogg"
 			if global; a = @@global_sounds; else; a = @@sounds; end
 			return a[id] if a[id]
-			s = "data/sound/bgm/" + id.to_s.split('_').join('/') + ext
+			s = "data/song/" + id.to_s.split('_').join('/') + ext
 			song = Gosu::Song.new Game.window, s
 			a[id] = song
 		end
@@ -224,6 +226,7 @@ module AGL
 	
 		def self.clear
 			@@imgs.clear
+			@@tilesets.clear
 			@@sounds.clear
 			@@fonts.clear
 		end
