@@ -10,7 +10,8 @@ It provides the following features:
   * Basic physics and collision checking
   * Animated objects
 
-More functionalities are coming. Feel free to contribute! 
+More functionalities are coming. Feel free to contribute! You can send feedback
+to victordavidsantos@gmail.com.
 
 Please note:
 
