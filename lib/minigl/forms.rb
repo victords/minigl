@@ -343,22 +343,23 @@ module AGL
 		
 		def draw
 			@img.draw @x, @y, 0
+			@font.draw @text, @text_x, @text_y, 0, 1, 1, 0xff000000
+			
+			if @anchor1 and @anchor2
+				Game.window.draw_quad @nodes[@anchor1], @text_y, 0x80000000,
+				                      @nodes[@anchor2] + 1, @text_y, 0x80000000,
+				                      @nodes[@anchor2] + 1, @text_y + @font.height, 0x80000000,
+				                      @nodes[@anchor1], @text_y + @font.height, 0x80000000, 0
+			end
+			
 			if @cursor_visible
-				if @cursor_img; @cursor_img.draw @text_x, @text_y, 0
+				if @cursor_img; @cursor_img.draw @nodes[@cur_node] - @cursor_img.width / 2, @text_y, 0
 				else
 					Game.window.draw_quad @nodes[@cur_node], @text_y, 0xff000000,
 					                      @nodes[@cur_node] + 1, @text_y, 0xff000000,
 					                      @nodes[@cur_node] + 1, @text_y + @font.height, 0xff000000,
 					                      @nodes[@cur_node], @text_y + @font.height, 0xff000000, 0
 				end
-			end
-			@font.draw @text, @text_x, @text_y, 0, 1, 1, 0xff000000
-			
-			if @anchor1 and @anchor2
-				Game.window.draw_quad @nodes[@anchor1], @text_y, 0x80000000,
-				                   @nodes[@anchor2] + 1, @text_y, 0x80000000,
-				                   @nodes[@anchor2] + 1, @text_y + @font.height, 0x80000000,
-				                   @nodes[@anchor1], @text_y + @font.height, 0x80000000, 0
 			end
 		end
 	end

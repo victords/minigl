@@ -222,10 +222,11 @@ module AGL
 		
 		def self.font id, size, global = true, ext = ".ttf"
 			if global; a = @@global_fonts; else; a = @@fonts; end
-			return a[id] if a[id]
+			id_size = "#{id}_#{size}"
+			return a[id_size] if a[id_size]
 			s = "data/font/" + id.to_s.split('_').join('/') + ext
 			font = Gosu::Font.new Game.window, s, size
-			a[id] = font
+			a[id_size] = font
 		end
 		
 #		def self.text id

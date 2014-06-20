@@ -19,5 +19,10 @@ Please note:
 provided by the gem is difficult to test automatically, but you can check out
 this [working game example](https://github.com/victords/aventura-do-saber).
   * The [documentation](https://github.com/victords/minigl/wiki) is under
-construction. 
+construction.
 
+**Version 1.2.2**
+
+  * Adjust in `Res.font` to distinguish fonts loaded with different sizes.
+  * Adjust in `TextField` to draw cursor image in the correct position and
+z-index.
