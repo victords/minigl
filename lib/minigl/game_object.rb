@@ -28,11 +28,18 @@ module AGL
 			end
 		end
 		
-		def draw map = nil
+		def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil
+			color = (alpha << 24) | color
 			if map
-				@img[@img_index].draw @x.round - map.cam.x, @y.round - map.cam.y, 0
+				if angle
+					@img[@img_index].draw_rot @x.round - map.cam.x, @y.round - map.cam.y, 0, angle, 0.5, 0.5, scale_x, scale_y, color
+				else
+					@img[@img_index].draw @x.round - map.cam.x, @y.round - map.cam.y, 0, scale_x, scale_y, color
+				end
+			elsif angle
+				@img[@img_index].draw_rot @x.round, @y.round, 0, angle, 0.5, 0.5, scale_x, scale_y, color
 			else
-				@img[@img_index].draw @x.round, @y.round, 0
+				@img[@img_index].draw @x.round, @y.round, 0, scale_x, scale_y, color
 			end
 		end
 	end
@@ -66,12 +73,20 @@ module AGL
 			false
 		end
 		
-		def draw map = nil
+		def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil
+			color = (alpha << 24) | color
 			if map
-				@img[@img_index].draw @x.round + @img_gap.x - map.cam.x,
-						                @y.round + @img_gap.y - map.cam.y, 0 if @img
+				if angle
+					@img[@img_index].draw_rot @x.round + @img_gap.x - map.cam.x,
+					                          @y.round + @img_gap.y - map.cam.y,
+					                          0, angle, 0.5, 0.5, scale_x, scale_y, color
+				else
+					@img[@img_index].draw @x.round + @img_gap.x - map.cam.x, @y.round + @img_gap.y - map.cam.y, 0, scale_x, scale_y, color
+				end
+			elsif angle
+				@img[@img_index].draw_rot @x.round + @img_gap.x, @y.round + @img_gap.y, 0, angle, 0.5, 0.5, scale_x, scale_y, color
 			else
-				@img[@img_index].draw @x.round + @img_gap.x, @y.round + @img_gap.y, 0 if @img
+				@img[@img_index].draw @x.round + @img_gap.x, @y.round + @img_gap.y, 0, scale_x, scale_y, color
 			end
 		end
 	end

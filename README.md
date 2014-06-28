@@ -21,8 +21,6 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * The [documentation](https://github.com/victords/minigl/wiki) is under
 construction.
 
-**Version 1.2.2**
+**Version 1.2.3**
 
-  * Adjust in `Res.font` to distinguish fonts loaded with different sizes.
-  * Adjust in `TextField` to draw cursor image in the correct position and
-z-index.
+  * Add drawing options to Sprite, GameObject, Button and TextField.

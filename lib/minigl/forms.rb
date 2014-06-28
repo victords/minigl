@@ -61,13 +61,15 @@ module AGL
 				end
 			end
 		end
-	
-		def draw
-			@img[@img_index].draw @x, @y, 0
+		
+		def draw text_color = 0, alpha = 0xff
+			color = (alpha << 24) | 0xffffff
+			text_color = (alpha << 24) | text_color
+			@img[@img_index].draw @x, @y, 0, 1, 1, color
 			if @center
-				@font.draw_rel @text, @text_x, @text_y, 0, 0.5, 0.5, 1, 1, 0xff000000
+				@font.draw_rel @text, @text_x, @text_y, 0, 0.5, 0.5, 1, 1, text_color
 			else
-				@font.draw @text, @text_x, @text_y, 0, 1, 1, 0xff000000
+				@font.draw @text, @text_x, @text_y, 0, 1, 1, text_color
 			end
 		end
 	end
@@ -341,24 +343,28 @@ module AGL
 			set_cursor_visible
 		end
 		
-		def draw
-			@img.draw @x, @y, 0
-			@font.draw @text, @text_x, @text_y, 0, 1, 1, 0xff000000
+		def draw text_color = 0, selection_color = 0, alpha = 0xff
+			color = (alpha << 24) | 0xffffff
+			text_color = (alpha << 24) | text_color
+			@img.draw @x, @y, 0, 1, 1, color
+			@font.draw @text, @text_x, @text_y, 0, 1, 1, text_color
 			
 			if @anchor1 and @anchor2
-				Game.window.draw_quad @nodes[@anchor1], @text_y, 0x80000000,
-				                      @nodes[@anchor2] + 1, @text_y, 0x80000000,
-				                      @nodes[@anchor2] + 1, @text_y + @font.height, 0x80000000,
-				                      @nodes[@anchor1], @text_y + @font.height, 0x80000000, 0
+				selection_color = ((alpha / 2) << 24) | selection_color
+				Game.window.draw_quad @nodes[@anchor1], @text_y, selection_color,
+				                      @nodes[@anchor2] + 1, @text_y, selection_color,
+				                      @nodes[@anchor2] + 1, @text_y + @font.height, selection_color,
+				                      @nodes[@anchor1], @text_y + @font.height, selection_color, 0
 			end
 			
 			if @cursor_visible
 				if @cursor_img; @cursor_img.draw @nodes[@cur_node] - @cursor_img.width / 2, @text_y, 0
 				else
-					Game.window.draw_quad @nodes[@cur_node], @text_y, 0xff000000,
-					                      @nodes[@cur_node] + 1, @text_y, 0xff000000,
-					                      @nodes[@cur_node] + 1, @text_y + @font.height, 0xff000000,
-					                      @nodes[@cur_node], @text_y + @font.height, 0xff000000, 0
+					cursor_color = (alpha << 24) | 0
+					Game.window.draw_quad @nodes[@cur_node], @text_y, cursor_color,
+					                      @nodes[@cur_node] + 1, @text_y, cursor_color,
+					                      @nodes[@cur_node] + 1, @text_y + @font.height, cursor_color,
+					                      @nodes[@cur_node], @text_y + @font.height, cursor_color, 0
 				end
 			end
 		end
