@@ -4,15 +4,15 @@ include AGL
 class MyGame < Gosu::Window
   def initialize
     super 800, 600, false # creating a 800 x 600 window, not full screen
-    Game.initialize self, Vector.new(0, 1), 10, 2, 20
+    Game.initialize self, Vector.new(0, 1), 10, 2
     
     @obj1 = GameObject.new 10, 10, 80, 80, :img1, Vector.new(-10, -10)
     @obj2 = Sprite.new 400, 0, :img1
     
     @font = Res.font :font1, 20
     @writer = TextHelper.new @font, 5
-    @btn = Button.new(10, 560, @font, "Test", :btn, false, 15, 5) {}
-    @txt = TextField.new 10, 520, @font, :text, nil, "", 15, 5, 16
+    @btn = Button.new(10, 560, @font, "Test", :btn, 0x008000, false, 15, 5) {}
+    @txt = TextField.new 10, 520, @font, :text, nil, 15, 5, 16, false, "", 0, 0x0000ff
   end
   
   def needs_cursor?
@@ -44,8 +44,8 @@ class MyGame < Gosu::Window
                            "Furthermore, the text must be right-aligned.",
                            780, 300, 300, :right
     
-    @btn.draw 0x008000, 0xcc
-    @txt.draw 0, 0x0000ff
+    @btn.draw 0xcc
+    @txt.draw
   end
 end
 

@@ -5,7 +5,8 @@ module AGL
 			@line_spacing = line_spacing
 		end
 	
-		def write_line text, x, y, mode = :left, color = 0xffffffff
+		def write_line text, x, y, mode = :left, color = 0, alpha = 0xff
+			color = (alpha << 24) | color
 			rel =
 				case mode
 				when :left then 0
@@ -16,7 +17,8 @@ module AGL
 			@font.draw_rel text, x, y, 0, rel, 0, 1, 1, color
 		end
 	
-		def write_breaking text, x, y, width, mode = :left, color = 0xffffffff
+		def write_breaking text, x, y, width, mode = :left, color = 0, alpha = 0xff
+			color = (alpha << 24) | color
 			text.split("\n").each do |p|
 				if mode == :justified
 					y = write_paragraph_justified p, x, y, width, color
@@ -33,6 +35,8 @@ module AGL
 			end
 		end
 	
+	private
+		
 		def write_paragraph text, x, y, width, rel, color
 			line = ""
 			line_width = 0

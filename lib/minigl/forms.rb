@@ -2,12 +2,13 @@ require_relative 'global'
 
 module AGL
 	class Button
-		def initialize x, y, font, text, img, center = true, margin_x = 0, margin_y = 0, &action
+		def initialize x, y, font, text, img, text_color = 0, center = true, margin_x = 0, margin_y = 0, &action
 			@x = x
 			@y = y
 			@font = font
 			@text = text
 			@img = Res.imgs img, 1, 3, true
+			@text_color = text_color
 			@w = @img[0].width
 			@h = @img[0].height
 			if center
@@ -62,9 +63,9 @@ module AGL
 			end
 		end
 		
-		def draw text_color = 0, alpha = 0xff
+		def draw alpha = 0xff
 			color = (alpha << 24) | 0xffffff
-			text_color = (alpha << 24) | text_color
+			text_color = (alpha << 24) | @text_color
 			@img[@img_index].draw @x, @y, 0, 1, 1, color
 			if @center
 				@font.draw_rel @text, @text_x, @text_y, 0, 0.5, 0.5, 1, 1, text_color
@@ -77,7 +78,8 @@ module AGL
 	class TextField
 		attr_reader :text
 		
-		def initialize x, y, font, img, cursor_img = nil, text = "", margin_x = 0, margin_y = 0, max_length = 100
+		def initialize x, y, font, img, cursor_img = nil, margin_x = 0, margin_y = 0, max_length = 100, active = false,
+		               text = "", text_color = 0, selection_color = 0
 			@x = x
 			@y = y
 			@font = font
@@ -85,14 +87,17 @@ module AGL
 			@w = @img.width
 			@h = @img.height
 			@cursor_img = Res.img(cursor_img) if cursor_img
+			@max_length = max_length
+			@active = active
 			@text = text
 			@text_x = x + margin_x
 			@text_y = y + margin_y
-			@max_length = max_length
+			@text_color = text_color
+			@selection_color = selection_color
 			
 			@nodes = [x + margin_x]
 			@cur_node = 0
-			@cursor_visible = true
+			@cursor_visible = false
 			@cursor_timer = 0
 			
 			@k = [
@@ -135,30 +140,48 @@ module AGL
 			@text[min..max]
 		end
 		
+		def focus
+			@active = true
+		end
+		
 		def update
 			################################ Mouse ################################
 			if Mouse.over? @x, @y, @w, @h
-				if Mouse.double_click? :left
+				if not @active and Mouse.button_pressed? :left
+					@active = true
+				end
+			elsif Mouse.button_pressed? :left
+				@anchor1 = @anchor2 = nil
+				@cursor_visible = false
+				@cursor_timer = 0
+				@active = false
+			end
+			
+			return unless @active
+			
+			if Mouse.double_click? :left
+				if @nodes.size > 1
 					@anchor1 = 0
 					@anchor2 = @nodes.size - 1
 					@cur_node = @anchor2
-					set_cursor_visible
-				elsif Mouse.button_pressed? :left
-					set_node_by_mouse
-					@anchor1 = @cur_node
-					@anchor2 = nil
-					set_cursor_visible
+					@double_clicked = true
 				end
-			end
-			if Mouse.button_down? :left
-				if @anchor1
+				set_cursor_visible
+			elsif Mouse.button_pressed? :left
+				set_node_by_mouse
+				@anchor1 = @cur_node
+				@anchor2 = nil
+				@double_clicked = false
+				set_cursor_visible
+			elsif Mouse.button_down? :left
+				if @anchor1 and not @double_clicked
 					set_node_by_mouse
 					if @cur_node != @anchor1; @anchor2 = @cur_node
 					else; @anchor2 = nil; end
 					set_cursor_visible
 				end
 			elsif Mouse.button_released? :left
-				if @anchor1
+				if @anchor1 and not @double_clicked
 					if @cur_node != @anchor1; @anchor2 = @cur_node
 					else; @anchor1 = nil; end
 				end
@@ -282,6 +305,35 @@ module AGL
 			end
 		end
 		
+		def draw alpha = 0xff
+			color = (alpha << 24) | 0xffffff
+			text_color = (alpha << 24) | @text_color
+			@img.draw @x, @y, 0, 1, 1, color
+			@font.draw @text, @text_x, @text_y, 0, 1, 1, text_color
+			
+			if @anchor1 and @anchor2
+				selection_color = ((alpha / 2) << 24) | @selection_color
+				Game.window.draw_quad @nodes[@anchor1], @text_y, selection_color,
+				                      @nodes[@anchor2] + 1, @text_y, selection_color,
+				                      @nodes[@anchor2] + 1, @text_y + @font.height, selection_color,
+				                      @nodes[@anchor1], @text_y + @font.height, selection_color, 0
+			end
+			
+			if @cursor_visible
+				if @cursor_img
+					@cursor_img.draw @nodes[@cur_node] - @cursor_img.width / 2, @text_y, 0
+				else
+					cursor_color = alpha << 24
+					Game.window.draw_quad @nodes[@cur_node], @text_y, cursor_color,
+					                      @nodes[@cur_node] + 1, @text_y, cursor_color,
+					                      @nodes[@cur_node] + 1, @text_y + @font.height, cursor_color,
+					                      @nodes[@cur_node], @text_y + @font.height, cursor_color, 0
+				end
+			end
+		end
+		
+	private
+		
 		def set_cursor_visible
 			@cursor_visible = true
 			@cursor_timer = 0
@@ -341,32 +393,6 @@ module AGL
 				@nodes[i] -= char_width
 			end
 			set_cursor_visible
-		end
-		
-		def draw text_color = 0, selection_color = 0, alpha = 0xff
-			color = (alpha << 24) | 0xffffff
-			text_color = (alpha << 24) | text_color
-			@img.draw @x, @y, 0, 1, 1, color
-			@font.draw @text, @text_x, @text_y, 0, 1, 1, text_color
-			
-			if @anchor1 and @anchor2
-				selection_color = ((alpha / 2) << 24) | selection_color
-				Game.window.draw_quad @nodes[@anchor1], @text_y, selection_color,
-				                      @nodes[@anchor2] + 1, @text_y, selection_color,
-				                      @nodes[@anchor2] + 1, @text_y + @font.height, selection_color,
-				                      @nodes[@anchor1], @text_y + @font.height, selection_color, 0
-			end
-			
-			if @cursor_visible
-				if @cursor_img; @cursor_img.draw @nodes[@cur_node] - @cursor_img.width / 2, @text_y, 0
-				else
-					cursor_color = (alpha << 24) | 0
-					Game.window.draw_quad @nodes[@cur_node], @text_y, cursor_color,
-					                      @nodes[@cur_node] + 1, @text_y, cursor_color,
-					                      @nodes[@cur_node] + 1, @text_y + @font.height, cursor_color,
-					                      @nodes[@cur_node], @text_y + @font.height, cursor_color, 0
-				end
-			end
 		end
 	end
 end

@@ -21,6 +21,8 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * The [documentation](https://github.com/victords/minigl/wiki) is under
 construction.
 
-**Version 1.2.3**
+**Version 1.2.4**
 
-  * Add drawing options to Sprite, GameObject, Button and TextField.
+  * Moved color options from `draw` to `initialize` in `Button` and `TextField`.
+  * Added focus control to `TextField`.
+  * Marked some methods of various classes as private.

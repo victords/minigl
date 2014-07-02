@@ -173,52 +173,6 @@ module AGL
 			end
 			check_contact obst, ramps
 		end
-		def check_contact obst, ramps
-			@top = @bottom = @left = @right = nil
-			obst.each do |o|
-				x2 = @x + @w; y2 = @y + @h; x2o = o.x + o.w; y2o = o.y + o.h
-				@right = o if !o.passable && x2.round(6) == o.x.round(6) && y2 > o.y && @y < y2o
-				@left = o if !o.passable && @x.round(6) == x2o.round(6) && y2 > o.y && @y < y2o
-				@bottom = o if y2.round(6) == o.y.round(6) && x2 > o.x && @x < x2o
-				@top = o if !o.passable && @y.round(6) == y2o.round(6) && x2 > o.x && @x < x2o
-			end		
-			if @bottom.nil?
-				ramps.each do |r|
-					if r.contact? self
-						@bottom = r
-						break
-					end
-				end
-			end
-		end
-		def find_right_limit coll_list
-			limit = @x + @w + @speed.x
-			coll_list.each do |c|
-				limit = c.x if !c.passable && c.x < limit
-			end
-			limit
-		end
-		def find_left_limit coll_list
-			limit = @x + @speed.x
-			coll_list.each do |c|
-				limit = c.x + c.w if !c.passable && c.x + c.w > limit
-			end
-			limit
-		end
-		def find_down_limit coll_list
-			limit = @y + @h + @speed.y
-			coll_list.each do |c|
-				limit = c.y if c.y < limit && c.y >= @y + @h
-			end
-			limit
-		end
-		def find_up_limit coll_list
-			limit = @y + @speed.y
-			coll_list.each do |c|
-				limit = c.y + c.h if !c.passable && c.y + c.h > limit
-			end
-			limit
-		end
 	
 		def move_carrying aim, speed, obstacles
 			x_d = aim.x - @x; y_d = aim.y - @y
@@ -285,6 +239,59 @@ module AGL
 				else; cur_point += 1; end
 			end
 			cur_point
+		end
+		
+	private
+		
+		def check_contact obst, ramps
+			@top = @bottom = @left = @right = nil
+			obst.each do |o|
+				x2 = @x + @w; y2 = @y + @h; x2o = o.x + o.w; y2o = o.y + o.h
+				@right = o if !o.passable && x2.round(6) == o.x.round(6) && y2 > o.y && @y < y2o
+				@left = o if !o.passable && @x.round(6) == x2o.round(6) && y2 > o.y && @y < y2o
+				@bottom = o if y2.round(6) == o.y.round(6) && x2 > o.x && @x < x2o
+				@top = o if !o.passable && @y.round(6) == y2o.round(6) && x2 > o.x && @x < x2o
+			end		
+			if @bottom.nil?
+				ramps.each do |r|
+					if r.contact? self
+						@bottom = r
+						break
+					end
+				end
+			end
+		end
+		
+		def find_right_limit coll_list
+			limit = @x + @w + @speed.x
+			coll_list.each do |c|
+				limit = c.x if !c.passable && c.x < limit
+			end
+			limit
+		end
+		
+		def find_left_limit coll_list
+			limit = @x + @speed.x
+			coll_list.each do |c|
+				limit = c.x + c.w if !c.passable && c.x + c.w > limit
+			end
+			limit
+		end
+		
+		def find_down_limit coll_list
+			limit = @y + @h + @speed.y
+			coll_list.each do |c|
+				limit = c.y if c.y < limit && c.y >= @y + @h
+			end
+			limit
+		end
+		
+		def find_up_limit coll_list
+			limit = @y + @speed.y
+			coll_list.each do |c|
+				limit = c.y + c.h if !c.passable && c.y + c.h > limit
+			end
+			limit
 		end
 	end
 end
