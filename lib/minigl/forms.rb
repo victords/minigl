@@ -2,15 +2,20 @@ require_relative 'global'
 
 module AGL
 	class Button
-		def initialize x, y, font, text, img, text_color = 0, center = true, margin_x = 0, margin_y = 0, &action
+		def initialize x, y, font, text, img, text_color = 0, center = true, margin_x = 0, margin_y = 0, width = nil, height = nil, &action
 			@x = x
 			@y = y
 			@font = font
 			@text = text
-			@img = Res.imgs img, 1, 3, true
-			@text_color = text_color
-			@w = @img[0].width
-			@h = @img[0].height
+			@img =
+				if img; Res.imgs img, 1, 3, true
+				else; nil; end
+			@w =
+				if img; @img[0].width
+				else; width; end
+			@h =
+				if img; @img[0].height
+				else; height; end
 			if center
 				@text_x = x + @w / 2
 				@text_y = y + @h / 2
@@ -18,6 +23,7 @@ module AGL
 				@text_x = x + margin_x
 				@text_y = y + margin_y
 			end
+			@text_color = text_color
 			@center = center
 			@action = Proc.new &action
 		
@@ -50,7 +56,7 @@ module AGL
 				elsif mouse_rel
 					@img_index = 0
 					@state = :up
-					@action.call
+					click
 				end
 			elsif @state == :down_out
 				if mouse_over
@@ -63,14 +69,20 @@ module AGL
 			end
 		end
 		
+		def click
+			@action.call
+		end
+		
 		def draw alpha = 0xff
 			color = (alpha << 24) | 0xffffff
 			text_color = (alpha << 24) | @text_color
-			@img[@img_index].draw @x, @y, 0, 1, 1, color
-			if @center
-				@font.draw_rel @text, @text_x, @text_y, 0, 0.5, 0.5, 1, 1, text_color
-			else
-				@font.draw @text, @text_x, @text_y, 0, 1, 1, text_color
+			@img[@img_index].draw @x, @y, 0, 1, 1, color if @img
+			if @text
+				if @center
+					@font.draw_rel @text, @text_x, @text_y, 0, 0.5, 0.5, 1, 1, text_color
+				else
+					@font.draw @text, @text_x, @text_y, 0, 1, 1, text_color
+				end
 			end
 		end
 	end
@@ -144,17 +156,21 @@ module AGL
 			@active = true
 		end
 		
+		def unfocus
+			@anchor1 = @anchor2 = nil
+			@cursor_visible = false
+			@cursor_timer = 0
+			@active = false
+		end
+		
 		def update
 			################################ Mouse ################################
 			if Mouse.over? @x, @y, @w, @h
 				if not @active and Mouse.button_pressed? :left
-					@active = true
+					focus
 				end
 			elsif Mouse.button_pressed? :left
-				@anchor1 = @anchor2 = nil
-				@cursor_visible = false
-				@cursor_timer = 0
-				@active = false
+				unfocus
 			end
 			
 			return unless @active
