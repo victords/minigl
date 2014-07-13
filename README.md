@@ -21,9 +21,8 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * The [documentation](https://github.com/victords/minigl/wiki) is under
 construction.
 
-**Version 1.2.5**
+**Version 1.2.6**
 
-  * Added support for "invisible" buttons (for associating actions with clicks
-in screen areas).
-  * Exposed `Button`'s `click` method and `TextField`'s `focus` and `unfocus`
-methods.
+  * Added support for character restriction in `TextField`.
+  * Added `set_position` method to `Button` and `TextField`.
+  * Added RDoc documentation.

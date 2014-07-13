@@ -1,7 +1,34 @@
 require_relative 'global'
 
 module AGL
+	# This class represents a button.
 	class Button
+		# Creates a button.
+		# Parameters:
+		# [x] The x-coordinate where the button will be drawn in the screen.
+		# [y] The y-coordinate where the button will be drawn in the screen.
+		# [font] The <code>Gosu::Font</code> object that will be used to draw the
+		#        button text.
+		# [text] The button text. Can be +nil+ or empty.
+		# [img] A spritesheet containing three images in a column, representing,
+		#       from top to bottom, the default state, the hover state (when the
+		#       mouse is over the button) and the pressed state (when the mouse
+		#       button is down and the cursor is over the button). If +nil+, the
+		#       +width+ and +height+ parameters must be provided.
+		# [text_color] Color of the button text, in hexadecimal RRGGBB format.
+		# [center] Whether the button text should be centered in its area (the
+		#          area is defined by the image size, when an image is given, or
+		#          by the +width+ and +height+ parameters, otherwise).
+		# [margin_x] The x offset, from the button x-coordinate, to draw the text.
+		#            This parameter is used only if +center+ is false.
+		# [margin_y] The y offset, from the button y-coordinate, to draw the text.
+		#            This parameter is used only if +center+ is false.
+		# [width] Width of the button clickable area. This parameter is used only
+		#         if +img+ is +nil+.
+		# [height] Height of the button clickable area. This parameter is used
+		#          only if +img+ is +nil+.
+		# [action] The block of code executed when the button is clicked (or by
+		#          calling the +click+ method).
 		def initialize x, y, font, text, img, text_color = 0, center = true, margin_x = 0, margin_y = 0, width = nil, height = nil, &action
 			@x = x
 			@y = y
@@ -73,6 +100,19 @@ module AGL
 			@action.call
 		end
 		
+		def set_position x, y
+			d_x = x - @x
+			d_y = y - @y
+			@x = x; @y = y
+			if @center
+				@text_x = x + @w / 2
+				@text_y = y + @h / 2
+			else
+				@text_x += d_x
+				@text_y += d_y
+			end
+		end
+		
 		def draw alpha = 0xff
 			color = (alpha << 24) | 0xffffff
 			text_color = (alpha << 24) | @text_color
@@ -90,8 +130,8 @@ module AGL
 	class TextField
 		attr_reader :text
 		
-		def initialize x, y, font, img, cursor_img = nil, margin_x = 0, margin_y = 0, max_length = 100, active = false,
-		               text = "", text_color = 0, selection_color = 0
+		def initialize x, y, font, img, cursor_img = nil, margin_x = 0, margin_y = 0, max_length = 100, active = false, text = "",
+		               allowed_chars = nil, text_color = 0, selection_color = 0
 			@x = x
 			@y = y
 			@font = font
@@ -128,39 +168,13 @@ module AGL
 				Gosu::KbBracketRight, Gosu::KbBackslash, Gosu::KbApostrophe,
 				Gosu::KbComma, Gosu::KbPeriod, Gosu::KbSlash
 			]
-			@chars = "abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ'-=/[]\\,.;\"_+?{}|<>:!@#$%6&*()"
-		end
-		
-		def text= value
-			@text = value[0...max_length]
-			@nodes.clear; @nodes << (@x + @margin_x)
-			x = @nodes[0]
-			for char in @text
-				x += @font.text_width char
-				@nodes << x
-			end
-			@cur_node = @nodes.size - 1
-			@anchor1 = nil
-			@anchor2 = nil
-			set_cursor_visible
-		end
-		
-		def selected_text
-			return "" if @anchor2.nil?
-			min = @anchor1 < @anchor2 ? @anchor1 : @anchor2
-			max = min == @anchor1 ? @anchor2 : @anchor1
-			@text[min..max]
-		end
-		
-		def focus
-			@active = true
-		end
-		
-		def unfocus
-			@anchor1 = @anchor2 = nil
-			@cursor_visible = false
-			@cursor_timer = 0
-			@active = false
+			@chars = "abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ'-=/[]\\,.;\"_+?{}|<>:!@#$%¨&*()"
+			@allowed_chars =
+				if allowed_chars
+					allowed_chars
+				else
+					@chars
+				end
 		end
 		
 		def update
@@ -321,6 +335,49 @@ module AGL
 			end
 		end
 		
+		def text= value
+			@text = value[0...max_length]
+			@nodes.clear; @nodes << (@x + @margin_x)
+			x = @nodes[0]
+			for char in @text
+				x += @font.text_width char
+				@nodes << x
+			end
+			@cur_node = @nodes.size - 1
+			@anchor1 = nil
+			@anchor2 = nil
+			set_cursor_visible
+		end
+		
+		def selected_text
+			return "" if @anchor2.nil?
+			min = @anchor1 < @anchor2 ? @anchor1 : @anchor2
+			max = min == @anchor1 ? @anchor2 : @anchor1
+			@text[min..max]
+		end
+		
+		def focus
+			@active = true
+		end
+		
+		def unfocus
+			@anchor1 = @anchor2 = nil
+			@cursor_visible = false
+			@cursor_timer = 0
+			@active = false
+		end
+		
+		def set_position x, y
+			d_x = x - @x
+			d_y = y - @y
+			@x = x; @y = y
+			@text_x += d_x
+			@text_y += d_y
+			@nodes.map! do |n|
+				n + d_x
+			end
+		end
+		
 		def draw alpha = 0xff
 			color = (alpha << 24) | 0xffffff
 			text_color = (alpha << 24) | @text_color
@@ -371,6 +428,7 @@ module AGL
 		end
 		
 		def insert_char char
+			return unless @allowed_chars.index char
 			if @text.length < @max_length
 				@text.insert @cur_node, char
 				@nodes.insert @cur_node + 1, @nodes[@cur_node] + @font.text_width(char)

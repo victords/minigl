@@ -11,8 +11,8 @@ class MyGame < Gosu::Window
     
     @font = Res.font :font1, 20
     @writer = TextHelper.new @font, 5
-    @btn = Button.new(10, 560, @font, "Test", :btn, 0x008000, false, 15, 5) {}
-    @txt = TextField.new 10, 520, @font, :text, nil, 15, 5, 16, false, "", 0, 0x0000ff
+    @btn = Button.new(10, 560, @font, "Test", :btn, 0x008000) {}
+    @txt = TextField.new 10, 520, @font, :text, nil, 15, 5, 16, false, "", nil, 0, 0x0000ff
   end
   
   def needs_cursor?
@@ -25,6 +25,8 @@ class MyGame < Gosu::Window
     @obj1.x += 1 if KB.key_down? Gosu::KbRight
     @obj1.y += 1 if KB.key_held? Gosu::KbDown
     @obj1.x -= 1 if KB.key_down? Gosu::KbLeft
+    @btn.set_position rand(700), rand(550) if KB.key_pressed? Gosu::KbSpace
+    @txt.set_position rand(700), rand(550) if KB.key_pressed? Gosu::KbReturn
     
     Mouse.update
     if Mouse.double_click? :left
