@@ -1,10 +1,34 @@
 require_relative 'movement'
 
 module AGL
+	# This class represents an (optionally animated) image inside the game screen.
 	class Sprite
+		# The index of the current sprite in the spritesheet being drawn.
 		attr_reader :img_index
-		attr_accessor :x, :y
 		
+		# The x-coordinate of the image in the screen.
+		attr_accessor :x
+		
+		# The y-coordinate of the image in the screen.
+		attr_accessor :y
+		
+		# Creates a new sprite.
+		# Parameters:
+		# [x] The x-coordinate where the sprite will be drawn in the screen.
+		# [y] The y-coordinate where the sprite will be drawn in the screen.
+		# [img] The path to a PNG image or spritesheet, following the MiniGL
+		#       convention: images must be inside a 'data/img' directory, relative
+		#       to the code file, and you must only provide the file name, without
+		#       extension, in this case. If the image is inside a subdirectory of
+		#       'data/img', you must prefix the file name with each subdirectory
+		#       name, followed by an underscore (so the file and directories names
+		#       must not contain underscores). For example, if your image is
+		#       'data/img/sprite/1.png', you must provide <code>"sprite_1"</code>
+		#       or +:sprite_1+.
+		# [sprite_cols] The number of columns in the spritesheet. Use +nil+ if the
+		#               image is not a spritesheet.
+		# [sprite_rows] The number of rows in the spritesheet. Use +nil+ if the
+		#               image is not a spritesheet.
 		def initialize x, y, img, sprite_cols = nil, sprite_rows = nil
 			@x = x; @y = y
 			@img =
@@ -18,6 +42,16 @@ module AGL
 			@index_index = 0
 		end
 		
+		# Performs time checking to update the image index according to the
+		# sequence of indices and the interval.
+		# Parameters:
+		# [indices] The sequence of image indices used in the animation. The
+		#           indices are determined from left to right, and from top to
+		#           bottom, inside the spritesheet. All indices must be in the
+		#           interval <code>0..(sprite_cols * sprite_rows)</code>.
+		# [interval] The amount of frames between each change in the image index.
+		#            A frame will usually represent 1/60 second (roughly 17
+		#            milliseconds).
 		def animate indices, interval
 			@anim_counter += 1
 			if @anim_counter >= interval

@@ -57,7 +57,9 @@ module AGL
 			@state = :up
 			@img_index = 0
 		end
-	
+		
+		# Updates the button, checking the mouse movement and buttons to define
+		# the button state.
 		def update
 			mouse_over = Mouse.over? @x, @y, @w, @h
 			mouse_press = Mouse.button_pressed? :left
@@ -96,10 +98,15 @@ module AGL
 			end
 		end
 		
+		# Executes the button click action.
 		def click
 			@action.call
 		end
 		
+		# Sets the position of the button in the screen.
+		# Parameters:
+		# [x] The new x-coordinate for the button.
+		# [y] The new y-coordinate for the button.
 		def set_position x, y
 			d_x = x - @x
 			d_y = y - @y
@@ -113,6 +120,10 @@ module AGL
 			end
 		end
 		
+		# Draws the button in the screen.
+		# Parameters:
+		# [alpha] The opacity with which the button will be drawn. Allowed values
+		#         vary between 0 (fully transparent) and 255 (fully opaque).
 		def draw alpha = 0xff
 			color = (alpha << 24) | 0xffffff
 			text_color = (alpha << 24) | @text_color
@@ -127,9 +138,40 @@ module AGL
 		end
 	end
 	
+	# This class represents a text field (input).
 	class TextField
+		# The current text inside the text field.
 		attr_reader :text
 		
+		# Creates a new text field.
+		# Parameters:
+		# [x] The x-coordinate where the text field will be drawn in the screen.
+		# [y] The y-coordinate where the text field will be drawn in the screen.
+		# [font] The <code>Gosu::Font</code> object that will be used to draw the
+		#        text inside the field.
+		# [img] The image of the text field. For a good result, you would likely
+		#       want something like a rectangle, horizontally wide, vertically
+		#       short, and with a color that contrasts with the +text_color+.
+		# [cursor_img] An image for the blinking cursor that stands in the point
+		#              where text will be inserted. If +nil+, a simple black line
+		#              will be drawn instead.
+		# [text_color] Color of the button text, in hexadecimal RRGGBB format.
+		# [margin_x] The x offset, from the field x-coordinate, to draw the text.
+		# [margin_y] The y offset, from the field y-coordinate, to draw the text.
+		# [max_length] The maximum length of the text inside the field.
+		# [active] Whether the text field must be focused by default. If +false+,
+		#          focus can be granted by clicking inside the text field or by
+		#          calling the +focus+ method.
+		# [text] The starting text. Must not be +nil+.
+		# [allowed_chars] A string containing all characters that can be typed
+		#                 inside the text field. The complete set of supported
+		#                 characters is given by the string
+		#                 <code>"abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ'-=/[]\\\\,.;\"_+?{}|<>:!@#$%¨&*()"</code>.
+		# [text_color] The color with which the text will be drawn, in hexadecimal
+		#              RRGGBB format.
+		# [selection_color] The color of the rectangle highlighting selected text,
+		#                   in hexadecimal RRGGBB format. The rectangle will
+		#                   always be drawn with 50% of opacity.
 		def initialize x, y, font, img, cursor_img = nil, margin_x = 0, margin_y = 0, max_length = 100, active = false, text = "",
 		               allowed_chars = nil, text_color = 0, selection_color = 0
 			@x = x
@@ -177,6 +219,7 @@ module AGL
 				end
 		end
 		
+		# Updates the text field, checking for mouse events and keyboard input.
 		def update
 			################################ Mouse ################################
 			if Mouse.over? @x, @y, @w, @h
@@ -335,6 +378,11 @@ module AGL
 			end
 		end
 		
+		# Sets the text of the text field to the specified value.
+		# Parameters:
+		# [value] The new text to be set. If it's longer than the +max_length+
+		#         parameter used in the constructor, it will be truncated to
+		#         +max_length+ characters.
 		def text= value
 			@text = value[0...max_length]
 			@nodes.clear; @nodes << (@x + @margin_x)
@@ -349,6 +397,7 @@ module AGL
 			set_cursor_visible
 		end
 		
+		# Returns the currently selected text.
 		def selected_text
 			return "" if @anchor2.nil?
 			min = @anchor1 < @anchor2 ? @anchor1 : @anchor2
@@ -356,10 +405,13 @@ module AGL
 			@text[min..max]
 		end
 		
+		# Grants focus to the text field, so that it allows keyboard input.
 		def focus
 			@active = true
 		end
 		
+		# Removes focus from the text field, so that no keyboard input will be
+		# accepted.
 		def unfocus
 			@anchor1 = @anchor2 = nil
 			@cursor_visible = false
@@ -367,6 +419,10 @@ module AGL
 			@active = false
 		end
 		
+		# Sets the position of the text field in the screen.
+		# Parameters:
+		# [x] The new x-coordinate for the text field.
+		# [y] The new y-coordinate for the text field.
 		def set_position x, y
 			d_x = x - @x
 			d_y = y - @y
@@ -378,6 +434,10 @@ module AGL
 			end
 		end
 		
+		# Draws the text field in the screen.
+		# Parameters:
+		# [alpha] The opacity with which the text field will be drawn. Allowed
+		#         values vary between 0 (fully transparent) and 255 (fully opaque).
 		def draw alpha = 0xff
 			color = (alpha << 24) | 0xffffff
 			text_color = (alpha << 24) | @text_color
