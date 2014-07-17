@@ -62,6 +62,22 @@ module AGL
 			end
 		end
 		
+		# Draws the sprite in the screen
+		# Parameters:
+		# [map] A Map object, relative to which the sprite will be drawn (the x
+		#       and y coordinates of the sprite will be changed according to the
+		#       position of the camera).
+		# [scale_x] A scale factor to be applied horizontally to the image.
+		# [scale_y] A scale factor to be applied vertically to the image.
+		# [alpha] The opacity with which the image will be drawn. Valid values
+		#         vary from 0 (fully transparent) to 255 (fully opaque).
+		# [color] A color filter to apply to the image. A white (0xffffff) filter
+		#         will keep all colors unchanged, while a black (0x000000) filter
+		#         will turn all colors to black. A red (0xff0000) filter will keep
+		#         reddish colors with slight or no change, whereas bluish colors
+		#         will be darkened, for example.
+		# [angle] A rotation, in degrees, to be applied to the image, relative to
+		#         its center.
 		def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil
 			color = (alpha << 24) | color
 			if map
@@ -77,10 +93,29 @@ module AGL
 			end
 		end
 	end
-
+	
+	# This class represents an object with a set of properties and methods
+	# commonly used in games. It defines an object with a rectangular bounding
+	# box, and having all the attributes required for using the Movement module.
 	class GameObject < Sprite
 		include Movement
 		
+		# Creates a new game object.
+		# Parameters:
+		# [x] The x-coordinate of the object's bounding box.
+		# [y] The y-coordinate of the object's bounding box.
+		# [w] The width of the object's bounding box.
+		# [h] The height of the object's bounding box.
+		# [img] The image or spritesheet for the object.
+		# [img_gap] A Vector object representing the difference between the top
+		#           left corner of the bounding box and the coordinates of the
+		#           image. For example, an object with <code>x = 100</code>,
+		#           <code>y = 50</code> and <code>img_gap = Vector.new(-5, -5)</code>
+		#           will be drawn at position (95, 45) of the screen.
+		# [sprite_cols] The number of columns in the spritesheet. Use +nil+ if the
+		#               image is not a spritesheet.
+		# [sprite_rows] The number of rows in the spritesheet. Use +nil+ if the
+		#               image is not a spritesheet.
 		def initialize x, y, w, h, img, img_gap = nil, sprite_cols = nil, sprite_rows = nil
 			super x, y, img, sprite_cols, sprite_rows
 			@w = w; @h = h
@@ -96,17 +131,37 @@ module AGL
 			@stored_forces = Vector.new 0, 0
 		end
 		
+		# Resets the animation timer and immediately changes the image index to
+		# the specified value.
+		# Parameters:
+		# [index] The image index to be set.
 		def set_animation index
 			@anim_counter = 0
 			@img_index = index
 			@index_index = 0
 		end
 		
-		def is_visible map
+		def is_visible map # :nodoc:
 			return map.cam.intersects @active_bounds if @active_bounds
 			false
 		end
 		
+		# Draws the game object in the screen.
+		# Parameters:
+		# [map] A Map object, relative to which the object will be drawn (the x
+		#       and y coordinates of the image will be changed according to the
+		#       position of the camera).
+		# [scale_x] A scale factor to be applied horizontally to the image.
+		# [scale_y] A scale factor to be applied vertically to the image.
+		# [alpha] The opacity with which the image will be drawn. Valid values
+		#         vary from 0 (fully transparent) to 255 (fully opaque).
+		# [color] A color filter to apply to the image. A white (0xffffff) filter
+		#         will keep all colors unchanged, while a black (0x000000) filter
+		#         will turn all colors to black. A red (0xff0000) filter will keep
+		#         reddish colors with slight or no change, whereas bluish colors
+		#         will be darkened, for example.
+		# [angle] A rotation, in degrees, to be applied to the image, relative to
+		#         its center.
 		def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil
 			color = (alpha << 24) | color
 			if map
@@ -125,6 +180,7 @@ module AGL
 		end
 	end
 	
+	# :nodoc: all
 	class Effect < Sprite
 		def initialize x, y, life_time, img, sprite_cols = nil, sprite_rows = nil, indices = nil, interval = 1
 			super x, y, img, sprite_cols, sprite_rows
