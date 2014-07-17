@@ -45,9 +45,9 @@ module AGL
 		# Initializes a MiniGL game. This method must be called before any feature
 		# provided by the library can be used.
 		# Parameters:
-		# [window] An instance of a class which inherits <code>Gosu::Window</code>.
-		#          this will be the game window, used to draw everything and
-		#          capture user input.
+		# [window] An instance of a class which inherits from
+		#          <code>Gosu::Window</code>. This will be the game window, used
+		#          to draw everything and capture user input.
 		# [gravity] A Vector object representing the horizontal and vertical
 		#           components of the force of gravity. Essentially, this force
 		#           will be applied to every object which calls +move+, from the
@@ -289,7 +289,20 @@ module AGL
 		end
 	end
 	
+	# This class is responsible for resource management. It keeps references to
+	# all loaded resources until a call to +clear+ is made. Resources can be
+	# loaded as global, so that their references won't be removed even when
+	# +clear+ is called.
+	#
+	# It also provides an easier syntax for loading resources, assuming a
+	# particular folder structure. All resources must be inside subdirectories
+	# of a 'data' directory, so that you will only need to specify the type of
+	# resource being loaded and the file name (either as string or as symbol).
+	# There are default extensions for each type of resource, so the extension
+	# must be specified only if the file is in a format other than the default.
 	class Res
+		# This is called by <code>Game.initialize</code>. Don't call it
+		# explicitly.
 		def self.initialize
 			@@imgs = Hash.new
 			@@global_imgs = Hash.new
@@ -297,10 +310,28 @@ module AGL
 			@@global_tilesets = Hash.new
 			@@sounds = Hash.new
 			@@global_sounds = Hash.new
+			@@songs = Hash.new
+			@@global_songs = Hash.new
 			@@fonts = Hash.new
 			@@global_fonts = Hash.new
 		end
 		
+		# Returns a <code>Gosu::Image</code> object.
+		# Parameters:
+		# [id] A string or symbol representing the path to the image. If the file
+		#      is inside 'data/img', only the file name is needed. If it's inside
+		#      a subdirectory, the id must be prefixed by each subdirectory name
+		#      followed by an underscore. Example: to load
+		#      'data/img/sprite/1.png', provide +:sprite_1+ or "sprite_1".
+		# [global] Set to true if you want to keep the image in memory until the
+		#          game execution is finished. If false, the image will be
+		#          released when you call +clear+.
+		# [tileable] Whether the image should be loaded in tileable mode, which is
+		#            proper for images that will be used as a tile, i.e., that
+		#            will be drawn repeated times, side by side, forming a
+		#            continuous composition.
+		# [ext] The extension of the file being loaded. Specify only if it is
+		#       other than ".png".
 		def self.img id, global = false, tileable = false, ext = ".png"
 			if global; a = @@global_imgs; else; a = @@imgs; end
 			return a[id] if a[id]
@@ -309,6 +340,20 @@ module AGL
 			a[id] = img
 		end
 		
+		# Returns an array of <code>Gosu::Image</code> objects, using the image as
+		# a spritesheet. The image with index 0 will be the top left sprite, and
+		# the following indices raise first from left to right and then from top
+		# to bottom.
+		# Parameters:
+		# [id] A string or symbol representing the path to the image. See +img+
+		#      for details.
+		# [sprite_cols] Number of columns in the spritesheet.
+		# [sprite_rows] Number of rows in the spritesheet.
+		# [global] Set to true if you want to keep the image in memory until the
+		#          game execution is finished. If false, the image will be
+		#          released when you call +clear+.
+		# [ext] The extension of the file being loaded. Specify only if it is
+		#       other than ".png".
 		def self.imgs id, sprite_cols, sprite_rows, global = false, ext = ".png"
 			if global; a = @@global_imgs; else; a = @@imgs; end
 			return a[id] if a[id]
@@ -317,6 +362,21 @@ module AGL
 			a[id] = imgs
 		end
 		
+		# Returns an array of <code>Gosu::Image</code> objects, using the image as
+		# a tileset. Works the same as +imgs+, except you must provide the tile
+		# size instead of the number of columns and rows, and that the images will
+		# be loaded as tileable.
+		# Parameters:
+		# [id] A string or symbol representing the path to the image. It must be
+		#      specified the same way as in +img+, but the base directory is
+		#      'data/tileset'.
+		# [tile_width] Width of each tile, in pixels.
+		# [tile_height] Height of each tile, in pixels.
+		# [global] Set to true if you want to keep the image in memory until the
+		#          game execution is finished. If false, the image will be
+		#          released when you call +clear+.
+		# [ext] The extension of the file being loaded. Specify only if it is
+		#       other than ".png".
 		def self.tileset id, tile_width = 32, tile_height = 32, global = false, ext = ".png"
 			if global; a = @@global_tilesets; else; a = @@tilesets; end
 			return a[id] if a[id]
@@ -325,6 +385,17 @@ module AGL
 			a[id] = tileset
 		end
 		
+		# Returns a <code>Gosu::Sample</code> object. This should be used for
+		# simple and short sound effects.
+		# Parameters:
+		# [id] A string or symbol representing the path to the sound. It must be
+		#      specified the same way as in +img+, but the base directory is
+		#      'data/sound'.
+		# [global] Set to true if you want to keep the sound in memory until the
+		#          game execution is finished. If false, the sound will be
+		#          released when you call +clear+.
+		# [ext] The extension of the file being loaded. Specify only if it is
+		#       other than ".wav".
 		def self.sound id, global = false, ext = ".wav"
 			if global; a = @@global_sounds; else; a = @@sounds; end
 			return a[id] if a[id]
@@ -333,14 +404,39 @@ module AGL
 			a[id] = sound
 		end
 		
+		# Returns a <code>Gosu::Song</code> object. This should be used for the
+		# background musics of your game.
+		# Parameters:
+		# [id] A string or symbol representing the path to the song. It must be
+		#      specified the same way as in +img+, but the base directory is
+		#      'data/song'.
+		# [global] Set to true if you want to keep the song in memory until the
+		#          game execution is finished. If false, the song will be released
+		#          when you call +clear+.
+		# [ext] The extension of the file being loaded. Specify only if it is
+		#       other than ".ogg".
 		def self.song id, global = false, ext = ".ogg"
-			if global; a = @@global_sounds; else; a = @@sounds; end
+			if global; a = @@global_songs; else; a = @@songs; end
 			return a[id] if a[id]
 			s = "data/song/" + id.to_s.split('_').join('/') + ext
 			song = Gosu::Song.new Game.window, s
 			a[id] = song
 		end
 		
+		# Returns a <code>Gosu::Font</code> object. Fonts are needed to draw text
+		# and used by MiniGL elements like buttons, text fields and TextHelper
+		# objects.
+		# Parameters:
+		# [id] A string or symbol representing the path to the song. It must be
+		#      specified the same way as in +img+, but the base directory is
+		#      'data/font'.
+		# [size] The size of the font, in pixels. This will correspond,
+		#        approximately, to the height of the tallest character when drawn.
+		# [global] Set to true if you want to keep the font in memory until the
+		#          game execution is finished. If false, the font will be released
+		#          when you call +clear+.
+		# [ext] The extension of the file being loaded. Specify only if it is
+		#       other than ".ttf".
 		def self.font id, size, global = true, ext = ".ttf"
 			if global; a = @@global_fonts; else; a = @@fonts; end
 			id_size = "#{id}_#{size}"
@@ -350,14 +446,12 @@ module AGL
 			a[id_size] = font
 		end
 		
-#		def self.text id
-#			G.texts[G.lang][id.to_sym]
-#		end
-		
+		# Releases the memory used by all non-global resources.
 		def self.clear
 			@@imgs.clear
 			@@tilesets.clear
 			@@sounds.clear
+			@@songs.clear
 			@@fonts.clear
 		end
 	end

@@ -1,10 +1,32 @@
 module AGL
+	# This class provides methods for easily drawing one or multiple lines of
+	# text, with control over the text alignment and coloring.
 	class TextHelper
+		# Creates a TextHelper.
+		# Parameters:
+		# [font] A <code>Gosu::Font</code> that will be used to draw the text.
+		# [line_spacing] When drawing multiple lines, the distance, in pixels,
+		#                between each line.
 		def initialize font, line_spacing = 0
 			@font = font
 			@line_spacing = line_spacing
 		end
-	
+		
+		# Draws a single line of text.
+		# Parameters:
+		# [text] The text to be drawn. No line breaks are allowed.
+		# [x] The horizontal reference for drawing the text. If +mode+ is +:left+,
+		#     all text will be drawn from this point to the right; if +mode+ is
+		#     +:right+, all text will be drawn from this point to the left; and if
+		#     +mode+ is +:center+, the text will be equally distributed to the
+		#     left and to the right of this point.
+		# [y] The vertical reference for drawing the text. All text will be drawn
+		#     from this point down.
+		# [mode] The alignment of the text. Valid values are +:left+, +:right+ and
+		#        +:center+.
+		# [color] The color of the text, in hexadecimal RRGGBB format.
+		# [alpha] The opacity of the text. Valid values vary from 0 (fully
+		#         transparent) to 255 (fully opaque).
 		def write_line text, x, y, mode = :left, color = 0, alpha = 0xff
 			color = (alpha << 24) | color
 			rel =
@@ -16,7 +38,23 @@ module AGL
 				end
 			@font.draw_rel text, x, y, 0, rel, 0, 1, 1, color
 		end
-	
+		
+		# Draws text, breaking lines when needed and when explicitly caused by the
+		# "\n" character.
+		# Parameters:
+		# [text] The text to be drawn. Line breaks are allowed.
+		# [x] The horizontal reference for drawing the text. Works like in
+		#     +write_line+ for the +:left+, +:right+ and +:center+ modes. For the
+		#     +:justified+ mode, works the same as for +:left+.
+		# [y] The vertical reference for drawing the text. All text will be drawn
+		#     from this point down.
+		# [width] The maximum width for the lines of text. Line is broken when
+		#         this width is exceeded.
+		# [mode] The alignment of the text. Valid values are +:left+, +:right+,
+		#        +:center+ and +:justified+.
+		# [color] The color of the text, in hexadecimal RRGGBB format.
+		# [alpha] The opacity of the text. Valid values vary from 0 (fully
+		#         transparent) to 255 (fully opaque).
 		def write_breaking text, x, y, width, mode = :left, color = 0, alpha = 0xff
 			color = (alpha << 24) | color
 			text.split("\n").each do |p|

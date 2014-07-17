@@ -1,9 +1,28 @@
 require_relative 'global'
 
 module AGL
+	# This class provides easy control of a tile map, i.e., a map consisting of
+	# a grid of equally sized tiles. It also provides viewport control, through
+	# its camera property and methods.
 	class Map
-		attr_reader :tile_size, :size, :cam
+		# A Vector where x is the tile width and y is the tile height.
+		attr_reader :tile_size
 		
+		# A Vector where x is the horizontal tile count and y the vertical count.
+		attr_reader :size
+		
+		# A Rectangle representing the region of the map that is currently
+		# visible.
+		attr_reader :cam
+		
+		# Creates a new map.
+		# Parameters:
+		# [t_w] The width of the tiles.
+		# [t_h] The height of the tiles.
+		# [t_x_count] The horizontal count of tiles in the map.
+		# [t_y_count] The vertical count of tiles in the map.
+		# [scr_w] Width of the viewport for the map.
+		# [scr_h] Height of the viewport for the map.
 		def initialize t_w, t_h, t_x_count, t_y_count, scr_w = 800, scr_h = 600
 			@tile_size = Vector.new t_w, t_h
 			@size = Vector.new t_x_count, t_y_count
@@ -12,38 +31,79 @@ module AGL
 			@max_y = t_y_count * t_h - scr_h
 		end
 		
+		# Returns a Vector with the total size of the map, in pixels (x for the
+		# width and y for the height).
 		def get_absolute_size
 			Vector.new(@tile_size.x * @size.x, @tile_size.y * @size.y)
 		end
 		
+		# Returns a Vector with the coordinates of the center of the map.
 		def get_center
 			Vector.new(@tile_size.x * @size.x / 2, @tile_size.y * @size.y / 2)
 		end
 		
+		# Returns the position in the screen corresponding to the given tile
+		# indices.
+		# Parameters:
+		# [map_x] The index of the tile in the horizontal direction. It must be in
+		#         the interval <code>0..t_x_count</code>.
+		# [map_y] The index of the tile in the vertical direction. It must be in
+		#         the interval <code>0..t_y_count</code>.
 		def get_screen_pos map_x, map_y
 			Vector.new(map_x * @tile_size.x - @cam.x, map_y * @tile_size.y - @cam.y)
 		end
 		
+		# Returns the tile in the map that corresponds to the given position in
+		# the screen, as a Vector, where x is the horizontal index and y the
+		# vertical index.
+		# Parameters:
+		# [scr_x] The x-coordinate in the screen.
+		# [scr_y] The y-coordinate in the screen.
 		def get_map_pos scr_x, scr_y
 			Vector.new((scr_x + @cam.x) / @tile_size.x, (scr_y + @cam.y) / @tile_size.y)
 		end
 		
+		# Verifies whether a tile is inside the map.
+		# Parameters:
+		# [v] A Vector representing the tile, with x as the horizontal index and
+		#     y as the vertical index.
 		def is_in_map v
 			v.x >= 0 && v.y >= 0 && v.x < @size.x && v.y < @size.y
 		end
 		
+		# Sets the top left corner of the viewport to the given position of the
+		# map. Note that this is not the position in the screen.
+		# Parameters:
+		# [cam_x] The x-coordinate inside the map, in pixels (not a tile index).
+		# [cam_y] The y-coordinate inside the map, in pixels (not a tile index).
 		def set_camera cam_x, cam_y
 			@cam.x = cam_x
 			@cam.y = cam_y
 			set_bounds
 		end
 		
+		# Moves the viewport by the given amount of pixels.
+		# Parameters:
+		# [x] The amount of pixels to move horizontally. Negative values will
+		#     cause the camera to move to the left.
+		# [y] The amount of pixels to move vertically. Negative values will cause
+		#     the camera to move up.
 		def move_camera x, y
 			@cam.x += x
 			@cam.y += y
 			set_bounds
 		end
 		
+		# Iterates through the currently visible tiles, providing the horizontal
+		# tile index, the vertical tile index, the x-coordinate (in pixels) and
+		# the y-coordinate (in pixels), of each tile, in that order, to a given
+		# block of code.
+		#
+		# Example:
+		#
+		#   map.foreach do |i, j, x, y|
+		#     draw_tile tiles[i][j], x, y
+		#   end
 		def foreach
 			for j in @min_vis_y..@max_vis_y
 				for i in @min_vis_x..@max_vis_x
