@@ -18,8 +18,9 @@ Please note:
   * The test package is not complete! Most of the functionality
 provided by the gem is difficult to test automatically, but you can check out
 this [working game example](https://github.com/victords/aventura-do-saber).
-  * The [documentation](https://github.com/victords/minigl/wiki) is under
-construction.
+  * The RDoc documentation is now available.
+  * An auxiliary, tutorial-like documentation is under construction
+[here](https://github.com/victords/minigl/wiki).
 
 **Version 1.2.6**
 
