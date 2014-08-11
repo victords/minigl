@@ -4,6 +4,7 @@ module AGL
 	# This class represents a button.
 	class Button
 		# Creates a button.
+		# 
 		# Parameters:
 		# [x] The x-coordinate where the button will be drawn in the screen.
 		# [y] The y-coordinate where the button will be drawn in the screen.
@@ -52,7 +53,7 @@ module AGL
 			end
 			@text_color = text_color
 			@center = center
-			@action = Proc.new &action
+			@action = action
 		
 			@state = :up
 			@img_index = 0
@@ -104,6 +105,7 @@ module AGL
 		end
 		
 		# Sets the position of the button in the screen.
+		# 
 		# Parameters:
 		# [x] The new x-coordinate for the button.
 		# [y] The new y-coordinate for the button.
@@ -121,6 +123,7 @@ module AGL
 		end
 		
 		# Draws the button in the screen.
+		# 
 		# Parameters:
 		# [alpha] The opacity with which the button will be drawn. Allowed values
 		#         vary between 0 (fully transparent) and 255 (fully opaque).
@@ -144,6 +147,7 @@ module AGL
 		attr_reader :text
 		
 		# Creates a new text field.
+		# 
 		# Parameters:
 		# [x] The x-coordinate where the text field will be drawn in the screen.
 		# [y] The y-coordinate where the text field will be drawn in the screen.
@@ -379,6 +383,7 @@ module AGL
 		end
 		
 		# Sets the text of the text field to the specified value.
+		# 
 		# Parameters:
 		# [value] The new text to be set. If it's longer than the +max_length+
 		#         parameter used in the constructor, it will be truncated to
@@ -420,6 +425,7 @@ module AGL
 		end
 		
 		# Sets the position of the text field in the screen.
+		# 
 		# Parameters:
 		# [x] The new x-coordinate for the text field.
 		# [y] The new y-coordinate for the text field.
@@ -435,6 +441,7 @@ module AGL
 		end
 		
 		# Draws the text field in the screen.
+		# 
 		# Parameters:
 		# [alpha] The opacity with which the text field will be drawn. Allowed
 		#         values vary between 0 (fully transparent) and 255 (fully opaque).

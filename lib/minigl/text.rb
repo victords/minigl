@@ -3,6 +3,7 @@ module AGL
 	# text, with control over the text alignment and coloring.
 	class TextHelper
 		# Creates a TextHelper.
+		# 
 		# Parameters:
 		# [font] A <code>Gosu::Font</code> that will be used to draw the text.
 		# [line_spacing] When drawing multiple lines, the distance, in pixels,
@@ -13,6 +14,7 @@ module AGL
 		end
 		
 		# Draws a single line of text.
+		# 
 		# Parameters:
 		# [text] The text to be drawn. No line breaks are allowed.
 		# [x] The horizontal reference for drawing the text. If +mode+ is +:left+,
@@ -41,6 +43,7 @@ module AGL
 		
 		# Draws text, breaking lines when needed and when explicitly caused by the
 		# "\n" character.
+		# 
 		# Parameters:
 		# [text] The text to be drawn. Line breaks are allowed.
 		# [x] The horizontal reference for drawing the text. Works like in

@@ -13,9 +13,12 @@ module AGL
 		attr_accessor :y
 		
 		# Creates a new sprite.
+		# 
 		# Parameters:
-		# [x] The x-coordinate where the sprite will be drawn in the screen.
-		# [y] The y-coordinate where the sprite will be drawn in the screen.
+		# [x] The x-coordinate in the screen (or map) where the sprite will be
+		#     drawn. This can be modified later via the +x+ attribute.
+		# [y] The y-coordinate in the screen (or map) where the sprite will be
+		#     drawn. This can be modified later via the +y+ attribute.
 		# [img] The path to a PNG image or spritesheet, following the MiniGL
 		#       convention: images must be inside a 'data/img' directory, relative
 		#       to the code file, and you must only provide the file name, without
@@ -44,6 +47,7 @@ module AGL
 		
 		# Performs time checking to update the image index according to the
 		# sequence of indices and the interval.
+		# 
 		# Parameters:
 		# [indices] The sequence of image indices used in the animation. The
 		#           indices are determined from left to right, and from top to
@@ -63,6 +67,7 @@ module AGL
 		end
 		
 		# Draws the sprite in the screen
+		# 
 		# Parameters:
 		# [map] A Map object, relative to which the sprite will be drawn (the x
 		#       and y coordinates of the sprite will be changed according to the
@@ -101,9 +106,12 @@ module AGL
 		include Movement
 		
 		# Creates a new game object.
+		# 
 		# Parameters:
-		# [x] The x-coordinate of the object's bounding box.
-		# [y] The y-coordinate of the object's bounding box.
+		# [x] The x-coordinate of the object's bounding box. This can be modified
+		#     later via the +x+ attribute.
+		# [y] The y-coordinate of the object's bounding box. This can be modified
+		#     later via the +y+ attribute.
 		# [w] The width of the object's bounding box.
 		# [h] The height of the object's bounding box.
 		# [img] The image or spritesheet for the object.
@@ -133,6 +141,7 @@ module AGL
 		
 		# Resets the animation timer and immediately changes the image index to
 		# the specified value.
+		# 
 		# Parameters:
 		# [index] The image index to be set.
 		def set_animation index
@@ -147,6 +156,7 @@ module AGL
 		end
 		
 		# Draws the game object in the screen.
+		# 
 		# Parameters:
 		# [map] A Map object, relative to which the object will be drawn (the x
 		#       and y coordinates of the image will be changed according to the
@@ -180,11 +190,38 @@ module AGL
 		end
 	end
 	
-	# :nodoc: all
+	# Represents a visual effect, i.e., a graphic - usually animated - that shows
+	# up in the screen, lasts for a given time and "disappears". You should
+	# explicitly dispose of references to effects whose attribute +dead+ is set
+	# to +true+.
 	class Effect < Sprite
-		def initialize x, y, life_time, img, sprite_cols = nil, sprite_rows = nil, indices = nil, interval = 1
+		# This is +true+ when the effect's lifetime has already passed.
+		attr_reader :dead
+		
+		# Creates a new Effect.
+		#
+		# Parameters:
+		# [x] The x-coordinate in the screen (or map) where the effect will be
+		#     drawn. This can be modified later via the +x+ attribute.
+		# [y] The y-coordinate in the screen (or map) where the effect will be
+		#     drawn. This can be modified later via the +y+ attribute.
+		# [img] The image or spritesheet to use for this effect (see Sprite for
+		#       details on spritesheets).
+		# [sprite_cols] (see Sprite)
+		# [sprite_rows] (see Sprite)
+		# [interval] The interval between steps of the animation, in updates.
+		# [indices] The indices to use in the animation. See Sprite#animate for
+		#           details. If +nil+, it will be the sequence from 0 to
+		#           <code>sprite_cols * sprite_rows - 1</code>.
+		# [lifetime] The lifetime of the effect, in updates. After +update+ is
+		#            called this number of times, the effect will no longer
+		#            be visible, even when +draw+ is called, and the +dead+ flag
+		#            will be set to +true+, so you get to know when to dispose
+		#            of the Effect object. If +nil+, it will be set to
+		#            <code>@indices.length * interval</code>, i.e., the exact time
+		#            needed for one animation cycle to complete.
+		def initialize x, y, img, sprite_cols = nil, sprite_rows = nil, interval = 10, indices = nil, lifetime = nil
 			super x, y, img, sprite_cols, sprite_rows
-			@life_time = life_time
 			@timer = 0
 			if indices
 				@indices = indices
@@ -192,14 +229,24 @@ module AGL
 				@indices = *(0..(@img.length - 1))
 			end
 			@interval = interval
+			if lifetime
+				@lifetime = lifetime
+			else
+				@lifetime = @indices.length * interval
+			end
 		end
 		
+		# Updates the effect, animating and counting its remaining lifetime.
 		def update
-			animate @indices, @interval
-			@timer += 1
-			if @timer == @life_time
-				@dead = true
+			unless @dead
+				animate @indices, @interval
+				@timer += 1
+				@dead = true if @timer == @lifetime
 			end
+		end
+		
+		def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil
+			super unless @dead
 		end
 	end
 end

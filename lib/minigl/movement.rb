@@ -22,6 +22,7 @@ module AGL
 		attr_reader :passable
 		
 		# Creates a new block.
+		# 
 		# Parameters:
 		# [x] The x-coordinate of the top left corner of the bounding box.
 		# [y] The y-coordinate of the top left corner of the bounding box.
@@ -48,6 +49,7 @@ module AGL
 	# to the +ramps+ array parameter of the +move+ method.
 	class Ramp
 		# Creates a new ramp.
+		# 
 		# Parameters:
 		# [x] The x-coordinate of the top left corner of a rectangle that
 		#     completely (and precisely) encloses the ramp (thought of as a right
@@ -71,6 +73,7 @@ module AGL
 		end
 		
 		# Checks if an object is in contact with this ramp (standing over it).
+		# 
 		# Parameters:
 		# [obj] The object to check contact with. It must have the +x+, +y+, +w+
 		#       and +h+ accessible attributes determining its bounding box.
@@ -80,6 +83,7 @@ module AGL
 		
 		# Checks if an object is intersecting this ramp (inside the corresponding
 		# right triangle and at the floor level or above).
+		# 
 		# Parameters:
 		# [obj] The object to check intersection with. It must have the +x+, +y+,
 		#       +w+ and +h+ accessible attributes determining its bounding box.
@@ -176,6 +180,7 @@ module AGL
 		
 		# Moves this object, based on the forces being applied to it, and
 		# performing collision checking.
+		# 
 		# Parameters:
 		# [forces] A Vector where x is the horizontal component of the resulting
 		#          force and y is the vertical component.
@@ -285,6 +290,7 @@ module AGL
 		
 		# Moves this object as an elevator (i.e., potentially carrying other
 		# objects) towards a given point.
+		# 
 		# Parameters:
 		# [aim] A Vector specifying where the object will move to.
 		# [speed] The constant speed at which the object will move. This must be
@@ -328,6 +334,7 @@ module AGL
 		
 		# Moves this object, without performing any collision checking, towards
 		# the specified point.
+		# 
 		# Parameters:
 		# [aim] A Vector specifying where the object will move to.
 		# [speed] The constant speed at which the object will move. This must be
@@ -357,6 +364,7 @@ module AGL
 		# method must be called repeatedly, and it returns the value that must be
 		# provided to +cur_point+ after the first call). If obstacles are
 		# provided, it will behave as an elevator (as in +move_carrying+).
+		# 
 		# Parameters:
 		# [points] An array of Vectors representing the path that the object will
 		#          perform.

@@ -22,6 +22,7 @@ module AGL
 		attr_accessor :h
 		
 		# Creates a new rectangle.
+		# 
 		# Parameters:
 		# [x] The x-coordinate of the rectangle.
 		# [y] The y-coordinate of the rectangle.
@@ -32,6 +33,7 @@ module AGL
 		end
 		
 		# Returns whether this rectangle intersects another.
+		# 
 		# Parameters:
 		# [r] The rectangle to check intersection with.
 		def intersects r
@@ -44,6 +46,7 @@ module AGL
 	class Game
 		# Initializes a MiniGL game. This method must be called before any feature
 		# provided by the library can be used.
+		# 
 		# Parameters:
 		# [window] An instance of a class which inherits from
 		#          <code>Gosu::Window</code>. This will be the game window, used
@@ -154,6 +157,7 @@ module AGL
 		
 		# Returns whether the given key is down in the current frame and was not
 		# down in the frame before.
+		# 
 		# Parameters:
 		# [key] Code of the key to be checked. The available codes are <code>
 		#       Gosu::KbUp, Gosu::KbDown, Gosu::KbReturn, Gosu::KbEscape,
@@ -177,6 +181,7 @@ module AGL
 		end
 		
 		# Returns whether the given key is down in the current frame.
+		# 
 		# Parameters:
 		# [key] Code of the key to be checked. See +key_pressed?+ for details.
 		def self.key_down? key
@@ -185,6 +190,7 @@ module AGL
 		
 		# Returns whether the given key is not down in the current frame but was
 		# down in the frame before.
+		# 
 		# Parameters:
 		# [key] Code of the key to be checked. See +key_pressed?+ for details.
 		def self.key_released? key
@@ -193,6 +199,7 @@ module AGL
 		
 		# Returns whether the given key is being held down. See
 		# <code>Game.initialize</code> for details.
+		# 
 		# Parameters:
 		# [key] Code of the key to be checked. See +key_pressed?+ for details.
 		def self.key_held? key
@@ -246,6 +253,7 @@ module AGL
 		
 		# Returns whether the given button is down in the current frame and was
 		# not down in the frame before.
+		# 
 		# Parameters:
 		# [btn] Button to be checked. Valid values are +:left+, +:middle+ and
 		#       +:right+
@@ -254,6 +262,7 @@ module AGL
 		end
 		
 		# Returns whether the given button is down in the current frame.
+		# 
 		# Parameters:
 		# [btn] Button to be checked. Valid values are +:left+, +:middle+ and
 		#       +:right+
@@ -263,6 +272,7 @@ module AGL
 		
 		# Returns whether the given button is not down in the current frame, but
 		# was down in the frame before.
+		# 
 		# Parameters:
 		# [btn] Button to be checked. Valid values are +:left+, +:middle+ and
 		#       +:right+
@@ -271,6 +281,7 @@ module AGL
 		end
 		
 		# Returns whether the given button has just been double clicked.
+		# 
 		# Parameters:
 		# [btn] Button to be checked. Valid values are +:left+, +:middle+ and
 		#       +:right+
@@ -279,6 +290,7 @@ module AGL
 		end
 		
 		# Returns whether the mouse cursor is currently inside the given area.
+		# 
 		# Parameters:
 		# [x] The x-coordinate of the top left corner of the area.
 		# [y] The y-coordinate of the top left corner of the area.
@@ -317,6 +329,7 @@ module AGL
 		end
 		
 		# Returns a <code>Gosu::Image</code> object.
+		# 
 		# Parameters:
 		# [id] A string or symbol representing the path to the image. If the file
 		#      is inside 'data/img', only the file name is needed. If it's inside
@@ -344,6 +357,7 @@ module AGL
 		# a spritesheet. The image with index 0 will be the top left sprite, and
 		# the following indices raise first from left to right and then from top
 		# to bottom.
+		# 
 		# Parameters:
 		# [id] A string or symbol representing the path to the image. See +img+
 		#      for details.
@@ -366,6 +380,7 @@ module AGL
 		# a tileset. Works the same as +imgs+, except you must provide the tile
 		# size instead of the number of columns and rows, and that the images will
 		# be loaded as tileable.
+		# 
 		# Parameters:
 		# [id] A string or symbol representing the path to the image. It must be
 		#      specified the same way as in +img+, but the base directory is
@@ -387,6 +402,7 @@ module AGL
 		
 		# Returns a <code>Gosu::Sample</code> object. This should be used for
 		# simple and short sound effects.
+		# 
 		# Parameters:
 		# [id] A string or symbol representing the path to the sound. It must be
 		#      specified the same way as in +img+, but the base directory is
@@ -406,6 +422,7 @@ module AGL
 		
 		# Returns a <code>Gosu::Song</code> object. This should be used for the
 		# background musics of your game.
+		# 
 		# Parameters:
 		# [id] A string or symbol representing the path to the song. It must be
 		#      specified the same way as in +img+, but the base directory is
@@ -426,6 +443,7 @@ module AGL
 		# Returns a <code>Gosu::Font</code> object. Fonts are needed to draw text
 		# and used by MiniGL elements like buttons, text fields and TextHelper
 		# objects.
+		# 
 		# Parameters:
 		# [id] A string or symbol representing the path to the song. It must be
 		#      specified the same way as in +img+, but the base directory is

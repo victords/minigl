@@ -16,6 +16,7 @@ module AGL
 		attr_reader :cam
 		
 		# Creates a new map.
+		# 
 		# Parameters:
 		# [t_w] The width of the tiles.
 		# [t_h] The height of the tiles.
@@ -44,6 +45,7 @@ module AGL
 		
 		# Returns the position in the screen corresponding to the given tile
 		# indices.
+		# 
 		# Parameters:
 		# [map_x] The index of the tile in the horizontal direction. It must be in
 		#         the interval <code>0..t_x_count</code>.
@@ -56,6 +58,7 @@ module AGL
 		# Returns the tile in the map that corresponds to the given position in
 		# the screen, as a Vector, where x is the horizontal index and y the
 		# vertical index.
+		# 
 		# Parameters:
 		# [scr_x] The x-coordinate in the screen.
 		# [scr_y] The y-coordinate in the screen.
@@ -64,6 +67,7 @@ module AGL
 		end
 		
 		# Verifies whether a tile is inside the map.
+		# 
 		# Parameters:
 		# [v] A Vector representing the tile, with x as the horizontal index and
 		#     y as the vertical index.
@@ -73,6 +77,7 @@ module AGL
 		
 		# Sets the top left corner of the viewport to the given position of the
 		# map. Note that this is not the position in the screen.
+		# 
 		# Parameters:
 		# [cam_x] The x-coordinate inside the map, in pixels (not a tile index).
 		# [cam_y] The y-coordinate inside the map, in pixels (not a tile index).
@@ -83,6 +88,7 @@ module AGL
 		end
 		
 		# Moves the viewport by the given amount of pixels.
+		# 
 		# Parameters:
 		# [x] The amount of pixels to move horizontally. Negative values will
 		#     cause the camera to move to the left.
