@@ -11,8 +11,9 @@ class MyGame < Gosu::Window
     
     @font = Res.font :font1, 20
     @writer = TextHelper.new @font, 5
-    @btn = Button.new(10, 560, @font, "Test", :btn, 0x008000) {}
-    @txt = TextField.new 10, 520, @font, :text, nil, 15, 5, 16, false, "", nil, 0, 0x0000ff
+    @btn = Button.new(10, 560, @font, "Test", :btn, 0x008000, 0, 0, 0, 0, 0, "friends") { |x| puts "hello #{x}" }
+    @chk = ToggleButton.new(210, 560, @font, "Click me", :check, 0xffffffff, false, 36, 5, 0, 0, "friends") { |c, x| puts "hello #{x}, checked: #{c}" }
+    @txt = TextField.new(10, 520, @font, :text, nil, 15, 5, 16, false, "", nil, 0, 0x0000ff, "test") { |x| puts "field #{x}" }
   end
   
   def needs_cursor?
@@ -26,6 +27,7 @@ class MyGame < Gosu::Window
     @obj1.y += 1 if KB.key_held? Gosu::KbDown
     @obj1.x -= 1 if KB.key_down? Gosu::KbLeft
     @btn.set_position rand(700), rand(550) if KB.key_pressed? Gosu::KbSpace
+    @chk.checked = false if KB.key_pressed? Gosu::KbEscape
     @txt.set_position rand(700), rand(550) if KB.key_pressed? Gosu::KbReturn
     
     Mouse.update
@@ -35,6 +37,7 @@ class MyGame < Gosu::Window
     end
     
     @btn.update
+    @chk.update
     @txt.update
   end
 
@@ -44,9 +47,10 @@ class MyGame < Gosu::Window
     @writer.write_breaking "Testing multiple line text.\nThis should draw text "\
                            "across multiple lines, respecting a limit width. "\
                            "Furthermore, the text must be right-aligned.",
-                           780, 300, 300, :right
+                           780, 300, 300, :right, 0xffffffff
     
     @btn.draw 0xcc
+    @chk.draw
     @txt.draw
   end
 end

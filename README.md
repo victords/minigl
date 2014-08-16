@@ -22,8 +22,9 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki).
 
-**Version 1.2.7**
+**Version 1.3.0**
 
-  * Completed and added documentation for the `Effect` class.
-  * Slight adjusts in the documentation.
-  * Slight adjust in the implementation of `Button`.
+  * Introduced the `ToggleButton` class.
+  * `Button` action now accepts parameters.
+  * `TextField` now triggers a "text changed" event (which accepts parameters,
+as well).

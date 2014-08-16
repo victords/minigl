@@ -28,9 +28,15 @@ module AGL
 		#         if +img+ is +nil+.
 		# [height] Height of the button clickable area. This parameter is used
 		#          only if +img+ is +nil+.
+		# [params] An object containing any parameters you want passed to the
+		#          +action+ block. When the button is clicked, the following is
+		#          called:
+		#            @action.call @params
+		#          Note that this doesn't force you to declare a block that takes
+		#          parameters.
 		# [action] The block of code executed when the button is clicked (or by
 		#          calling the +click+ method).
-		def initialize x, y, font, text, img, text_color = 0, center = true, margin_x = 0, margin_y = 0, width = nil, height = nil, &action
+		def initialize x, y, font, text, img, text_color = 0, center = true, margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action
 			@x = x
 			@y = y
 			@font = font
@@ -54,6 +60,7 @@ module AGL
 			@text_color = text_color
 			@center = center
 			@action = action
+			@params = params
 		
 			@state = :up
 			@img_index = 0
@@ -70,6 +77,8 @@ module AGL
 				if mouse_over
 					@img_index = 1
 					@state = :over
+				else
+					@img_index = 0
 				end
 			elsif @state == :over
 				if not mouse_over
@@ -78,30 +87,36 @@ module AGL
 				elsif mouse_press
 					@img_index = 2
 					@state = :down
+				else
+					@img_index = 1
 				end
 			elsif @state == :down
 				if not mouse_over
 					@img_index = 0
 					@state = :down_out
 				elsif mouse_rel
-					@img_index = 0
-					@state = :up
+					@img_index = 1
+					@state = :over
 					click
+				else
+					@img_index = 2
 				end
-			elsif @state == :down_out
+			else # :down_out
 				if mouse_over
 					@img_index = 2
 					@state = :down
 				elsif mouse_rel
 					@img_index = 0
 					@state = :up
+				else
+					@img_index = 0
 				end
 			end
 		end
 		
 		# Executes the button click action.
 		def click
-			@action.call
+			@action.call @params
 		end
 		
 		# Sets the position of the button in the screen.
@@ -141,6 +156,64 @@ module AGL
 		end
 	end
 	
+	# This class represents a toggle button, which can be also interpreted as a
+	# check box. It is always in one of two states, given as +true+ or +false+
+	# by its property +checked+.
+	class ToggleButton < Button
+		# Defines the state of the button (returns +true+ or +false+).
+		attr_reader :checked
+		
+		# Creates a ToggleButton. All parameters work the same as in Button,
+		# except the image, +img+, which now has to be composed of two columns
+		# and three rows, the first column with images for the unchecked state,
+		# and the second with images for the checked state.
+		# 
+		# The +action+ block now will always receive a first boolean parameter
+		# corresponding to the value of +checked+. So, if you want to pass
+		# parameters to the block, you should declare it like this:
+		#   b = ToggleButton.new ... { |checked, params|
+		#     puts "button was checked" if checked
+		#     # do something with params
+		#   }
+		def initialize x, y, font, text, img, text_color = 0, center = true, margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action
+			super x, y, font, text, nil, text_color, center, margin_x, margin_y, width, height, params, &action
+			@img =
+				if img; Res.imgs img, 2, 3, true
+				else; nil; end
+			@w =
+				if img; @img[0].width
+				else; width; end
+			@h =
+				if img; @img[0].height
+				else; height; end
+		end
+		
+		# Updates the button, checking the mouse movement and buttons to define
+		# the button state.
+		def update
+			super
+			@img_index *= 2
+			@img_index += 1 if @checked
+		end
+		
+		# Executes the button click action, and toggles its state. The +action+
+		# block always receives as a first parameter +true+, if the button has
+		# been changed to checked, or +false+, otherwise.
+		def click
+			@checked = !@checked
+			@action.call @checked, @params
+		end
+		
+		# Sets the state of the button to the value given.
+		# 
+		# Parameters:
+		# [value] The state to be set (+true+ for checked, +false+ for unchecked).
+		def checked= value
+			click if value != @checked
+			@checked = value
+		end
+	end
+	
 	# This class represents a text field (input).
 	class TextField
 		# The current text inside the text field.
@@ -176,8 +249,17 @@ module AGL
 		# [selection_color] The color of the rectangle highlighting selected text,
 		#                   in hexadecimal RRGGBB format. The rectangle will
 		#                   always be drawn with 50% of opacity.
+		# [params] An object containing any parameters you want passed to the
+		#          +on_text_changed+ block. When the text of the text field is
+		#          changed, the following is called:
+		#            @on_text_changed.call @params
+		#          Note that this doesn't force you to declare a block that takes
+		#          parameters.
+		# [on_text_changed] The block of code executed when the text in the text
+		#                   field is changed, either by user input or by calling
+		#                   +text=+. Can be +nil+.
 		def initialize x, y, font, img, cursor_img = nil, margin_x = 0, margin_y = 0, max_length = 100, active = false, text = "",
-		               allowed_chars = nil, text_color = 0, selection_color = 0
+		               allowed_chars = nil, text_color = 0, selection_color = 0, params = nil, &on_text_changed
 			@x = x
 			@y = y
 			@font = font
@@ -221,6 +303,9 @@ module AGL
 				else
 					@chars
 				end
+			
+			@on_text_changed = on_text_changed
+			@params = params
 		end
 		
 		# Updates the text field, checking for mouse events and keyboard input.
@@ -280,7 +365,7 @@ module AGL
 			inserted = false
 			for i in 0..46 # alnum
 				if KB.key_pressed?(@k[i]) or KB.key_held?(@k[i])
-					remove_interval if @anchor1 and @anchor2
+					remove_interval true if @anchor1 and @anchor2
 					if i < 26
 #						bool capsLock = Console.CapsLock;
 						if shift
@@ -400,6 +485,7 @@ module AGL
 			@anchor1 = nil
 			@anchor2 = nil
 			set_cursor_visible
+			@on_text_changed.call @params if @on_text_changed
 		end
 		
 		# Returns the currently selected text.
@@ -495,19 +581,18 @@ module AGL
 		end
 		
 		def insert_char char
-			return unless @allowed_chars.index char
-			if @text.length < @max_length
-				@text.insert @cur_node, char
-				@nodes.insert @cur_node + 1, @nodes[@cur_node] + @font.text_width(char)
-				for i in (@cur_node + 2)..(@nodes.size - 1)
-					@nodes[i] += @font.text_width(char)
-				end
-				@cur_node += 1
-				set_cursor_visible
+			return unless @allowed_chars.index char and @text.length < @max_length
+			@text.insert @cur_node, char
+			@nodes.insert @cur_node + 1, @nodes[@cur_node] + @font.text_width(char)
+			for i in (@cur_node + 2)..(@nodes.size - 1)
+				@nodes[i] += @font.text_width(char)
 			end
+			@cur_node += 1
+			set_cursor_visible
+			@on_text_changed.call @params if @on_text_changed
 		end
 		
-		def remove_interval
+		def remove_interval will_insert = false
 			min = @anchor1 < @anchor2 ? @anchor1 : @anchor2
 			max = min == @anchor1 ? @anchor2 : @anchor1
 			interval_width = 0
@@ -523,6 +608,7 @@ module AGL
 			@anchor1 = nil
 			@anchor2 = nil
 			set_cursor_visible
+			@on_text_changed.call @params if @on_text_changed and not will_insert
 		end
 		
 		def remove_char back
@@ -534,6 +620,7 @@ module AGL
 				@nodes[i] -= char_width
 			end
 			set_cursor_visible
+			@on_text_changed.call @params if @on_text_changed
 		end
 	end
 end
