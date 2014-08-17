@@ -11,9 +11,13 @@ class MyGame < Gosu::Window
     
     @font = Res.font :font1, 20
     @writer = TextHelper.new @font, 5
-    @btn = Button.new(10, 560, @font, "Test", :btn, 0x008000, 0, 0, 0, 0, 0, "friends") { |x| puts "hello #{x}" }
-    @chk = ToggleButton.new(210, 560, @font, "Click me", :check, 0xffffffff, false, 36, 5, 0, 0, "friends") { |c, x| puts "hello #{x}, checked: #{c}" }
-    @txt = TextField.new(10, 520, @font, :text, nil, 15, 5, 16, false, "", nil, 0, 0x0000ff, "test") { |x| puts "field #{x}" }
+    @btn = Button.new(10, 560, @font, "Test", :btn, 0x008000, 0x808080, 0, 0, 0, 0, 0, "friends") { |x| puts "hello #{x}" }
+    @btn.enabled = false
+    @chk = ToggleButton.new(210, 560, @font, "Click me", :check, 0xffffff, 0x808080, false, 36, 5, 0, 0, "friends") { |c, x|
+             puts "hello #{x}, checked: #{c}"
+           }
+    @txt = TextField.new(10, 520, @font, :text, nil, nil, 15, 5, 16, false, "", nil, 0, 0, 0x0000ff, "test") { |t, x| puts "field #{x}, text: #{t}" }
+    @txt.visible = false
   end
   
   def needs_cursor?
@@ -27,8 +31,11 @@ class MyGame < Gosu::Window
     @obj1.y += 1 if KB.key_held? Gosu::KbDown
     @obj1.x -= 1 if KB.key_down? Gosu::KbLeft
     @btn.set_position rand(700), rand(550) if KB.key_pressed? Gosu::KbSpace
+    @btn.enabled = !@btn.enabled if KB.key_pressed? Gosu::KbLeftControl
     @chk.checked = false if KB.key_pressed? Gosu::KbEscape
-    @txt.set_position rand(700), rand(550) if KB.key_pressed? Gosu::KbReturn
+    @chk.enabled = !@chk.enabled if KB.key_pressed? Gosu::KbRightControl
+    @txt.visible = !@txt.visible if KB.key_pressed? Gosu::KbReturn
+    @txt.enabled = !@txt.enabled if KB.key_pressed? Gosu::KbLeftAlt
     
     Mouse.update
     if Mouse.double_click? :left

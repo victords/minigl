@@ -1,8 +1,22 @@
 require_relative 'global'
 
 module AGL
+	class Component # :nodoc:
+		attr_accessor :enabled, :visible
+		
+		def initialize x, y, font, text, text_color, disabled_text_color
+			@x = x
+			@y = y
+			@font = font
+			@text = text
+			@text_color = text_color
+			@disabled_text_color = disabled_text_color
+			@enabled = @visible = true
+		end
+	end
+	
 	# This class represents a button.
-	class Button
+	class Button < Component
 		# Creates a button.
 		# 
 		# Parameters:
@@ -11,12 +25,15 @@ module AGL
 		# [font] The <code>Gosu::Font</code> object that will be used to draw the
 		#        button text.
 		# [text] The button text. Can be +nil+ or empty.
-		# [img] A spritesheet containing three images in a column, representing,
+		# [img] A spritesheet containing four images in a column, representing,
 		#       from top to bottom, the default state, the hover state (when the
-		#       mouse is over the button) and the pressed state (when the mouse
-		#       button is down and the cursor is over the button). If +nil+, the
-		#       +width+ and +height+ parameters must be provided.
+		#       mouse is over the button), the pressed state (when the mouse
+		#       button is down and the cursor is over the button) and the disabled
+		#       state. If +nil+, the +width+ and +height+ parameters must be
+		#       provided.
 		# [text_color] Color of the button text, in hexadecimal RRGGBB format.
+		# [disabled_text_color] Color of the button text, when it's disabled, in
+		#                       hexadecimal RRGGBB format.
 		# [center] Whether the button text should be centered in its area (the
 		#          area is defined by the image size, when an image is given, or
 		#          by the +width+ and +height+ parameters, otherwise).
@@ -36,13 +53,11 @@ module AGL
 		#          parameters.
 		# [action] The block of code executed when the button is clicked (or by
 		#          calling the +click+ method).
-		def initialize x, y, font, text, img, text_color = 0, center = true, margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action
-			@x = x
-			@y = y
-			@font = font
-			@text = text
+		def initialize x, y, font, text, img, text_color = 0, disabled_text_color = 0, center = true, margin_x = 0, margin_y = 0,
+		               width = nil, height = nil, params = nil, &action
+			super x, y, font, text, text_color, disabled_text_color
 			@img =
-				if img; Res.imgs img, 1, 3, true
+				if img; Res.imgs img, 1, 4, true
 				else; nil; end
 			@w =
 				if img; @img[0].width
@@ -57,18 +72,19 @@ module AGL
 				@text_x = x + margin_x
 				@text_y = y + margin_y
 			end
-			@text_color = text_color
 			@center = center
 			@action = action
 			@params = params
 		
 			@state = :up
-			@img_index = 0
+			@img_index = @enabled ? 0 : 3
 		end
 		
 		# Updates the button, checking the mouse movement and buttons to define
 		# the button state.
 		def update
+			return unless @enabled and @visible
+			
 			mouse_over = Mouse.over? @x, @y, @w, @h
 			mouse_press = Mouse.button_pressed? :left
 			mouse_rel = Mouse.button_released? :left
@@ -143,8 +159,10 @@ module AGL
 		# [alpha] The opacity with which the button will be drawn. Allowed values
 		#         vary between 0 (fully transparent) and 255 (fully opaque).
 		def draw alpha = 0xff
+			return unless @visible
+			
 			color = (alpha << 24) | 0xffffff
-			text_color = (alpha << 24) | @text_color
+			text_color = (alpha << 24) | (@enabled ? @text_color : @disabled_text_color)
 			@img[@img_index].draw @x, @y, 0, 1, 1, color if @img
 			if @text
 				if @center
@@ -153,6 +171,12 @@ module AGL
 					@font.draw @text, @text_x, @text_y, 0, 1, 1, text_color
 				end
 			end
+		end
+		
+		def enabled= value # :nodoc:
+			@enabled = value
+			@state = :up
+			@img_index = 3
 		end
 	end
 	
@@ -165,7 +189,7 @@ module AGL
 		
 		# Creates a ToggleButton. All parameters work the same as in Button,
 		# except the image, +img+, which now has to be composed of two columns
-		# and three rows, the first column with images for the unchecked state,
+		# and four rows, the first column with images for the unchecked state,
 		# and the second with images for the checked state.
 		# 
 		# The +action+ block now will always receive a first boolean parameter
@@ -175,10 +199,11 @@ module AGL
 		#     puts "button was checked" if checked
 		#     # do something with params
 		#   }
-		def initialize x, y, font, text, img, text_color = 0, center = true, margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action
-			super x, y, font, text, nil, text_color, center, margin_x, margin_y, width, height, params, &action
+		def initialize x, y, font, text, img, text_color = 0, disabled_text_color = 0, center = true, margin_x = 0, margin_y = 0,
+		               width = nil, height = nil, params = nil, &action
+			super x, y, font, text, nil, text_color, disabled_text_color, center, margin_x, margin_y, width, height, params, &action
 			@img =
-				if img; Res.imgs img, 2, 3, true
+				if img; Res.imgs img, 2, 4, true
 				else; nil; end
 			@w =
 				if img; @img[0].width
@@ -191,6 +216,8 @@ module AGL
 		# Updates the button, checking the mouse movement and buttons to define
 		# the button state.
 		def update
+			return unless @enabled and @visible
+			
 			super
 			@img_index *= 2
 			@img_index += 1 if @checked
@@ -212,10 +239,16 @@ module AGL
 			click if value != @checked
 			@checked = value
 		end
+		
+		def enabled= value # :nodoc:
+			@enabled = value
+			@state = :up
+			@img_index = @checked ? 7 : 6
+		end
 	end
 	
 	# This class represents a text field (input).
-	class TextField
+	class TextField < Component
 		# The current text inside the text field.
 		attr_reader :text
 		
@@ -232,6 +265,8 @@ module AGL
 		# [cursor_img] An image for the blinking cursor that stands in the point
 		#              where text will be inserted. If +nil+, a simple black line
 		#              will be drawn instead.
+		# [disabled_img] Image for the text field when it's disabled. If +nil+,
+		#                a darkened version of +img+ will be used.
 		# [text_color] Color of the button text, in hexadecimal RRGGBB format.
 		# [margin_x] The x offset, from the field x-coordinate, to draw the text.
 		# [margin_y] The y offset, from the field y-coordinate, to draw the text.
@@ -246,33 +281,34 @@ module AGL
 		#                 <code>"abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ'-=/[]\\\\,.;\"_+?{}|<>:!@#$%¨&*()"</code>.
 		# [text_color] The color with which the text will be drawn, in hexadecimal
 		#              RRGGBB format.
+		# [disabled_text_color] The color with which the text will be drawn, when
+		#                       the text field is disabled, in hexadecimal RRGGBB
+		#                       format.
 		# [selection_color] The color of the rectangle highlighting selected text,
 		#                   in hexadecimal RRGGBB format. The rectangle will
 		#                   always be drawn with 50% of opacity.
 		# [params] An object containing any parameters you want passed to the
 		#          +on_text_changed+ block. When the text of the text field is
 		#          changed, the following is called:
-		#            @on_text_changed.call @params
-		#          Note that this doesn't force you to declare a block that takes
-		#          parameters.
+		#            @on_text_changed.call @text, @params
+		#          Thus, +params+ will be the second parameter. Note that this
+		#          doesn't force you to declare a block that takes parameters.
 		# [on_text_changed] The block of code executed when the text in the text
 		#                   field is changed, either by user input or by calling
-		#                   +text=+. Can be +nil+.
-		def initialize x, y, font, img, cursor_img = nil, margin_x = 0, margin_y = 0, max_length = 100, active = false, text = "",
-		               allowed_chars = nil, text_color = 0, selection_color = 0, params = nil, &on_text_changed
-			@x = x
-			@y = y
-			@font = font
+		#                   +text=+. The new text is passed as a first parameter
+		#                   to this block, followed by +params+. Can be +nil+.
+		def initialize x, y, font, img, cursor_img = nil, disabled_img = nil, margin_x = 0, margin_y = 0, max_length = 100, active = false, text = "",
+		               allowed_chars = nil, text_color = 0, disabled_text_color = 0, selection_color = 0, params = nil, &on_text_changed
+			super x, y, font, text, text_color, disabled_text_color
 			@img = Res.img img
 			@w = @img.width
 			@h = @img.height
 			@cursor_img = Res.img(cursor_img) if cursor_img
+			@disabled_img = Res.img(disabled_img) if disabled_img
 			@max_length = max_length
 			@active = active
-			@text = text
 			@text_x = x + margin_x
 			@text_y = y + margin_y
-			@text_color = text_color
 			@selection_color = selection_color
 			
 			@nodes = [x + margin_x]
@@ -310,6 +346,8 @@ module AGL
 		
 		# Updates the text field, checking for mouse events and keyboard input.
 		def update
+			return unless @enabled and @visible
+			
 			################################ Mouse ################################
 			if Mouse.over? @x, @y, @w, @h
 				if not @active and Mouse.button_pressed? :left
@@ -356,10 +394,10 @@ module AGL
 			end
 			
 			############################### Keyboard ##############################
-			shift = KB.key_down?(@k[53]) or KB.key_down?(@k[54])
-			if KB.key_pressed?(@k[53]) or KB.key_pressed?(@k[54]) # shift
+			shift = ((KB.key_down? @k[53]) or (KB.key_down? @k[54]))
+			if ((KB.key_pressed? @k[53]) or (KB.key_pressed? @k[54])) # shift
 				@anchor1 = @cur_node if @anchor1.nil?
-			elsif KB.key_released?(@k[53]) or KB.key_released?(@k[54])
+			elsif ((KB.key_released? @k[53]) or (KB.key_released? @k[54]))
 				@anchor1 = nil if @anchor2.nil?
 			end
 			inserted = false
@@ -485,7 +523,7 @@ module AGL
 			@anchor1 = nil
 			@anchor2 = nil
 			set_cursor_visible
-			@on_text_changed.call @params if @on_text_changed
+			@on_text_changed.call @text, @params if @on_text_changed
 		end
 		
 		# Returns the currently selected text.
@@ -532,9 +570,12 @@ module AGL
 		# [alpha] The opacity with which the text field will be drawn. Allowed
 		#         values vary between 0 (fully transparent) and 255 (fully opaque).
 		def draw alpha = 0xff
-			color = (alpha << 24) | 0xffffff
-			text_color = (alpha << 24) | @text_color
-			@img.draw @x, @y, 0, 1, 1, color
+			return unless @visible
+			
+			color = (alpha << 24) | ((@enabled or @disabled_img) ? 0xffffff : 0x808080)
+			text_color = (alpha << 24) | (@enabled ? @text_color : @disabled_text_color)
+			img = ((@enabled or @disabled_img.nil?) ? @img : @disabled_img)
+			img.draw @x, @y, 0, 1, 1, color
 			@font.draw @text, @text_x, @text_y, 0, 1, 1, text_color
 			
 			if @anchor1 and @anchor2
@@ -556,6 +597,16 @@ module AGL
 					                      @nodes[@cur_node], @text_y + @font.height, cursor_color, 0
 				end
 			end
+		end
+		
+		def enabled= value # :nodoc:
+			@enabled = value
+			unfocus unless @enabled
+		end
+		
+		def visible= value # :nodoc:
+			@visible = value
+			unfocus unless @visible
 		end
 		
 	private
@@ -589,7 +640,7 @@ module AGL
 			end
 			@cur_node += 1
 			set_cursor_visible
-			@on_text_changed.call @params if @on_text_changed
+			@on_text_changed.call @text, @params if @on_text_changed
 		end
 		
 		def remove_interval will_insert = false
@@ -608,7 +659,7 @@ module AGL
 			@anchor1 = nil
 			@anchor2 = nil
 			set_cursor_visible
-			@on_text_changed.call @params if @on_text_changed and not will_insert
+			@on_text_changed.call @text, @params if @on_text_changed and not will_insert
 		end
 		
 		def remove_char back
@@ -620,7 +671,7 @@ module AGL
 				@nodes[i] -= char_width
 			end
 			set_cursor_visible
-			@on_text_changed.call @params if @on_text_changed
+			@on_text_changed.call @text, @params if @on_text_changed
 		end
 	end
 end

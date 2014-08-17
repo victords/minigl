@@ -106,6 +106,7 @@ module AGL
 				Gosu::KbUp, Gosu::KbDown,
 				Gosu::KbReturn, Gosu::KbEscape,
 				Gosu::KbLeftControl, Gosu::KbRightControl,
+				Gosu::KbLeftAlt, Gosu::KbRightAlt,
 				Gosu::KbA, Gosu::KbB, Gosu::KbC, Gosu::KbD, Gosu::KbE, Gosu::KbF,
 				Gosu::KbG, Gosu::KbH, Gosu::KbI, Gosu::KbJ, Gosu::KbK, Gosu::KbL,
 				Gosu::KbM, Gosu::KbN, Gosu::KbO, Gosu::KbP, Gosu::KbQ, Gosu::KbR,
@@ -116,7 +117,7 @@ module AGL
 				Gosu::KbNumpad5, Gosu::KbNumpad6, Gosu::KbNumpad7, Gosu::KbNumpad8,
 				Gosu::KbNumpad9, Gosu::KbNumpad0, Gosu::KbSpace, Gosu::KbBackspace,
 				Gosu::KbDelete, Gosu::KbLeft, Gosu::KbRight, Gosu::KbHome,
-				Gosu::KbEnd, Gosu::KbLeftShift, Gosu::KbRightShift,
+				Gosu::KbEnd, Gosu::KbLeftShift, Gosu::KbRightShift, Gosu::KbTab,
 				Gosu::KbBacktick, Gosu::KbMinus, Gosu::KbEqual, Gosu::KbBracketLeft,
 				Gosu::KbBracketRight, Gosu::KbBackslash, Gosu::KbApostrophe,
 				Gosu::KbComma, Gosu::KbPeriod, Gosu::KbSlash
@@ -162,6 +163,7 @@ module AGL
 		# [key] Code of the key to be checked. The available codes are <code>
 		#       Gosu::KbUp, Gosu::KbDown, Gosu::KbReturn, Gosu::KbEscape,
 		#       Gosu::KbLeftControl, Gosu::KbRightControl,
+		#       Gosu::KbLeftAlt, Gosu::KbRightAlt,
 		#       Gosu::KbA, Gosu::KbB, Gosu::KbC, Gosu::KbD, Gosu::KbE, Gosu::KbF,
 		#       Gosu::KbG, Gosu::KbH, Gosu::KbI, Gosu::KbJ, Gosu::KbK, Gosu::KbL,
 		#       Gosu::KbM, Gosu::KbN, Gosu::KbO, Gosu::KbP, Gosu::KbQ, Gosu::KbR,
@@ -172,7 +174,7 @@ module AGL
 		#       Gosu::KbNumpad5, Gosu::KbNumpad6, Gosu::KbNumpad7, Gosu::KbNumpad8,
 		#       Gosu::KbNumpad9, Gosu::KbNumpad0, Gosu::KbSpace, Gosu::KbBackspace,
 		#       Gosu::KbDelete, Gosu::KbLeft, Gosu::KbRight, Gosu::KbHome,
-		#       Gosu::KbEnd, Gosu::KbLeftShift, Gosu::KbRightShift,
+		#       Gosu::KbEnd, Gosu::KbLeftShift, Gosu::KbRightShift, Gosu::KbTab,
 		#       Gosu::KbBacktick, Gosu::KbMinus, Gosu::KbEqual, Gosu::KbBracketLeft,
 		#       Gosu::KbBracketRight, Gosu::KbBackslash, Gosu::KbApostrophe,
 		#       Gosu::KbComma, Gosu::KbPeriod, Gosu::KbSlash</code>.
