@@ -22,11 +22,12 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki).
 
-**Version 1.3.1**
+**Version 1.3.2**
 
-  * Introduced the `enabled` and `visible` attributes for the form components.
-  * Fixed issue with right shift for selection in the `TextField`.
-  * Added missing keys to `KB`.
+  * Created documentation for the abstract class `Component`.
+  * Granted read and write access to the `params` attribute for all components.
+  * Fixed issue with `ToggleButton` instantiation with no width and height set.
+  * Added `checked` parameter to the constructor of `ToggleButton`.
 
 **WARNING**: this version can generate incompatibility, because of the parameter
-order in the constructors for `Button`, `ToggleButton` and `TextField`.
+order in the constructor for `ToggleButton`.

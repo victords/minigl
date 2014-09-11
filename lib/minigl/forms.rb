@@ -1,9 +1,24 @@
 require_relative 'global'
 
 module AGL
-	class Component # :nodoc:
-		attr_accessor :enabled, :visible
+	# This class is an abstract ancestor for all form components (Button,
+	# ToggleButton and TextField).
+	class Component
+		# Determines whether the control is enabled, i.e., will process user input.
+		attr_accessor :enabled
 		
+		# Determines whether the control is visible, i.e., will be drawn in the
+		# screen and process user input, if enabled.
+		attr_accessor :visible
+		
+		# A container for any parameters to be passed to the code blocks called
+		# in response to events of the control (click of a button, change of the
+		# text in a text field, etc.). More detail can be found in the constructor
+		# for each specific component class.
+		attr_accessor :params
+		
+		# This constructor is for internal use of the subclasses only. Do not
+		# instantiate objects of this class.
 		def initialize x, y, font, text, text_color, disabled_text_color
 			@x = x
 			@y = y
@@ -66,8 +81,8 @@ module AGL
 				if img; @img[0].height
 				else; height; end
 			if center
-				@text_x = x + @w / 2
-				@text_y = y + @h / 2
+				@text_x = x + @w / 2 if @w
+				@text_y = y + @h / 2 if @h
 			else
 				@text_x = x + margin_x
 				@text_y = y + margin_y
@@ -188,9 +203,10 @@ module AGL
 		attr_reader :checked
 		
 		# Creates a ToggleButton. All parameters work the same as in Button,
-		# except the image, +img+, which now has to be composed of two columns
+		# except for the image, +img+, which now has to be composed of two columns
 		# and four rows, the first column with images for the unchecked state,
-		# and the second with images for the checked state.
+		# and the second with images for the checked state, and for +checked+,
+		# which defines the initial state of the ToggleButton.
 		# 
 		# The +action+ block now will always receive a first boolean parameter
 		# corresponding to the value of +checked+. So, if you want to pass
@@ -199,7 +215,7 @@ module AGL
 		#     puts "button was checked" if checked
 		#     # do something with params
 		#   }
-		def initialize x, y, font, text, img, text_color = 0, disabled_text_color = 0, center = true, margin_x = 0, margin_y = 0,
+		def initialize x, y, font, text, img, checked = false, text_color = 0, disabled_text_color = 0, center = true, margin_x = 0, margin_y = 0,
 		               width = nil, height = nil, params = nil, &action
 			super x, y, font, text, nil, text_color, disabled_text_color, center, margin_x, margin_y, width, height, params, &action
 			@img =
@@ -211,6 +227,11 @@ module AGL
 			@h =
 				if img; @img[0].height
 				else; height; end
+			if center
+				@text_x = x + @w / 2
+				@text_y = y + @h / 2
+			end
+			@checked = checked
 		end
 		
 		# Updates the button, checking the mouse movement and buttons to define

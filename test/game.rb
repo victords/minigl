@@ -13,7 +13,7 @@ class MyGame < Gosu::Window
     @writer = TextHelper.new @font, 5
     @btn = Button.new(10, 560, @font, "Test", :btn, 0x008000, 0x808080, 0, 0, 0, 0, 0, "friends") { |x| puts "hello #{x}" }
     @btn.enabled = false
-    @chk = ToggleButton.new(210, 560, @font, "Click me", :check, 0xffffff, 0x808080, false, 36, 5, 0, 0, "friends") { |c, x|
+    @chk = ToggleButton.new(210, 560, @font, "Click me", :check, false, 0xffffff, 0x808080, false, 36, 5, 0, 0, "friends") { |c, x|
              puts "hello #{x}, checked: #{c}"
            }
     @txt = TextField.new(10, 520, @font, :text, nil, nil, 15, 5, 16, false, "", nil, 0, 0, 0x0000ff, "test") { |t, x| puts "field #{x}, text: #{t}" }
