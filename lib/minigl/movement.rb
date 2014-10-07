@@ -133,6 +133,12 @@ module AGL
 	# rectangular bounding boxes), including a method to behave as an elevator,
 	# affecting other objects' positions as it moves.
 	module Movement
+		# The mass of the object, in arbitrary units. The default value for
+		# GameObject instances, for example, is 1. The larger the mass (i.e., the
+		# heavier the object), the more intense the forces applied to the object
+		# have to be in order to move it.
+		attr_reader :mass
+		
 		# A Vector with the current speed of the object (x: horizontal component,
 		# y: vertical component).
 		attr_reader :speed
@@ -193,12 +199,12 @@ module AGL
 			forces.x += Game.gravity.x; forces.y += Game.gravity.y
 			forces.x += @stored_forces.x; forces.y += @stored_forces.y
 			@stored_forces.x = @stored_forces.y = 0
-		
+			
 			# check_contact obst, ramps
 			forces.x = 0 if (forces.x < 0 and @left) or (forces.x > 0 and @right)
 			forces.y = 0 if (forces.y < 0 and @top) or (forces.y > 0 and @bottom)
-		
-			@speed.x += forces.x; @speed.y += forces.y
+			
+			@speed.x += forces.x / @mass; @speed.y += forces.y / @mass
 			@speed.x = 0 if @speed.x.abs < @min_speed.x
 			@speed.y = 0 if @speed.y.abs < @min_speed.y
 			@speed.x = (@speed.x <=> 0) * @max_speed.x if @speed.x.abs > @max_speed.x

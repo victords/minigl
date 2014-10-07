@@ -6,6 +6,7 @@ class MovingObject
 	include Movement
 	def initialize x, y, w, h
 		@x = x; @y = y; @w = w; @h = h
+		@mass = 1.0
 		@speed = Vector.new 0, 0
 		@min_speed = Vector.new 0.01, 0.01
 		@max_speed = Vector.new 1000, 1000

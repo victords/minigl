@@ -124,7 +124,9 @@ module AGL
 		#               image is not a spritesheet.
 		# [sprite_rows] The number of rows in the spritesheet. Use +nil+ if the
 		#               image is not a spritesheet.
-		def initialize x, y, w, h, img, img_gap = nil, sprite_cols = nil, sprite_rows = nil
+		# [mass] The mass of the object. Details on how it is used can be found
+		#        in the Movement module.
+		def initialize x, y, w, h, img, img_gap = nil, sprite_cols = nil, sprite_rows = nil, mass = 1.0
 			super x, y, img, sprite_cols, sprite_rows
 			@w = w; @h = h
 			@img_gap =
@@ -133,6 +135,7 @@ module AGL
 				else
 					img_gap
 				end
+			@mass = mass
 			@speed = Vector.new 0, 0
 			@min_speed = Vector.new 0.01, 0.01
 			@max_speed = Vector.new 15, 15
