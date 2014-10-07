@@ -173,17 +173,19 @@ module AGL
 		# Parameters:
 		# [alpha] The opacity with which the button will be drawn. Allowed values
 		#         vary between 0 (fully transparent) and 255 (fully opaque).
-		def draw alpha = 0xff
+		# [z_index] The z-order to draw the object. Objects with larger z-orders
+		#           will be drawn on top of the ones with smaller z-orders.
+		def draw alpha = 0xff, z_index = 0
 			return unless @visible
 			
 			color = (alpha << 24) | 0xffffff
 			text_color = (alpha << 24) | (@enabled ? @text_color : @disabled_text_color)
-			@img[@img_index].draw @x, @y, 0, 1, 1, color if @img
+			@img[@img_index].draw @x, @y, z_index, 1, 1, color if @img
 			if @text
 				if @center
-					@font.draw_rel @text, @text_x, @text_y, 0, 0.5, 0.5, 1, 1, text_color
+					@font.draw_rel @text, @text_x, @text_y, z_index, 0.5, 0.5, 1, 1, text_color
 				else
-					@font.draw @text, @text_x, @text_y, 0, 1, 1, text_color
+					@font.draw @text, @text_x, @text_y, z_index, 1, 1, text_color
 				end
 			end
 		end
@@ -590,32 +592,34 @@ module AGL
 		# Parameters:
 		# [alpha] The opacity with which the text field will be drawn. Allowed
 		#         values vary between 0 (fully transparent) and 255 (fully opaque).
-		def draw alpha = 0xff
+		# [z_index] The z-order to draw the object. Objects with larger z-orders
+		#           will be drawn on top of the ones with smaller z-orders.
+		def draw alpha = 0xff, z_index = 0
 			return unless @visible
 			
 			color = (alpha << 24) | ((@enabled or @disabled_img) ? 0xffffff : 0x808080)
 			text_color = (alpha << 24) | (@enabled ? @text_color : @disabled_text_color)
 			img = ((@enabled or @disabled_img.nil?) ? @img : @disabled_img)
-			img.draw @x, @y, 0, 1, 1, color
-			@font.draw @text, @text_x, @text_y, 0, 1, 1, text_color
+			img.draw @x, @y, z_index, 1, 1, color
+			@font.draw @text, @text_x, @text_y, z_index, 1, 1, text_color
 			
 			if @anchor1 and @anchor2
 				selection_color = ((alpha / 2) << 24) | @selection_color
 				Game.window.draw_quad @nodes[@anchor1], @text_y, selection_color,
 				                      @nodes[@anchor2] + 1, @text_y, selection_color,
 				                      @nodes[@anchor2] + 1, @text_y + @font.height, selection_color,
-				                      @nodes[@anchor1], @text_y + @font.height, selection_color, 0
+				                      @nodes[@anchor1], @text_y + @font.height, selection_color, z_index
 			end
 			
 			if @cursor_visible
 				if @cursor_img
-					@cursor_img.draw @nodes[@cur_node] - @cursor_img.width / 2, @text_y, 0
+					@cursor_img.draw @nodes[@cur_node] - @cursor_img.width / 2, @text_y, z_index
 				else
 					cursor_color = alpha << 24
 					Game.window.draw_quad @nodes[@cur_node], @text_y, cursor_color,
 					                      @nodes[@cur_node] + 1, @text_y, cursor_color,
 					                      @nodes[@cur_node] + 1, @text_y + @font.height, cursor_color,
-					                      @nodes[@cur_node], @text_y + @font.height, cursor_color, 0
+					                      @nodes[@cur_node], @text_y + @font.height, cursor_color, z_index
 				end
 			end
 		end

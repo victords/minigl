@@ -29,7 +29,9 @@ module AGL
 		# [color] The color of the text, in hexadecimal RRGGBB format.
 		# [alpha] The opacity of the text. Valid values vary from 0 (fully
 		#         transparent) to 255 (fully opaque).
-		def write_line text, x, y, mode = :left, color = 0, alpha = 0xff
+		# [z_index] The z-order to draw the object. Objects with larger z-orders
+		#           will be drawn on top of the ones with smaller z-orders.
+		def write_line text, x, y, mode = :left, color = 0, alpha = 0xff, z_index = 0
 			color = (alpha << 24) | color
 			rel =
 				case mode
@@ -38,7 +40,7 @@ module AGL
 				when :right then 1
 				else 0
 				end
-			@font.draw_rel text, x, y, 0, rel, 0, 1, 1, color
+			@font.draw_rel text, x, y, z_index, rel, 0, 1, 1, color
 		end
 		
 		# Draws text, breaking lines when needed and when explicitly caused by the
@@ -58,11 +60,13 @@ module AGL
 		# [color] The color of the text, in hexadecimal RRGGBB format.
 		# [alpha] The opacity of the text. Valid values vary from 0 (fully
 		#         transparent) to 255 (fully opaque).
-		def write_breaking text, x, y, width, mode = :left, color = 0, alpha = 0xff
+		# [z_index] The z-order to draw the object. Objects with larger z-orders
+		#           will be drawn on top of the ones with smaller z-orders.
+		def write_breaking text, x, y, width, mode = :left, color = 0, alpha = 0xff, z_index = 0
 			color = (alpha << 24) | color
 			text.split("\n").each do |p|
 				if mode == :justified
-					y = write_paragraph_justified p, x, y, width, color
+					y = write_paragraph_justified p, x, y, width, color, z_index
 				else
 					rel =
 						case mode
@@ -71,20 +75,20 @@ module AGL
 						when :right then 1
 						else 0
 						end
-					y = write_paragraph p, x, y, width, rel, color
+					y = write_paragraph p, x, y, width, rel, color, z_index
 				end
 			end
 		end
 	
 	private
 		
-		def write_paragraph text, x, y, width, rel, color
+		def write_paragraph text, x, y, width, rel, color, z_index
 			line = ""
 			line_width = 0
 			text.split(' ').each do |word|
 				w = @font.text_width word
 				if line_width + w > width
-					@font.draw_rel line.chop, x, y, 0, rel, 0, 1, 1, color
+					@font.draw_rel line.chop, x, y, z_index, rel, 0, 1, 1, color
 					line = ""
 					line_width = 0
 					y += @font.height + @line_spacing
@@ -92,11 +96,11 @@ module AGL
 				line += "#{word} "
 				line_width += @font.text_width "#{word} "
 			end
-			@font.draw_rel line.chop, x, y, 0, rel, 0, 1, 1, color if not line.empty?
+			@font.draw_rel line.chop, x, y, z_index, rel, 0, 1, 1, color if not line.empty?
 			y + @font.height + @line_spacing
 		end
 	
-		def write_paragraph_justified text, x, y, width, color
+		def write_paragraph_justified text, x, y, width, color, z_index
 			space_width = @font.text_width " "
 			spaces = [[]]
 			line_index = 0
@@ -127,7 +131,7 @@ module AGL
 			spaces.each do |line|
 				new_x = x
 				line.each do |s|
-					@font.draw words[index], new_x, y, 0, 1, 1, color
+					@font.draw words[index], new_x, y, z_index, 1, 1, color
 					new_x += @font.text_width(words[index]) + s
 					index += 1
 				end

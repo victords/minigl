@@ -13,7 +13,7 @@ class MyGame < Gosu::Window
     @writer = TextHelper.new @font, 5
     @btn = Button.new(10, 560, @font, "Test", :btn, 0x008000, 0x808080, 0, 0, 0, 0, 0, "friends") { |x| puts "hello #{x}" }
     @btn.enabled = false
-    @chk = ToggleButton.new(210, 560, @font, "Click me", :check, false, 0xffffff, 0x808080, false, 36, 5, 0, 0, "friends") { |c, x|
+    @chk = ToggleButton.new(740, 300, @font, "Click me", :check, false, 0xffffff, 0x808080, false, 36, 5, 0, 0, "friends") { |c, x|
              puts "hello #{x}, checked: #{c}"
            }
     @txt = TextField.new(10, 520, @font, :text, nil, nil, 15, 5, 16, false, "", nil, 0, 0, 0x0000ff, "test") { |t, x| puts "field #{x}, text: #{t}" }
@@ -49,12 +49,12 @@ class MyGame < Gosu::Window
   end
 
   def draw
-    @obj1.draw nil, 1, 1, 0x80, 0x33ff33, 30
+    @obj1.draw nil, 1, 1, 255, 0x33ff33, 30, 1
     @obj2.draw nil, 0.6, 1.4, 0x99
     @writer.write_breaking "Testing multiple line text.\nThis should draw text "\
                            "across multiple lines, respecting a limit width. "\
                            "Furthermore, the text must be right-aligned.",
-                           780, 300, 300, :right, 0xffffffff
+                           780, 300, 300, :right, 0xff0000, 255, 1
     
     @btn.draw 0xcc
     @chk.draw

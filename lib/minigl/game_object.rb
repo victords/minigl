@@ -83,18 +83,20 @@ module AGL
 		#         will be darkened, for example.
 		# [angle] A rotation, in degrees, to be applied to the image, relative to
 		#         its center.
-		def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil
+		# [z_index] The z-order to draw the object. Objects with larger z-orders
+		#           will be drawn on top of the ones with smaller z-orders.
+		def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, z_index = 0
 			color = (alpha << 24) | color
 			if map
 				if angle
-					@img[@img_index].draw_rot @x.round - map.cam.x, @y.round - map.cam.y, 0, angle, 0.5, 0.5, scale_x, scale_y, color
+					@img[@img_index].draw_rot @x.round - map.cam.x, @y.round - map.cam.y, z_index, angle, 0.5, 0.5, scale_x, scale_y, color
 				else
-					@img[@img_index].draw @x.round - map.cam.x, @y.round - map.cam.y, 0, scale_x, scale_y, color
+					@img[@img_index].draw @x.round - map.cam.x, @y.round - map.cam.y, z_index, scale_x, scale_y, color
 				end
 			elsif angle
-				@img[@img_index].draw_rot @x.round, @y.round, 0, angle, 0.5, 0.5, scale_x, scale_y, color
+				@img[@img_index].draw_rot @x.round, @y.round, z_index, angle, 0.5, 0.5, scale_x, scale_y, color
 			else
-				@img[@img_index].draw @x.round, @y.round, 0, scale_x, scale_y, color
+				@img[@img_index].draw @x.round, @y.round, z_index, scale_x, scale_y, color
 			end
 		end
 	end
@@ -175,20 +177,22 @@ module AGL
 		#         will be darkened, for example.
 		# [angle] A rotation, in degrees, to be applied to the image, relative to
 		#         its center.
-		def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil
+		# [z_index] The z-order to draw the object. Objects with larger z-orders
+		#           will be drawn on top of the ones with smaller z-orders.
+		def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, z_index = 0
 			color = (alpha << 24) | color
 			if map
 				if angle
 					@img[@img_index].draw_rot @x.round + @img_gap.x - map.cam.x,
 					                          @y.round + @img_gap.y - map.cam.y,
-					                          0, angle, 0.5, 0.5, scale_x, scale_y, color
+					                          z_index, angle, 0.5, 0.5, scale_x, scale_y, color
 				else
-					@img[@img_index].draw @x.round + @img_gap.x - map.cam.x, @y.round + @img_gap.y - map.cam.y, 0, scale_x, scale_y, color
+					@img[@img_index].draw @x.round + @img_gap.x - map.cam.x, @y.round + @img_gap.y - map.cam.y, z_index, scale_x, scale_y, color
 				end
 			elsif angle
-				@img[@img_index].draw_rot @x.round + @img_gap.x, @y.round + @img_gap.y, 0, angle, 0.5, 0.5, scale_x, scale_y, color
+				@img[@img_index].draw_rot @x.round + @img_gap.x, @y.round + @img_gap.y, z_index, angle, 0.5, 0.5, scale_x, scale_y, color
 			else
-				@img[@img_index].draw @x.round + @img_gap.x, @y.round + @img_gap.y, 0, scale_x, scale_y, color
+				@img[@img_index].draw @x.round + @img_gap.x, @y.round + @img_gap.y, z_index, scale_x, scale_y, color
 			end
 		end
 	end
@@ -248,7 +252,7 @@ module AGL
 			end
 		end
 		
-		def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil
+		def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, z_index = 0
 			super unless @dead
 		end
 	end

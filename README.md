@@ -22,12 +22,11 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki).
 
-**Version 1.3.2**
+**Version 1.3.3**
 
-  * Created documentation for the abstract class `Component`.
-  * Granted read and write access to the `params` attribute for all components.
-  * Fixed issue with `ToggleButton` instantiation with no width and height set.
-  * Added `checked` parameter to the constructor of `ToggleButton`.
+  * Added `mass` attribute to the GameObject class and Movement module.
+  * Added readers for the attributes of `Ramp`.
+  * Added z-index support to all drawing functions.
 
-**WARNING**: this version can generate incompatibility, because of the parameter
-order in the constructor for `ToggleButton`.
+**WARNING**: this version can generate incompatibility, because the `move`
+method of `Movement` now requires the calling object to have a `mass` attribute.
