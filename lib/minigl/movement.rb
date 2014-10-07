@@ -48,6 +48,24 @@ module AGL
 	# the y axis. You must provide instances of this class (or derived classes)
 	# to the +ramps+ array parameter of the +move+ method.
 	class Ramp
+		# The x-coordinate of the top left corner of a rectangle that completely
+		# (and precisely) encloses the ramp (thought of as a right triangle).
+		attr_reader :x
+		
+		# The y-coordinate of the top left corner of the rectangle described in
+		# the +x+ attribute.
+		attr_reader :y
+		
+		# The width of the ramp.
+		attr_reader :w
+		
+		# The height of the ramp.
+		attr_reader :h
+		
+		# Whether the height of the ramp increases from left to right (decreases
+		# from left to right when +false+).
+		attr_reader :left
+		
 		# Creates a new ramp.
 		# 
 		# Parameters:
