@@ -5,6 +5,9 @@ module AGL
 	# a grid of equally sized tiles. It also provides viewport control, through
 	# its camera property and methods.
 	class Map
+		Sqrt2Div2 = Math.sqrt(2) / 2
+		MinusPiDiv4 = -Math::PI / 4
+		
 		# A Vector where x is the tile width and y is the tile height.
 		attr_reader :tile_size
 		
@@ -24,23 +27,35 @@ module AGL
 		# [t_y_count] The vertical count of tiles in the map.
 		# [scr_w] Width of the viewport for the map.
 		# [scr_h] Height of the viewport for the map.
-		def initialize t_w, t_h, t_x_count, t_y_count, scr_w = 800, scr_h = 600
+		# [limit_cam] Whether the camera should respect the bounds of the map
+		#             (i.e., when given coordinates that would imply regions
+		#             outside the map to appear in the screen, the camera would
+		#             move to the nearest position where only the map shows up
+		#             in the screen).
+		def initialize t_w, t_h, t_x_count, t_y_count, scr_w = 800, scr_h = 600, limit_cam = true, isometric = false
 			@tile_size = Vector.new t_w, t_h
 			@size = Vector.new t_x_count, t_y_count
 			@cam = Rectangle.new 0, 0, scr_w, scr_h
+			set_camera 0, 0
+			@limit_cam = limit_cam
 			@max_x = t_x_count * t_w - scr_w
 			@max_y = t_y_count * t_h - scr_h
+			@isometric = isometric
+			initialize_isometric if isometric
 		end
 		
 		# Returns a Vector with the total size of the map, in pixels (x for the
 		# width and y for the height).
 		def get_absolute_size
-			Vector.new(@tile_size.x * @size.x, @tile_size.y * @size.y)
+			return Vector.new(@tile_size.x * @size.x, @tile_size.y * @size.y) unless @isometric
+			avg = (@size.x + @size.y) * 0.5
+			Vector.new (avg * @tile_size.x).to_i, (avg * @tile_size.y).to_i
 		end
 		
 		# Returns a Vector with the coordinates of the center of the map.
 		def get_center
-			Vector.new(@tile_size.x * @size.x / 2, @tile_size.y * @size.y / 2)
+			abs_size = get_absolute_size
+			Vector.new(abs_size.x * 0.5, abs_size.y * 0.5)
 		end
 		
 		# Returns the position in the screen corresponding to the given tile
@@ -52,7 +67,9 @@ module AGL
 		# [map_y] The index of the tile in the vertical direction. It must be in
 		#         the interval <code>0..t_y_count</code>.
 		def get_screen_pos map_x, map_y
-			Vector.new(map_x * @tile_size.x - @cam.x, map_y * @tile_size.y - @cam.y)
+			return Vector.new(map_x * @tile_size.x - @cam.x, map_y * @tile_size.y - @cam.y) unless @isometric
+			Vector.new ((map_x - map_y - 1) * @tile_size.x * 0.5) - @cam.x + @x_offset,
+			           ((map_x + map_y) * @tile_size.y * 0.5) - @cam.y
 		end
 		
 		# Returns the tile in the map that corresponds to the given position in
@@ -63,7 +80,29 @@ module AGL
 		# [scr_x] The x-coordinate in the screen.
 		# [scr_y] The y-coordinate in the screen.
 		def get_map_pos scr_x, scr_y
-			Vector.new((scr_x + @cam.x) / @tile_size.x, (scr_y + @cam.y) / @tile_size.y)
+			return Vector.new((scr_x + @cam.x) / @tile_size.x, (scr_y + @cam.y) / @tile_size.y) unless @isometric
+			
+			# Escreve a posição em relação a origem (no centro do mapa)
+			center = get_center
+			position = Vector.new scr_x + @cam.x - center.x, scr_y + @cam.y - center.y
+
+			# Multiplica por tile_ratio para obter tiles quadrados
+			position.y *= @tile_ratio
+			
+			# O centro do mapa também é deslocado
+			center.y *= @tile_ratio
+			
+			# Rotaciona o vetor posição -45°
+			position = rotate position, MinusPiDiv4
+			
+			# Retorna a referência da posição para o canto da tela
+			position.x += center.x; position.y += center.y
+			
+			# O mapa quadrado está centralizado no centro do losango, precisa retornar ao canto da tela
+			position.x -= @isometric_offset_x; position.y -= @isometric_offset_y
+			
+			# Depois divide pelo tamanho do quadrado para achar a posição da matriz
+			Vector.new((position.x * @inverse_square_size).to_i, (position.y * @inverse_square_size).to_i)
 		end
 		
 		# Verifies whether a tile is inside the map.
@@ -113,25 +152,43 @@ module AGL
 		def foreach
 			for j in @min_vis_y..@max_vis_y
 				for i in @min_vis_x..@max_vis_x
-					yield i, j, i * @tile_size.x - @cam.x, j * @tile_size.y - @cam.y
+					pos = get_screen_pos i, j
+					yield i, j, pos.x, pos.y
 				end
 			end
 		end
 		
 	private
 		
+		def initialize_isometric
+			@x_offset = (@size.y * 0.5 * @tile_size.x).round
+			@tile_ratio = @tile_size.x.to_f / @tile_size.y
+			square_size = @tile_size.x * Sqrt2Div2
+			@inverse_square_size = 1 / square_size
+			a = (@size.x + @size.y) * 0.5 * @tile_size.x
+			@isometric_offset_x = (a - square_size * @size.x) * 0.5
+			@isometric_offset_y = (a - square_size * @size.y) * 0.5
+		end
+		
 		def set_bounds
 			@cam.x = @cam.x.round
 			@cam.y = @cam.y.round
-			@cam.x = 0 if @cam.x < 0
-			@cam.x = @max_x if @cam.x > @max_x
-			@cam.y = 0 if @cam.y < 0
-			@cam.y = @max_y if @cam.y > @max_y
+			@cam.x = 0 if @limit_cam and @cam.x < 0
+			@cam.x = @max_x if @limit_cam and @cam.x > @max_x
+			@cam.y = 0 if @limit_cam and @cam.y < 0
+			@cam.y = @max_y if @limit_cam and @cam.y > @max_y
 			
-			@min_vis_x = @cam.x / @tile_size.x
-			@min_vis_y = @cam.y / @tile_size.y
-			@max_vis_x = (@cam.x + @cam.w - 1) / @tile_size.x
-			@max_vis_y = (@cam.y + @cam.h - 1) / @tile_size.y
+			if @isometric
+				@min_vis_x = get_map_pos(0, 0).x
+				@min_vis_y = get_map_pos(@cam.w - 1, 0).y
+				@max_vis_x = get_map_pos(@cam.w - 1, @cam.h - 1).x
+				@max_vis_y = get_map_pos(0, @cam.h - 1).y
+			else
+				@min_vis_x = @cam.x / @tile_size.x
+				@min_vis_y = @cam.y / @tile_size.y
+				@max_vis_x = (@cam.x + @cam.w - 1) / @tile_size.x
+				@max_vis_y = (@cam.y + @cam.h - 1) / @tile_size.y
+			end
 			
 			if @min_vis_y < 0; @min_vis_y = 0
 			elsif @min_vis_y > @size.y - 1; @min_vis_y = @size.y - 1; end
@@ -144,6 +201,12 @@ module AGL
 			
 			if @max_vis_x < 0; @max_vis_x = 0
 			elsif @max_vis_x > @size.x - 1; @max_vis_x = @size.x - 1; end
+		end
+		
+		def rotate v, angle
+			sin = Math.sin angle
+			cos = Math.cos angle
+			Vector.new cos * v.x - sin * v.y, sin * v.x + cos * v.y
 		end
 	end
 end
