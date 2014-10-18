@@ -21,7 +21,7 @@ dependencies for compiling extensions. Visit
 [this page](https://github.com/jlnr/gosu/wiki/Getting-Started-on-Linux) for
 details.
 
-After installing Gosu, you can just `gem install minigl`.
+After installing the gosu dependencies, you can just `gem install minigl`.
 
 Please note:
 
@@ -32,10 +32,7 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki).
 
-**Version 1.3.4**
+**Version 1.3.5**
 
-  * Fixed issue when running the game from a directory other than the directory
-of the game script.
-  * Added `prefix=` method to `Res`, allowing specification of the prefix for
-the 'data' directory.
-  * Added the `limit_cam` and `isometric` options to the `Map` class.
+  * Fixed Gosu version dependency.
+  * Added Gemfile, for developers.
