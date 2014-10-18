@@ -6,8 +6,9 @@ class SpriteTest < Test::Unit::TestCase
 	def setup
 		@window = Gosu::Window.new 800, 600, false
 		Game.initialize @window
+    Res.prefix = File.expand_path(File.dirname(__FILE__))
 	end
-	
+
 	def test_sprite_position
 		s = Sprite.new 10, 20, :image
 		assert_equal 10, s.x
@@ -16,7 +17,7 @@ class SpriteTest < Test::Unit::TestCase
 		assert_equal -100, s.x
 		assert_equal 200, s.y
 	end
-	
+
 	def test_sprite_animation
 		s = Sprite.new 10, 20, :image, 3, 1
 		indices = [0, 1, 2]
@@ -32,8 +33,9 @@ class GameObjectTest < Test::Unit::TestCase
 	def setup
 		@window = Gosu::Window.new 800, 600, false
 		Game.initialize @window
+    Res.prefix = File.expand_path(File.dirname(__FILE__))
 	end
-	
+
 	def test_game_object_attributes
 		o = GameObject.new 10, 20, 3, 1, :image
 		assert_equal 10, o.x
@@ -45,7 +47,7 @@ class GameObjectTest < Test::Unit::TestCase
 		assert_equal 0, o.stored_forces.x
 		assert_equal 0, o.stored_forces.y
 	end
-	
+
 	def test_game_object_animation
 		o = GameObject.new 10, 20, 3, 1, :image, nil, 3, 1
 		indices = [0, 1, 2]

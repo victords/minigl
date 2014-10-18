@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
 	s.name                  = 'minigl'
-	s.version               = '1.3.3'
-	s.date                  = '2014-10-07'
+	s.version               = '1.3.4'
+	s.date                  = '2014-10-17'
 	s.summary               = "MiniGL"
 	s.description           = "A minimal 2D Game Library built on top of the Gosu gem."
 	s.authors               = ["Victor David Santos"]

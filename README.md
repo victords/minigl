@@ -4,6 +4,7 @@ MiniGL is a minimal **2D Game** Library, available as a Ruby gem, and built on
 top of the [Gosu](http://www.libgosu.org/) gem.
 
 It provides the following features:
+
   * Resource management (images, sounds, ...)
   * Input manipulation (keyboard, mouse, ...)
   * UI (text, buttons, text fields, ...)
@@ -12,6 +13,15 @@ It provides the following features:
 
 More functionalities are coming. Feel free to contribute! You can send feedback
 to victordavidsantos@gmail.com.
+
+## Installing
+
+MiniGL was built on top of the Gosu gem, version 0.7.50. This gem has its own
+dependencies for compiling extensions. Visit
+[this page](https://github.com/jlnr/gosu/wiki/Getting-Started-on-Linux) for
+details.
+
+After installing Gosu, you can just `gem install minigl`.
 
 Please note:
 
@@ -22,11 +32,10 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki).
 
-**Version 1.3.3**
+**Version 1.3.4**
 
-  * Added `mass` attribute to the GameObject class and Movement module.
-  * Added readers for the attributes of `Ramp`.
-  * Added z-index support to all drawing functions.
-
-**WARNING**: this version can generate incompatibility, because the `move`
-method of `Movement` now requires the calling object to have a `mass` attribute.
+  * Fixed issue when running the game from a directory other than the directory
+of the game script.
+  * Added `prefix=` method to `Res`, allowing specification of the prefix for
+the 'data' directory.
+  * Added the `limit_cam` and `isometric` options to the `Map` class.
