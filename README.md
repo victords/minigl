@@ -32,7 +32,6 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki).
 
-**Version 1.3.5**
+**Version 1.3.6**
 
-  * Fixed Gosu version dependency.
-  * Added Gemfile, for developers.
+  * Changed license to MIT.
