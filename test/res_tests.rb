@@ -6,7 +6,7 @@ class ResTest < Test::Unit::TestCase
 	def setup
 		@window = Gosu::Window.new 800, 600, false
 		Game.initialize @window
-    Res.prefix = File.expand_path(File.dirname(__FILE__))
+    Res.prefix = File.expand_path(File.dirname(__FILE__)) + '/data'
 	end
 
 	def test_tileset

@@ -2,9 +2,88 @@ require 'gosu'
 
 # The main module of the library, used only as a namespace.
 module AGL
-	# A Struct with two attributes, x and y (in this order), representing a point
-	# in a bidimensional space.
-	Vector = Struct.new :x, :y
+	# This class represents a point or vector in a bidimensional space.
+	class Vector
+    # The x coordinate of the vector
+    attr_accessor :x
+
+    # The y coordinate of the vector
+    attr_accessor :y
+
+    # Creates a new bidimensional vector.
+    #
+    # Parameters:
+    # [x] The x coordinate of the vector
+    # [y] The y coordinate of the vector
+    def initialize x, y
+      @x = x
+      @y = y
+    end
+
+    # Returns +true+ if both coordinates of this vector are equal to the
+    # corresponding coordinates of +other_vector+, with +precision+ decimal
+    # places of precision.
+    def == other_vector, precision = 6
+      @x.round(precision) == other_vector.x.round(precision) and
+          @y.round(precision) == other_vector.y.round(precision)
+    end
+
+    # Returns +true+ if at least one coordinate of this vector is different from
+    # the corresponding coordinate of +other_vector+, with +precision+ decimal
+    # places of precision.
+    def != other_vector, precision = 6
+      @x.round(precision) != other_vector.x.round(precision) or
+          @y.round(precision) != other_vector.y.round(precision)
+    end
+
+    # Sums this vector with +other_vector+, i.e., sums each coordinate of this
+    # vector with the corresponding coordinate of +other_vector+.
+    def + other_vector
+      Vector.new @x + other_vector.x, @y + other_vector.y
+    end
+
+    # Subtracts +other_vector+ from this vector, i.e., subtracts from each
+    # coordinate of this vector the corresponding coordinate of +other_vector+.
+    def - other_vector
+      Vector.new @x - other_vector.x, @y - other_vector.y
+    end
+
+    # Multiplies this vector by a scalar, i.e., each coordinate is multiplied by
+    # the given number.
+    def * scalar
+      Vector.new @x * scalar, @y * scalar
+    end
+
+    # Divides this vector by a scalar, i.e., each coordinate is divided by the
+    # given number.
+    def / scalar
+      Vector.new @x / scalar.to_f, @y / scalar.to_f
+    end
+
+    # Returns the euclidean distance between this vector and +other_vector+.
+    def distance other_vector
+      dx = @x - other_vector.x
+      dy = @y - other_vector.y
+      Math.sqrt(dx ** 2 + dy ** 2)
+    end
+
+    # Returns a vector corresponding to the rotation of this vector around the
+    # origin (0, 0) by +radians+ radians.
+    def rotate radians
+      sin = Math.sin radians
+      cos = Math.cos radians
+      Vector.new cos * @x - sin * @y, sin * @x + cos * @y
+    end
+
+    # Rotates this vector by +radians+ radians around the origin (0, 0).
+    def rotate! radians
+      sin = Math.sin radians
+      cos = Math.cos radians
+      prev_x = @x
+      @x = cos * @x - sin * @y
+      @y = sin * prev_x + cos * @y
+    end
+  end
 
 	# This class represents a rectangle by its x and y coordinates and width and
 	# height.
@@ -328,12 +407,16 @@ module AGL
 			@@global_songs = Hash.new
 			@@fonts = Hash.new
 			@@global_fonts = Hash.new
-			@@prefix = File.expand_path(File.dirname($0)) + '/'
-			puts @@prefix
+			@@prefix = File.expand_path(File.dirname($0)) + '/data/'
     end
 
+    # Get the current prefix for searching data files. This is the directory
+    # under which 'img', 'sound', 'song', etc. folders are located.
+    def self.prefix; @@prefix; end
+
     # Set a custom prefix for loading resources. By default, the prefix is the
-    # directory of the game script.
+    # directory of the game script. The prefix is the directory under which
+    # 'img', 'sound', 'song', etc. folders are located.
     def self.prefix= value
       value += '/' if value[-1] != '/'
       @@prefix = value
@@ -359,7 +442,7 @@ module AGL
 		def self.img id, global = false, tileable = false, ext = ".png"
 			if global; a = @@global_imgs; else; a = @@imgs; end
 			return a[id] if a[id]
-			s = @@prefix + "data/img/" + id.to_s.split('_').join('/') + ext
+			s = @@prefix + "img/" + id.to_s.split('_').join('/') + ext
 			img = Gosu::Image.new Game.window, s, tileable
 			a[id] = img
 		end
@@ -382,7 +465,7 @@ module AGL
 		def self.imgs id, sprite_cols, sprite_rows, global = false, ext = ".png"
 			if global; a = @@global_imgs; else; a = @@imgs; end
 			return a[id] if a[id]
-			s = @@prefix + "data/img/" + id.to_s.split('_').join('/') + ext
+			s = @@prefix + "img/" + id.to_s.split('_').join('/') + ext
 			imgs = Gosu::Image.load_tiles Game.window, s, -sprite_cols, -sprite_rows, false
 			a[id] = imgs
 		end
@@ -406,7 +489,7 @@ module AGL
 		def self.tileset id, tile_width = 32, tile_height = 32, global = false, ext = ".png"
 			if global; a = @@global_tilesets; else; a = @@tilesets; end
 			return a[id] if a[id]
-			s = @@prefix + "data/tileset/" + id.to_s.split('_').join('/') + ext
+			s = @@prefix + "tileset/" + id.to_s.split('_').join('/') + ext
 			tileset = Gosu::Image.load_tiles Game.window, s, tile_width, tile_height, true
 			a[id] = tileset
 		end
@@ -426,7 +509,7 @@ module AGL
 		def self.sound id, global = false, ext = ".wav"
 			if global; a = @@global_sounds; else; a = @@sounds; end
 			return a[id] if a[id]
-			s = @@prefix + "data/sound/" + id.to_s.split('_').join('/') + ext
+			s = @@prefix + "sound/" + id.to_s.split('_').join('/') + ext
 			sound = Gosu::Sample.new Game.window, s
 			a[id] = sound
 		end
@@ -446,7 +529,7 @@ module AGL
 		def self.song id, global = false, ext = ".ogg"
 			if global; a = @@global_songs; else; a = @@songs; end
 			return a[id] if a[id]
-			s = @@prefix + "data/song/" + id.to_s.split('_').join('/') + ext
+			s = @@prefix + "song/" + id.to_s.split('_').join('/') + ext
 			song = Gosu::Song.new Game.window, s
 			a[id] = song
 		end
@@ -470,7 +553,7 @@ module AGL
 			if global; a = @@global_fonts; else; a = @@fonts; end
 			id_size = "#{id}_#{size}"
 			return a[id_size] if a[id_size]
-			s = @@prefix + "data/font/" + id.to_s.split('_').join('/') + ext
+			s = @@prefix + "font/" + id.to_s.split('_').join('/') + ext
 			font = Gosu::Font.new Game.window, s, size
 			a[id_size] = font
 		end

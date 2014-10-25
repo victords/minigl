@@ -5,6 +5,11 @@ module AGL
 	# a grid of equally sized tiles. It also provides viewport control, through
 	# its camera property and methods.
 	class Map
+    # :nodoc:
+    Sqrt2Div2 = Math.sqrt(2) / 2
+    # :nodoc:
+    MinusPiDiv4 = -Math::PI / 4
+
 		# A Vector where x is the tile width and y is the tile height.
 		attr_reader :tile_size
 
@@ -145,8 +150,6 @@ module AGL
 		end
 
 	private
-    Sqrt2Div2 = Math.sqrt(2) / 2
-    MinusPiDiv4 = -Math::PI / 4
 
 		def set_bounds
 			if @isometric
@@ -242,20 +245,14 @@ module AGL
       center.y *= @tile_ratio
 
       # Rotaciona o vetor posição -45°
-      position = rotate position, MinusPiDiv4
+      position.rotate! MinusPiDiv4
 
       # Retorna a referência da posição para o canto da tela
-      position.x += center.x; position.y += center.y
+      position += center
 
       # O mapa quadrado está centralizado no centro do losango, precisa retornar ao canto da tela
       position.x -= @isometric_offset_x; position.y -= @isometric_offset_y
       position
     end
-
-		def rotate v, angle
-			sin = Math.sin angle
-			cos = Math.cos angle
-			Vector.new cos * v.x - sin * v.y, sin * v.x + cos * v.y
-		end
 	end
 end

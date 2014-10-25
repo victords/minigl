@@ -6,7 +6,7 @@ class SpriteTest < Test::Unit::TestCase
 	def setup
 		@window = Gosu::Window.new 800, 600, false
 		Game.initialize @window
-    Res.prefix = File.expand_path(File.dirname(__FILE__))
+    Res.prefix = File.expand_path(File.dirname(__FILE__)) + '/data'
 	end
 
 	def test_sprite_position
@@ -33,7 +33,7 @@ class GameObjectTest < Test::Unit::TestCase
 	def setup
 		@window = Gosu::Window.new 800, 600, false
 		Game.initialize @window
-    Res.prefix = File.expand_path(File.dirname(__FILE__))
+    Res.prefix = File.expand_path(File.dirname(__FILE__)) + '/data'
 	end
 
 	def test_game_object_attributes

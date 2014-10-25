@@ -32,6 +32,8 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki).
 
-**Version 1.3.6**
+**Version 1.3.7**
 
-  * Changed license to MIT.
+  * Minor adjustment and exposure of `prefix` attribute of `Res`.
+  * Removed debug message that was being output when starting the game.
+  * Improved the `Vector` class with operations, comparisons, etc.
