@@ -32,8 +32,13 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki).
 
-**Version 1.3.7**
+**Version 1.3.8**
 
-  * Minor adjustment and exposure of `prefix` attribute of `Res`.
-  * Removed debug message that was being output when starting the game.
-  * Improved the `Vector` class with operations, comparisons, etc.
+  * Fix in `Map` for non-integer camera coordinates in ortogonal maps.
+  * Fixed documentation for `Map` class.
+  * Fixed bug in `text=` of `TextField`.
+  * Fixed indentation of all files.
+
+**P.S.** I'm sorry for the few last releases which brought so few
+improvements to the library... Still, I think this is better than leaving those
+small errors uncorrected.
