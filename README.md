@@ -16,8 +16,8 @@ to victordavidsantos@gmail.com.
 
 ## Installing
 
-MiniGL was built on top of the Gosu gem, version 0.7.50. This gem has its own
-dependencies for compiling extensions. Visit
+MiniGL was built on top of the Gosu gem. This gem has its own dependencies for
+compiling extensions. Visit
 [this page](https://github.com/jlnr/gosu/wiki/Getting-Started-on-Linux) for
 details.
 
@@ -32,14 +32,7 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki).
 
-**Version 1.3.8**
-
-  * Fix in `Map` for non-integer camera coordinates in ortogonal maps.
-  * Fixed documentation for `Map` class.
-  * Fixed bug in `text=` of `TextField`.
-  * Fixed indentation of all files.
-
-**Version 1.3.8p1**
+**Version 1.3.9**
 
   * Fixed gosu dependency (~> 0.7).
 
