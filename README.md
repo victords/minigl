@@ -39,6 +39,10 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * Fixed bug in `text=` of `TextField`.
   * Fixed indentation of all files.
 
+**Version 1.3.8p1**
+
+  * Fixed gosu dependency (~> 0.7).
+
 **P.S.** I'm sorry for the few last releases which brought so few
 improvements to the library... Still, I think this is better than leaving those
 small errors uncorrected.
