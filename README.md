@@ -32,10 +32,10 @@ this [working game example](https://github.com/victords/aventura-do-saber).
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki).
 
-**Version 1.3.9**
+**Version 1.3.10**
 
-  * Fixed gosu dependency (~> 0.7).
+  * Split the `center` parameter in `Button` and `ToggleButton` constructors
+into `center_x` and `center_y` (see doc. for details).
 
-**P.S.** I'm sorry for the few last releases which brought so few
-improvements to the library... Still, I think this is better than leaving those
-small errors uncorrected.
+**P.S.** This version can cause incompatibility because of the parameter order
+in the constructors of `Button` and `ToggleButton`.

@@ -19,7 +19,7 @@ module AGL
 
     # This constructor is for internal use of the subclasses only. Do not
     # instantiate objects of this class.
-    def initialize x, y, font, text, text_color, disabled_text_color
+    def initialize(x, y, font, text, text_color, disabled_text_color)
       @x = x
       @y = y
       @font = font
@@ -49,9 +49,12 @@ module AGL
     # [text_color] Color of the button text, in hexadecimal RRGGBB format.
     # [disabled_text_color] Color of the button text, when it's disabled, in
     #                       hexadecimal RRGGBB format.
-    # [center] Whether the button text should be centered in its area (the
-    #          area is defined by the image size, when an image is given, or
-    #          by the +width+ and +height+ parameters, otherwise).
+    # [center_x] Whether the button text should be horizontally centered in its
+    #            area (the area is defined by the image size, if an image is
+    #            given, or by the +width+ and +height+ parameters, otherwise).
+    # [center_y] Whether the button text should be vertically centered in its
+    #            area (the area is defined by the image size, if an image is
+    #            given, or by the +width+ and +height+ parameters, otherwise).
     # [margin_x] The x offset, from the button x-coordinate, to draw the text.
     #            This parameter is used only if +center+ is false.
     # [margin_y] The y offset, from the button y-coordinate, to draw the text.
@@ -68,8 +71,8 @@ module AGL
     #          parameters.
     # [action] The block of code executed when the button is clicked (or by
     #          calling the +click+ method).
-    def initialize x, y, font, text, img, text_color = 0, disabled_text_color = 0, center = true, margin_x = 0, margin_y = 0,
-                   width = nil, height = nil, params = nil, &action
+    def initialize(x, y, font, text, img, text_color = 0, disabled_text_color = 0, center_x = true, center_y = true,
+                   margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action)
       super x, y, font, text, text_color, disabled_text_color
       @img =
         if img; Res.imgs img, 1, 4, true
@@ -80,14 +83,12 @@ module AGL
       @h =
         if img; @img[0].height
         else; height; end
-      if center
-        @text_x = x + @w / 2 if @w
-        @text_y = y + @h / 2 if @h
-      else
-        @text_x = x + margin_x
-        @text_y = y + margin_y
-      end
-      @center = center
+      if center_x; @text_x = x + @w / 2 if @w
+      else; @text_x = x + margin_x; end
+      if center_y; @text_y = y + @h / 2 if @h
+      else; @text_y = y + margin_y; end
+      @center_x = center_x
+      @center_y = center_y
       @action = action
       @params = params
 
@@ -155,17 +156,12 @@ module AGL
     # Parameters:
     # [x] The new x-coordinate for the button.
     # [y] The new y-coordinate for the button.
-    def set_position x, y
-      d_x = x - @x
-      d_y = y - @y
+    def set_position(x, y)
+      if @center_x; @text_x = x + @w / 2
+      else; @text_x += x - @x; end
+      if @center_y; @text_y = y + @h / 2
+      else; @text_y += y - @y; end
       @x = x; @y = y
-      if @center
-        @text_x = x + @w / 2
-        @text_y = y + @h / 2
-      else
-        @text_x += d_x
-        @text_y += d_y
-      end
     end
 
     # Draws the button in the screen.
@@ -175,22 +171,24 @@ module AGL
     #         vary between 0 (fully transparent) and 255 (fully opaque).
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
-    def draw alpha = 0xff, z_index = 0
+    def draw(alpha = 0xff, z_index = 0)
       return unless @visible
 
       color = (alpha << 24) | 0xffffff
       text_color = (alpha << 24) | (@enabled ? @text_color : @disabled_text_color)
       @img[@img_index].draw @x, @y, z_index, 1, 1, color if @img
       if @text
-        if @center
-          @font.draw_rel @text, @text_x, @text_y, z_index, 0.5, 0.5, 1, 1, text_color
+        if @center_x or @center_y
+          rel_x = @center_x ? 0.5 : 0
+          rel_y = @center_y ? 0.5 : 0
+          @font.draw_rel @text, @text_x, @text_y, z_index, rel_x, rel_y, 1, 1, text_color
         else
           @font.draw @text, @text_x, @text_y, z_index, 1, 1, text_color
         end
       end
     end
 
-    def enabled= value # :nodoc:
+    def enabled=(value) # :nodoc:
       @enabled = value
       @state = :up
       @img_index = 3
@@ -217,9 +215,9 @@ module AGL
     #     puts "button was checked" if checked
     #     # do something with params
     #   }
-    def initialize x, y, font, text, img, checked = false, text_color = 0, disabled_text_color = 0, center = true, margin_x = 0, margin_y = 0,
-                   width = nil, height = nil, params = nil, &action
-      super x, y, font, text, nil, text_color, disabled_text_color, center, margin_x, margin_y, width, height, params, &action
+    def initialize(x, y, font, text, img, checked = false, text_color = 0, disabled_text_color = 0, center_x = true, center_y = true,
+                   margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action)
+      super x, y, font, text, nil, text_color, disabled_text_color, center_x, center_y, margin_x, margin_y, width, height, params, &action
       @img =
         if img; Res.imgs img, 2, 4, true
         else; nil; end
@@ -229,10 +227,8 @@ module AGL
       @h =
         if img; @img[0].height
         else; height; end
-      if center
-        @text_x = x + @w / 2
-        @text_y = y + @h / 2
-      end
+      @text_x = x + @w / 2 if center_x
+      @text_y = y + @h / 2 if center_y
       @checked = checked
     end
 
@@ -258,12 +254,12 @@ module AGL
     #
     # Parameters:
     # [value] The state to be set (+true+ for checked, +false+ for unchecked).
-    def checked= value
+    def checked=(value)
       click if value != @checked
       @checked = value
     end
 
-    def enabled= value # :nodoc:
+    def enabled=(value) # :nodoc:
       @enabled = value
       @state = :up
       @img_index = @checked ? 7 : 6
@@ -320,8 +316,8 @@ module AGL
     #                   field is changed, either by user input or by calling
     #                   +text=+. The new text is passed as a first parameter
     #                   to this block, followed by +params+. Can be +nil+.
-    def initialize x, y, font, img, cursor_img = nil, disabled_img = nil, margin_x = 0, margin_y = 0, max_length = 100, active = false, text = "",
-                   allowed_chars = nil, text_color = 0, disabled_text_color = 0, selection_color = 0, params = nil, &on_text_changed
+    def initialize(x, y, font, img, cursor_img = nil, disabled_img = nil, margin_x = 0, margin_y = 0, max_length = 100, active = false, text = '',
+                   allowed_chars = nil, text_color = 0, disabled_text_color = 0, selection_color = 0, params = nil, &on_text_changed)
       super x, y, font, text, text_color, disabled_text_color
       @img = Res.img img
       @w = @img.width
@@ -417,10 +413,10 @@ module AGL
       end
 
       ############################### Keyboard ##############################
-      shift = ((KB.key_down? @k[53]) or (KB.key_down? @k[54]))
-      if ((KB.key_pressed? @k[53]) or (KB.key_pressed? @k[54])) # shift
+      shift = (KB.key_down?(@k[53]) or KB.key_down?(@k[54]))
+      if KB.key_pressed?(@k[53]) or KB.key_pressed?(@k[54]) # shift
         @anchor1 = @cur_node if @anchor1.nil?
-      elsif ((KB.key_released? @k[53]) or (KB.key_released? @k[54]))
+      elsif KB.key_released?(@k[53]) or KB.key_released?(@k[54])
         @anchor1 = nil if @anchor2.nil?
       end
       inserted = false
@@ -530,7 +526,7 @@ module AGL
     # [value] The new text to be set. If it's longer than the +max_length+
     #         parameter used in the constructor, it will be truncated to
     #         +max_length+ characters.
-    def text= value
+    def text=(value)
       @text = value[0...@max_length]
       @nodes.clear; @nodes << @text_x
       x = @nodes[0]
@@ -547,7 +543,7 @@ module AGL
 
     # Returns the currently selected text.
     def selected_text
-      return "" if @anchor2.nil?
+      return '' if @anchor2.nil?
       min = @anchor1 < @anchor2 ? @anchor1 : @anchor2
       max = min == @anchor1 ? @anchor2 : @anchor1
       @text[min..max]
@@ -572,7 +568,7 @@ module AGL
     # Parameters:
     # [x] The new x-coordinate for the text field.
     # [y] The new y-coordinate for the text field.
-    def set_position x, y
+    def set_position(x, y)
       d_x = x - @x
       d_y = y - @y
       @x = x; @y = y
@@ -590,7 +586,7 @@ module AGL
     #         values vary between 0 (fully transparent) and 255 (fully opaque).
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
-    def draw alpha = 0xff, z_index = 0
+    def draw(alpha = 0xff, z_index = 0)
       return unless @visible
 
       color = (alpha << 24) | ((@enabled or @disabled_img) ? 0xffffff : 0x808080)
@@ -620,12 +616,12 @@ module AGL
       end
     end
 
-    def enabled= value # :nodoc:
+    def enabled=(value) # :nodoc:
       @enabled = value
       unfocus unless @enabled
     end
 
-    def visible= value # :nodoc:
+    def visible=(value) # :nodoc:
       @visible = value
       unfocus unless @visible
     end
@@ -652,7 +648,7 @@ module AGL
       @cur_node = index
     end
 
-    def insert_char char
+    def insert_char(char)
       return unless @allowed_chars.index char and @text.length < @max_length
       @text.insert @cur_node, char
       @nodes.insert @cur_node + 1, @nodes[@cur_node] + @font.text_width(char)
@@ -664,7 +660,7 @@ module AGL
       @on_text_changed.call @text, @params if @on_text_changed
     end
 
-    def remove_interval will_insert = false
+    def remove_interval(will_insert = false)
       min = @anchor1 < @anchor2 ? @anchor1 : @anchor2
       max = min == @anchor1 ? @anchor2 : @anchor1
       interval_width = 0
@@ -683,10 +679,10 @@ module AGL
       @on_text_changed.call @text, @params if @on_text_changed and not will_insert
     end
 
-    def remove_char back
+    def remove_char(back)
       @cur_node -= 1 if back
       char_width = @font.text_width(@text[@cur_node])
-      @text[@cur_node] = ""
+      @text[@cur_node] = ''
       @nodes.delete_at @cur_node + 1
       for i in (@cur_node + 1)..(@nodes.size - 1)
         @nodes[i] -= char_width
