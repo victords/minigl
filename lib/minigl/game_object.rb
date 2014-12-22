@@ -32,7 +32,7 @@ module AGL
     #               image is not a spritesheet.
     # [sprite_rows] The number of rows in the spritesheet. Use +nil+ if the
     #               image is not a spritesheet.
-    def initialize x, y, img, sprite_cols = nil, sprite_rows = nil
+    def initialize(x, y, img, sprite_cols = nil, sprite_rows = nil)
       @x = x; @y = y
       @img =
         if sprite_cols.nil?
@@ -56,7 +56,7 @@ module AGL
     # [interval] The amount of frames between each change in the image index.
     #            A frame will usually represent 1/60 second (roughly 17
     #            milliseconds).
-    def animate indices, interval
+    def animate(indices, interval)
       @anim_counter += 1
       if @anim_counter >= interval
         @index_index += 1
@@ -85,7 +85,7 @@ module AGL
     #         its center.
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
-    def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, z_index = 0
+    def draw(map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, z_index = 0)
       color = (alpha << 24) | color
       if map
         if angle
@@ -128,7 +128,7 @@ module AGL
     #               image is not a spritesheet.
     # [mass] The mass of the object. Details on how it is used can be found
     #        in the Movement module.
-    def initialize x, y, w, h, img, img_gap = nil, sprite_cols = nil, sprite_rows = nil, mass = 1.0
+    def initialize(x, y, w, h, img, img_gap = nil, sprite_cols = nil, sprite_rows = nil, mass = 1.0)
       super x, y, img, sprite_cols, sprite_rows
       @w = w; @h = h
       @img_gap =
@@ -149,7 +149,7 @@ module AGL
     #
     # Parameters:
     # [index] The image index to be set.
-    def set_animation index
+    def set_animation(index)
       @anim_counter = 0
       @img_index = index
       @index_index = 0
@@ -174,7 +174,7 @@ module AGL
     #         its center.
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
-    def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, z_index = 0
+    def draw(map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, z_index = 0)
       color = (alpha << 24) | color
       if map
         if angle
@@ -222,7 +222,7 @@ module AGL
     #            of the Effect object. If +nil+, it will be set to
     #            <code>@indices.length * interval</code>, i.e., the exact time
     #            needed for one animation cycle to complete.
-    def initialize x, y, img, sprite_cols = nil, sprite_rows = nil, interval = 10, indices = nil, lifetime = nil
+    def initialize(x, y, img, sprite_cols = nil, sprite_rows = nil, interval = 10, indices = nil, lifetime = nil)
       super x, y, img, sprite_cols, sprite_rows
       @timer = 0
       if indices
@@ -247,7 +247,7 @@ module AGL
       end
     end
 
-    def draw map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, z_index = 0
+    def draw(map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, z_index = 0)
       super unless @dead
     end
   end

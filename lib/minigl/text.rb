@@ -8,7 +8,7 @@ module AGL
     # [font] A <code>Gosu::Font</code> that will be used to draw the text.
     # [line_spacing] When drawing multiple lines, the distance, in pixels,
     #                between each line.
-    def initialize font, line_spacing = 0
+    def initialize(font, line_spacing = 0)
       @font = font
       @line_spacing = line_spacing
     end
@@ -31,7 +31,7 @@ module AGL
     #         transparent) to 255 (fully opaque).
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
-    def write_line text, x, y, mode = :left, color = 0, alpha = 0xff, z_index = 0
+    def write_line(text, x, y, mode = :left, color = 0, alpha = 0xff, z_index = 0)
       color = (alpha << 24) | color
       rel =
         case mode
@@ -62,7 +62,7 @@ module AGL
     #         transparent) to 255 (fully opaque).
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
-    def write_breaking text, x, y, width, mode = :left, color = 0, alpha = 0xff, z_index = 0
+    def write_breaking(text, x, y, width, mode = :left, color = 0, alpha = 0xff, z_index = 0)
       color = (alpha << 24) | color
       text.split("\n").each do |p|
         if mode == :justified
@@ -82,14 +82,14 @@ module AGL
 
   private
 
-    def write_paragraph text, x, y, width, rel, color, z_index
-      line = ""
+    def write_paragraph(text, x, y, width, rel, color, z_index)
+      line = ''
       line_width = 0
       text.split(' ').each do |word|
         w = @font.text_width word
         if line_width + w > width
           @font.draw_rel line.chop, x, y, z_index, rel, 0, 1, 1, color
-          line = ""
+          line = ''
           line_width = 0
           y += @font.height + @line_spacing
         end
@@ -101,7 +101,7 @@ module AGL
     end
 
     def write_paragraph_justified text, x, y, width, color, z_index
-      space_width = @font.text_width " "
+      space_width = @font.text_width ' '
       spaces = [[]]
       line_index = 0
       new_x = x

@@ -120,45 +120,27 @@ module AGL
     end
   end
 
-  # The main class for a MiniGL game, holds references to globally accessible
-  # objects and constants.
-  class Game
-    # Initializes a MiniGL game. This method must be called before any feature
-    # provided by the library can be used.
-    #
-    # Parameters:
-    # [window] An instance of a class which inherits from
-    #          <code>Gosu::Window</code>. This will be the game window, used
-    #          to draw everything and capture user input.
-    # [gravity] A Vector object representing the horizontal and vertical
-    #           components of the force of gravity. Essentially, this force
-    #           will be applied to every object which calls +move+, from the
-    #           Movement module.
-    # [kb_held_delay] The number of frames a key must be held by the user
-    #                 before the "held" event (that can be checked with
-    #                 <code>KB.key_held?</code>) starts to trigger.
-    # [kb_held_interval] The interval, in frames, between each triggering of
-    #                    the "held" event, after the key has been held for
-    #                    more than +kb_held_delay+ frames.
-    # [double_click_delay] The maximum interval, in frames, between two
-    #                      clicks, to trigger the "double click" event
-    #                      (checked with <code>Mouse.double_click?</code>).
-    def self.initialize window, gravity = Vector.new(0, 1),
-                        kb_held_delay = 40, kb_held_interval = 5,
-                        double_click_delay = 8
+  class G
+    # Initializes a MiniGL game. This method is called whenever a +Game+ object
+    # is instantiated and must NOT be called explicitly.
+    def self.initialize(window, fullscreen, gravity, kb_held_delay, kb_held_interval, double_click_delay)
       @@window = window
+      @@fullscreen = fullscreen
       @@gravity = gravity
       @@kb_held_delay = kb_held_delay
       @@kb_held_interval = kb_held_interval
       @@double_click_delay = double_click_delay
+    end
 
-      KB.initialize
-      Mouse.initialize
-      Res.initialize
+    def self.toggle_fullscreen
+      # ferrou...
     end
 
     # Returns a reference to the game window.
     def self.window; @@window; end
+
+    # Returns whether the game window is currently in full screen mode.
+    def self.fullscreen; @@fullscreen; end
 
     # Returns a Vector representing the force of gravity. See +initialize+ for
     # details.
@@ -172,6 +154,39 @@ module AGL
 
     # Returns the value of double_click_delay. See +initialize+ for details.
     def self.double_click_delay; @@double_click_delay; end
+  end
+
+  # The main class for a MiniGL game, holds references to globally accessible
+  # objects and constants.
+  class Game < Gosu::Window
+    # Creates a game window (initializing a game with all MiniGL features
+    # enabled).
+    #
+    # Parameters:
+    # [scr_w] Width of the window, in pixels.
+    # [scr_h] Height of the window, in pixels.
+    # [fullscreen] Whether the window must be initialized in full screen mode.
+    # [gravity] A Vector object representing the horizontal and vertical
+    #           components of the force of gravity. Essentially, this force
+    #           will be applied to every object which calls +move+, from the
+    #           Movement module.
+    # [kb_held_delay] The number of frames a key must be held by the user
+    #                 before the "held" event (that can be checked with
+    #                 <code>KB.key_held?</code>) starts to trigger.
+    # [kb_held_interval] The interval, in frames, between each triggering of
+    #                    the "held" event, after the key has been held for
+    #                    more than +kb_held_delay+ frames.
+    # [double_click_delay] The maximum interval, in frames, between two
+    #                      clicks, to trigger the "double click" event
+    #                      (checked with <code>Mouse.double_click?</code>).
+    def initialize(scr_w, scr_h, fullscreen = true, gravity = Vector.new(0, 1),
+                   kb_held_delay = 40, kb_held_interval = 5, double_click_delay = 8)
+      super scr_w, scr_h, fullscreen
+      G.initialize(self, fullscreen, gravity, kb_held_delay, kb_held_interval, double_click_delay)
+      KB.initialize
+      Mouse.initialize
+      Res.initialize
+    end
   end
 
   #class JSHelper
@@ -210,7 +225,7 @@ module AGL
     # Updates the state of all keys.
     def self.update
       @@held_timer.each do |k, v|
-        if v < Game.kb_held_delay; @@held_timer[k] += 1
+        if v < G.kb_held_delay; @@held_timer[k] += 1
         else
           @@held_interval[k] = 0
           @@held_timer.delete k
@@ -218,14 +233,14 @@ module AGL
       end
 
       @@held_interval.each do |k, v|
-        if v < Game.kb_held_interval; @@held_interval[k] += 1
+        if v < G.kb_held_interval; @@held_interval[k] += 1
         else; @@held_interval[k] = 0; end
       end
 
       @@prev_down = @@down.clone
       @@down.clear
       @@keys.each do |k|
-        if Game.window.button_down? k
+        if G.window.button_down? k
           @@down << k
           @@held_timer[k] = 0 if @@prev_down.index(k).nil?
         elsif @@prev_down.index(k)
@@ -257,7 +272,7 @@ module AGL
     #       Gosu::KbBacktick, Gosu::KbMinus, Gosu::KbEqual, Gosu::KbBracketLeft,
     #       Gosu::KbBracketRight, Gosu::KbBackslash, Gosu::KbApostrophe,
     #       Gosu::KbComma, Gosu::KbPeriod, Gosu::KbSlash</code>.
-    def self.key_pressed? key
+    def self.key_pressed?(key)
       @@prev_down.index(key).nil? and @@down.index(key)
     end
 
@@ -265,7 +280,7 @@ module AGL
     #
     # Parameters:
     # [key] Code of the key to be checked. See +key_pressed?+ for details.
-    def self.key_down? key
+    def self.key_down?(key)
       @@down.index(key)
     end
 
@@ -274,7 +289,7 @@ module AGL
     #
     # Parameters:
     # [key] Code of the key to be checked. See +key_pressed?+ for details.
-    def self.key_released? key
+    def self.key_released?(key)
       @@prev_down.index(key) and @@down.index(key).nil?
     end
 
@@ -283,8 +298,8 @@ module AGL
     #
     # Parameters:
     # [key] Code of the key to be checked. See +key_pressed?+ for details.
-    def self.key_held? key
-      @@held_interval[key] == Game.kb_held_interval
+    def self.key_held?(key)
+      @@held_interval[key] == G.kb_held_interval
     end
   end
 
@@ -306,14 +321,14 @@ module AGL
       @@dbl_click.clear
 
       @@dbl_click_timer.each do |k, v|
-        if v < Game.double_click_delay; @@dbl_click_timer[k] += 1
+        if v < G.double_click_delay; @@dbl_click_timer[k] += 1
         else; @@dbl_click_timer.delete k; end
       end
 
       k1 = [Gosu::MsLeft, Gosu::MsMiddle, Gosu::MsRight]
       k2 = [:left, :middle, :right]
       for i in 0..2
-        if Game.window.button_down? k1[i]
+        if G.window.button_down? k1[i]
           @@down[k2[i]] = true
           @@dbl_click[k2[i]] = true if @@dbl_click_timer[k2[i]]
           @@dbl_click_timer.delete k2[i]
@@ -322,8 +337,8 @@ module AGL
         end
       end
 
-      @@x = Game.window.mouse_x.round
-      @@y = Game.window.mouse_y.round
+      @@x = G.window.mouse_x.round
+      @@y = G.window.mouse_y.round
     end
 
     # Returns the x-coordinate of the mouse cursor in the screen.
@@ -338,7 +353,7 @@ module AGL
     # Parameters:
     # [btn] Button to be checked. Valid values are +:left+, +:middle+ and
     #       +:right+
-    def self.button_pressed? btn
+    def self.button_pressed?(btn)
       @@down[btn] and not @@prev_down[btn]
     end
 
@@ -347,7 +362,7 @@ module AGL
     # Parameters:
     # [btn] Button to be checked. Valid values are +:left+, +:middle+ and
     #       +:right+
-    def self.button_down? btn
+    def self.button_down?(btn)
       @@down[btn]
     end
 
@@ -357,7 +372,7 @@ module AGL
     # Parameters:
     # [btn] Button to be checked. Valid values are +:left+, +:middle+ and
     #       +:right+
-    def self.button_released? btn
+    def self.button_released?(btn)
       @@prev_down[btn] and not @@down[btn]
     end
 
@@ -366,7 +381,7 @@ module AGL
     # Parameters:
     # [btn] Button to be checked. Valid values are +:left+, +:middle+ and
     #       +:right+
-    def self.double_click? btn
+    def self.double_click?(btn)
       @@dbl_click[btn]
     end
 
@@ -377,7 +392,7 @@ module AGL
     # [y] The y-coordinate of the top left corner of the area.
     # [w] The width of the area.
     # [h] The height of the area.
-    def self.over? x, y, w, h
+    def self.over?(x, y, w, h)
       @@x >= x and @@x < x + w and @@y >= y and @@y < y + h
     end
   end
@@ -417,7 +432,7 @@ module AGL
     # Set a custom prefix for loading resources. By default, the prefix is the
     # directory of the game script. The prefix is the directory under which
     # 'img', 'sound', 'song', etc. folders are located.
-    def self.prefix= value
+    def self.prefix=(value)
       value += '/' if value[-1] != '/'
       @@prefix = value
     end
@@ -439,11 +454,11 @@ module AGL
     #            continuous composition.
     # [ext] The extension of the file being loaded. Specify only if it is
     #       other than ".png".
-    def self.img id, global = false, tileable = false, ext = ".png"
+    def self.img(id, global = false, tileable = false, ext = '.png')
       if global; a = @@global_imgs; else; a = @@imgs; end
       return a[id] if a[id]
-      s = @@prefix + "img/" + id.to_s.split('_').join('/') + ext
-      img = Gosu::Image.new Game.window, s, tileable
+      s = @@prefix + 'img/' + id.to_s.split('_').join('/') + ext
+      img = Gosu::Image.new G.window, s, tileable
       a[id] = img
     end
 
@@ -462,11 +477,11 @@ module AGL
     #          released when you call +clear+.
     # [ext] The extension of the file being loaded. Specify only if it is
     #       other than ".png".
-    def self.imgs id, sprite_cols, sprite_rows, global = false, ext = ".png"
+    def self.imgs(id, sprite_cols, sprite_rows, global = false, ext = '.png')
       if global; a = @@global_imgs; else; a = @@imgs; end
       return a[id] if a[id]
-      s = @@prefix + "img/" + id.to_s.split('_').join('/') + ext
-      imgs = Gosu::Image.load_tiles Game.window, s, -sprite_cols, -sprite_rows, false
+      s = @@prefix + 'img/' + id.to_s.split('_').join('/') + ext
+      imgs = Gosu::Image.load_tiles G.window, s, -sprite_cols, -sprite_rows, false
       a[id] = imgs
     end
 
@@ -486,11 +501,11 @@ module AGL
     #          released when you call +clear+.
     # [ext] The extension of the file being loaded. Specify only if it is
     #       other than ".png".
-    def self.tileset id, tile_width = 32, tile_height = 32, global = false, ext = ".png"
+    def self.tileset(id, tile_width = 32, tile_height = 32, global = false, ext = '.png')
       if global; a = @@global_tilesets; else; a = @@tilesets; end
       return a[id] if a[id]
-      s = @@prefix + "tileset/" + id.to_s.split('_').join('/') + ext
-      tileset = Gosu::Image.load_tiles Game.window, s, tile_width, tile_height, true
+      s = @@prefix + 'tileset/' + id.to_s.split('_').join('/') + ext
+      tileset = Gosu::Image.load_tiles G.window, s, tile_width, tile_height, true
       a[id] = tileset
     end
 
@@ -506,11 +521,11 @@ module AGL
     #          released when you call +clear+.
     # [ext] The extension of the file being loaded. Specify only if it is
     #       other than ".wav".
-    def self.sound id, global = false, ext = ".wav"
+    def self.sound(id, global = false, ext = '.wav')
       if global; a = @@global_sounds; else; a = @@sounds; end
       return a[id] if a[id]
-      s = @@prefix + "sound/" + id.to_s.split('_').join('/') + ext
-      sound = Gosu::Sample.new Game.window, s
+      s = @@prefix + 'sound/' + id.to_s.split('_').join('/') + ext
+      sound = Gosu::Sample.new G.window, s
       a[id] = sound
     end
 
@@ -526,11 +541,11 @@ module AGL
     #          when you call +clear+.
     # [ext] The extension of the file being loaded. Specify only if it is
     #       other than ".ogg".
-    def self.song id, global = false, ext = ".ogg"
+    def self.song(id, global = false, ext = '.ogg')
       if global; a = @@global_songs; else; a = @@songs; end
       return a[id] if a[id]
-      s = @@prefix + "song/" + id.to_s.split('_').join('/') + ext
-      song = Gosu::Song.new Game.window, s
+      s = @@prefix + 'song/' + id.to_s.split('_').join('/') + ext
+      song = Gosu::Song.new G.window, s
       a[id] = song
     end
 
@@ -549,12 +564,12 @@ module AGL
     #          when you call +clear+.
     # [ext] The extension of the file being loaded. Specify only if it is
     #       other than ".ttf".
-    def self.font id, size, global = true, ext = ".ttf"
+    def self.font(id, size, global = true, ext = '.ttf')
       if global; a = @@global_fonts; else; a = @@fonts; end
       id_size = "#{id}_#{size}"
       return a[id_size] if a[id_size]
-      s = @@prefix + "font/" + id.to_s.split('_').join('/') + ext
-      font = Gosu::Font.new Game.window, s, size
+      s = @@prefix + 'font/' + id.to_s.split('_').join('/') + ext
+      font = Gosu::Font.new G.window, s, size
       a[id_size] = font
     end
 

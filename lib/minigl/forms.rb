@@ -597,10 +597,10 @@ module AGL
 
       if @anchor1 and @anchor2
         selection_color = ((alpha / 2) << 24) | @selection_color
-        Game.window.draw_quad @nodes[@anchor1], @text_y, selection_color,
-                              @nodes[@anchor2] + 1, @text_y, selection_color,
-                              @nodes[@anchor2] + 1, @text_y + @font.height, selection_color,
-                              @nodes[@anchor1], @text_y + @font.height, selection_color, z_index
+        G.window.draw_quad @nodes[@anchor1], @text_y, selection_color,
+                           @nodes[@anchor2] + 1, @text_y, selection_color,
+                           @nodes[@anchor2] + 1, @text_y + @font.height, selection_color,
+                           @nodes[@anchor1], @text_y + @font.height, selection_color, z_index
       end
 
       if @cursor_visible
@@ -608,10 +608,10 @@ module AGL
           @cursor_img.draw @nodes[@cur_node] - @cursor_img.width / 2, @text_y, z_index
         else
           cursor_color = alpha << 24
-          Game.window.draw_quad @nodes[@cur_node], @text_y, cursor_color,
-                                @nodes[@cur_node] + 1, @text_y, cursor_color,
-                                @nodes[@cur_node] + 1, @text_y + @font.height, cursor_color,
-                                @nodes[@cur_node], @text_y + @font.height, cursor_color, z_index
+          G.window.draw_quad @nodes[@cur_node], @text_y, cursor_color,
+                             @nodes[@cur_node] + 1, @text_y, cursor_color,
+                             @nodes[@cur_node] + 1, @text_y + @font.height, cursor_color,
+                             @nodes[@cur_node], @text_y + @font.height, cursor_color, z_index
         end
       end
     end
@@ -668,7 +668,7 @@ module AGL
         interval_width += @font.text_width(@text[i])
         @nodes.delete_at min + 1
       end
-      @text[min...max] = ""
+      @text[min...max] = ''
       for i in (min + 1)..(@nodes.size - 1)
         @nodes[i] -= interval_width
       end

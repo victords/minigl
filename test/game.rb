@@ -1,10 +1,9 @@
 require_relative '../lib/minigl'
 include AGL
 
-class MyGame < Gosu::Window
+class MyGame < Game
   def initialize
-    super 800, 600, false # creating a 800 x 600 window, not full screen
-    Game.initialize self, Vector.new(0, 1), 10, 2
+    super 800, 600, false
 
     @obj1 = GameObject.new 10, 10, 80, 80, :img1, Vector.new(-10, -10)
     @obj2 = Sprite.new 400, 0, :img1
@@ -62,5 +61,4 @@ class MyGame < Gosu::Window
   end
 end
 
-game = MyGame.new
-game.show
+MyGame.new.show

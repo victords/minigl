@@ -31,7 +31,7 @@ module AGL
     # [passable] Whether a moving object can pass through this block when
     # coming from below. This is a common feature of platforms in platform
     # games.
-    def initialize x, y, w, h, passable
+    def initialize(x, y, w, h, passable)
       @x = x; @y = y; @w = w; @h = h
       @passable = passable
     end
@@ -82,7 +82,7 @@ module AGL
     #     highest).
     # [left] Whether the height of the ramp increases from left to right. Use
     #        +false+ for a ramp that goes down from left to right.
-    def initialize x, y, w, h, left
+    def initialize(x, y, w, h, left)
       @x = x
       @y = y
       @w = w
@@ -95,7 +95,7 @@ module AGL
     # Parameters:
     # [obj] The object to check contact with. It must have the +x+, +y+, +w+
     #       and +h+ accessible attributes determining its bounding box.
-    def contact? obj
+    def contact?(obj)
       obj.x.round(6) == get_x(obj).round(6) && obj.y.round(6) == get_y(obj).round(6)
     end
 
@@ -105,16 +105,16 @@ module AGL
     # Parameters:
     # [obj] The object to check intersection with. It must have the +x+, +y+,
     #       +w+ and +h+ accessible attributes determining its bounding box.
-    def intersects obj
+    def intersects(obj)
       obj.x + obj.w > @x && obj.x < @x + @w && obj.y > get_y(obj) && obj.y <= @y + @h - obj.h
     end
 
     # :nodoc:
-    def can_collide? obj
+    def can_collide?(obj)
       @can_collide = (obj.speed.y >= 0 and not intersects(obj))
     end
 
-    def check_intersection obj
+    def check_intersection(obj)
       if @can_collide and intersects obj
         obj.y = get_y obj
         obj.speed.y = 0
@@ -133,12 +133,12 @@ module AGL
       end
     end
 
-    def get_x obj
+    def get_x(obj)
       return @x + (1.0 * (@y + @h - obj.y - obj.h) * @w / @h) - obj.w if @left
       @x + (1.0 * (obj.y + obj.h - @y) * @w / @h)
     end
 
-    def get_y obj
+    def get_y(obj)
       return @y - obj.h if @left && obj.x + obj.w > @x + @w
       return @y + (1.0 * (@x + @w - obj.x - obj.w) * @h / @w) - obj.h if @left
       return @y - obj.h if obj.x < @x
@@ -213,8 +213,8 @@ module AGL
     #        objects that <code>include Movement</code>.
     # [ramps] An array of ramps to be considered in the collision checking.
     #         Ramps must be instances of Ramp (or derived classes).
-    def move forces, obst, ramps
-      forces.x += Game.gravity.x; forces.y += Game.gravity.y
+    def move(forces, obst, ramps)
+      forces.x += G.gravity.x; forces.y += G.gravity.y
       forces.x += @stored_forces.x; forces.y += @stored_forces.y
       @stored_forces.x = @stored_forces.y = 0
 
@@ -323,7 +323,7 @@ module AGL
     #             checking, and carried along when colliding from above.
     #             Obstacles must be instances of Block (or derived classes),
     #             or objects that <code>include Movement</code>.
-    def move_carrying aim, speed, obstacles
+    def move_carrying(aim, speed, obstacles)
       x_d = aim.x - @x; y_d = aim.y - @y
       distance = Math.sqrt(x_d**2 + y_d**2)
       @speed.x = 1.0 * x_d * speed / distance
@@ -363,7 +363,7 @@ module AGL
     # [aim] A Vector specifying where the object will move to.
     # [speed] The constant speed at which the object will move. This must be
     #         provided as a scalar, not a vector.
-    def move_free aim, speed
+    def move_free(aim, speed)
       x_d = aim.x - @x; y_d = aim.y - @y
       distance = Math.sqrt(x_d**2 + y_d**2)
       @speed.x = 1.0 * x_d * speed / distance
@@ -402,7 +402,7 @@ module AGL
     #             checking, and carried along when colliding from above.
     #             Obstacles must be instances of Block (or derived classes),
     #             or objects that <code>include Movement</code>.
-    def cycle points, cur_point, speed, obstacles = nil
+    def cycle(points, cur_point, speed, obstacles = nil)
       if obstacles
         move_carrying points[cur_point], speed, obstacles
       else
@@ -417,7 +417,7 @@ module AGL
 
   private
 
-    def check_contact obst, ramps
+    def check_contact(obst, ramps)
       @top = @bottom = @left = @right = nil
       obst.each do |o|
         x2 = @x + @w; y2 = @y + @h; x2o = o.x + o.w; y2o = o.y + o.h
@@ -436,7 +436,7 @@ module AGL
       end
     end
 
-    def find_right_limit coll_list
+    def find_right_limit(coll_list)
       limit = @x + @w + @speed.x
       coll_list.each do |c|
         limit = c.x if !c.passable && c.x < limit
@@ -444,7 +444,7 @@ module AGL
       limit
     end
 
-    def find_left_limit coll_list
+    def find_left_limit(coll_list)
       limit = @x + @speed.x
       coll_list.each do |c|
         limit = c.x + c.w if !c.passable && c.x + c.w > limit
@@ -452,7 +452,7 @@ module AGL
       limit
     end
 
-    def find_down_limit coll_list
+    def find_down_limit(coll_list)
       limit = @y + @h + @speed.y
       coll_list.each do |c|
         limit = c.y if c.y < limit && c.y >= @y + @h
@@ -460,7 +460,7 @@ module AGL
       limit
     end
 
-    def find_up_limit coll_list
+    def find_up_limit(coll_list)
       limit = @y + @speed.y
       coll_list.each do |c|
         limit = c.y + c.h if !c.passable && c.y + c.h > limit
