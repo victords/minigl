@@ -96,7 +96,7 @@ module AGL
     # [obj] The object to check contact with. It must have the +x+, +y+, +w+
     #       and +h+ accessible attributes determining its bounding box.
     def contact?(obj)
-      obj.x.round(6) == get_x(obj).round(6) && obj.y.round(6) == get_y(obj).round(6)
+      obj.x + obj.w > @x && obj.x < @x + @w && obj.x.round(6) == get_x(obj).round(6) && obj.y.round(6) == get_y(obj).round(6)
     end
 
     # Checks if an object is intersecting this ramp (inside the corresponding
@@ -105,36 +105,37 @@ module AGL
     # Parameters:
     # [obj] The object to check intersection with. It must have the +x+, +y+,
     #       +w+ and +h+ accessible attributes determining its bounding box.
-    def intersects(obj)
+    def intersect?(obj)
       obj.x + obj.w > @x && obj.x < @x + @w && obj.y > get_y(obj) && obj.y <= @y + @h - obj.h
     end
 
     # :nodoc:
-    def can_collide?(obj)
-      @can_collide = (obj.speed.y >= 0 and not intersects(obj))
+    def check_can_collide(m)
+      y = get_y(m) + m.h
+      @can_collide = m.x + m.w > @x && @x + @w > m.x && m.y < y && m.y + m.h > y
     end
 
     def check_intersection(obj)
-      if @can_collide and intersects obj
-        obj.y = get_y obj
+      if @can_collide and intersect? obj
+        r = @h.to_f / @w
+        if obj.prev_speed.y > 0 && (@left && obj.prev_speed.x > 0 || !@left && obj.prev_speed.x < 0)
+          dx = get_x(obj) - obj.x
+          s = (obj.prev_speed.y.to_f / obj.prev_speed.x).abs
+          dx /= s + r
+          obj.x += dx
+          obj.y -= s * dx.abs
+        else
+          obj.y = get_y obj
+        end
+        obj.speed.x = (r >= 1 ? 0 : obj.speed.x * (1 - r))
         obj.speed.y = 0
-        # a = @w / @h
-        # x = get_x(obj)
-        # y = get_y(obj)
-        # w = obj.x - x
-        # h = obj.y - y
-        # dx = w * h / (w * a + h)
-        # dy = dx * a
-        #
-        # obj.x -= dx
-        # obj.y -= dy
-        # obj.speed.x *= (@w / (@w + @h))
-        # obj.speed.y = 0
       end
     end
 
     def get_x(obj)
+      return obj.x if @left && obj.x + obj.w > @x + @w
       return @x + (1.0 * (@y + @h - obj.y - obj.h) * @w / @h) - obj.w if @left
+      return obj.x if obj.x < @x
       @x + (1.0 * (obj.y + obj.h - @y) * @w / @h)
     end
 
@@ -197,6 +198,8 @@ module AGL
     # be applied in the next time +move+ is called.
     attr_accessor :stored_forces
 
+    attr_reader :prev_speed # :nodoc:
+
     # Returns the bounding box as a Rectangle.
     def bounds
       Rectangle.new @x, @y, @w, @h
@@ -228,9 +231,7 @@ module AGL
       @speed.x = (@speed.x <=> 0) * @max_speed.x if @speed.x.abs > @max_speed.x
       @speed.y = (@speed.y <=> 0) * @max_speed.y if @speed.y.abs > @max_speed.y
 
-      ramps.each do |r|
-        r.can_collide? self
-      end
+      @prev_speed = @speed.clone
 
       x = @speed.x < 0 ? @x + @speed.x : @x
       y = @speed.y < 0 ? @y + @speed.y : @y
@@ -239,7 +240,10 @@ module AGL
       move_bounds = Rectangle.new x, y, w, h
       coll_list = []
       obst.each do |o|
-        coll_list << o if move_bounds.intersects o.bounds
+        coll_list << o if move_bounds.intersect? o.bounds
+      end
+      ramps.each do |r|
+        r.check_can_collide move_bounds
       end
 
       if coll_list.length > 0
@@ -306,6 +310,11 @@ module AGL
       @x += @speed.x
       @y += @speed.y
 
+      # Keeping contact with ramp
+      # if @speed.y == 0 and @speed.x.abs <= G.ramp_contact_threshold and @bottom.is_a? Ramp
+      #   @y = @bottom.get_y(self)
+      #   puts 'aqui'
+      # end
       ramps.each do |r|
         r.check_intersection self
       end

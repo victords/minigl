@@ -15,7 +15,7 @@ module AGL
     # Parameters:
     # [x] The x coordinate of the vector
     # [y] The y coordinate of the vector
-    def initialize x, y
+    def initialize(x = 0, y = 0)
       @x = x
       @y = y
     end
@@ -23,7 +23,7 @@ module AGL
     # Returns +true+ if both coordinates of this vector are equal to the
     # corresponding coordinates of +other_vector+, with +precision+ decimal
     # places of precision.
-    def == other_vector, precision = 6
+    def ==(other_vector, precision = 6)
       @x.round(precision) == other_vector.x.round(precision) and
           @y.round(precision) == other_vector.y.round(precision)
     end
@@ -31,37 +31,37 @@ module AGL
     # Returns +true+ if at least one coordinate of this vector is different from
     # the corresponding coordinate of +other_vector+, with +precision+ decimal
     # places of precision.
-    def != other_vector, precision = 6
+    def !=(other_vector, precision = 6)
       @x.round(precision) != other_vector.x.round(precision) or
           @y.round(precision) != other_vector.y.round(precision)
     end
 
     # Sums this vector with +other_vector+, i.e., sums each coordinate of this
     # vector with the corresponding coordinate of +other_vector+.
-    def + other_vector
+    def +(other_vector)
       Vector.new @x + other_vector.x, @y + other_vector.y
     end
 
     # Subtracts +other_vector+ from this vector, i.e., subtracts from each
     # coordinate of this vector the corresponding coordinate of +other_vector+.
-    def - other_vector
+    def -(other_vector)
       Vector.new @x - other_vector.x, @y - other_vector.y
     end
 
     # Multiplies this vector by a scalar, i.e., each coordinate is multiplied by
     # the given number.
-    def * scalar
+    def *(scalar)
       Vector.new @x * scalar, @y * scalar
     end
 
     # Divides this vector by a scalar, i.e., each coordinate is divided by the
     # given number.
-    def / scalar
+    def /(scalar)
       Vector.new @x / scalar.to_f, @y / scalar.to_f
     end
 
     # Returns the euclidean distance between this vector and +other_vector+.
-    def distance other_vector
+    def distance(other_vector)
       dx = @x - other_vector.x
       dy = @y - other_vector.y
       Math.sqrt(dx ** 2 + dy ** 2)
@@ -69,14 +69,14 @@ module AGL
 
     # Returns a vector corresponding to the rotation of this vector around the
     # origin (0, 0) by +radians+ radians.
-    def rotate radians
+    def rotate(radians)
       sin = Math.sin radians
       cos = Math.cos radians
       Vector.new cos * @x - sin * @y, sin * @x + cos * @y
     end
 
     # Rotates this vector by +radians+ radians around the origin (0, 0).
-    def rotate! radians
+    def rotate!(radians)
       sin = Math.sin radians
       cos = Math.cos radians
       prev_x = @x
@@ -107,7 +107,7 @@ module AGL
     # [y] The y-coordinate of the rectangle.
     # [w] The width of the rectangle.
     # [h] The height of the rectangle.
-    def initialize x, y, w, h
+    def initialize(x, y, w, h)
       @x = x; @y = y; @w = w; @h = h
     end
 
@@ -115,7 +115,7 @@ module AGL
     #
     # Parameters:
     # [r] The rectangle to check intersection with.
-    def intersects r
+    def intersect?(r)
       @x < r.x + r.w && @x + @w > r.x && @y < r.y + r.h && @y + @h > r.y
     end
   end
@@ -123,10 +123,11 @@ module AGL
   class G
     # Initializes a MiniGL game. This method is called whenever a +Game+ object
     # is instantiated and must NOT be called explicitly.
-    def self.initialize(window, fullscreen, gravity, kb_held_delay, kb_held_interval, double_click_delay)
+    def self.initialize(window, fullscreen, gravity, ramp_contact_threshold, kb_held_delay, kb_held_interval, double_click_delay)
       @@window = window
       @@fullscreen = fullscreen
       @@gravity = gravity
+      @@ramp_contact_threshold = ramp_contact_threshold
       @@kb_held_delay = kb_held_delay
       @@kb_held_interval = kb_held_interval
       @@double_click_delay = double_click_delay
@@ -145,6 +146,10 @@ module AGL
     # Returns a Vector representing the force of gravity. See +initialize+ for
     # details.
     def self.gravity; @@gravity; end
+
+    # Returns the maximum horizontal movement an object can perform and keep
+    # contact with a ramp when it's above one.
+    def self.ramp_contact_threshold; @@ramp_contact_threshold; end
 
     # Returns the value of kb_held_delay. See +initialize+ for details.
     def self.kb_held_delay; @@kb_held_delay; end
@@ -179,10 +184,11 @@ module AGL
     # [double_click_delay] The maximum interval, in frames, between two
     #                      clicks, to trigger the "double click" event
     #                      (checked with <code>Mouse.double_click?</code>).
-    def initialize(scr_w, scr_h, fullscreen = true, gravity = Vector.new(0, 1),
+    def initialize(scr_w, scr_h, fullscreen = true,
+                   gravity = Vector.new(0, 1), ramp_contact_threshold = 5,
                    kb_held_delay = 40, kb_held_interval = 5, double_click_delay = 8)
       super scr_w, scr_h, fullscreen
-      G.initialize(self, fullscreen, gravity, kb_held_delay, kb_held_interval, double_click_delay)
+      G.initialize(self, fullscreen, gravity, ramp_contact_threshold, kb_held_delay, kb_held_interval, double_click_delay)
       KB.initialize
       Mouse.initialize
       Res.initialize
