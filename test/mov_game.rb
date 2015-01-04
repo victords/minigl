@@ -12,9 +12,9 @@ class MyGame < Game
       Block.new(-1, 0, 1, 600, false),
       Block.new(800, 0, 1, 600, false),
       Block.new(375, 550, 50, 50, true),
-      # Block.new(325, 500, 50, 100, false),
-      # Block.new(375, 400, 50, 200, false),
-      # Block.new(425, 500, 50, 100, false)
+      # Block.new(150, 200, 20, 300, false),
+      Block.new(220, 300, 100, 20, true),
+      Block.new(485, 490, 127, 10, false),
     ]
     @ramps = [
       Ramp.new(485, 330, 127, 160, true),

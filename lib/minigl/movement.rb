@@ -427,6 +427,7 @@ module AGL
   private
 
     def check_contact(obst, ramps)
+      prev_bottom = @bottom
       @top = @bottom = @left = @right = nil
       obst.each do |o|
         x2 = @x + @w; y2 = @y + @h; x2o = o.x + o.w; y2o = o.y + o.h
@@ -440,6 +441,15 @@ module AGL
           if r.contact? self
             @bottom = r
             break
+          end
+        end
+        if @bottom.nil?
+          ramps.each do |r|
+            if r == prev_bottom && @x + @w > r.x && r.x + r.w > @x && @prev_speed.y >= 0
+              @y = r.get_y self
+              @bottom = r
+              break
+            end
           end
         end
       end
