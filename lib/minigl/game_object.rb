@@ -139,7 +139,6 @@ module AGL
         end
       @mass = mass
       @speed = Vector.new 0, 0
-      @min_speed = Vector.new 0.01, 0.01
       @max_speed = Vector.new 15, 15
       @stored_forces = Vector.new 0, 0
     end

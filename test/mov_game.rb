@@ -7,23 +7,20 @@ class MyGame < Game
     super 800, 600, false
 
     @obj = GameObject.new(0, 0, 50, 50, :square)
+    # @obj.max_speed.x = 3
     @obsts = [
       Block.new(0, 600, 800, 1, false),
       Block.new(-1, 0, 1, 600, false),
       Block.new(800, 0, 1, 600, false),
-      Block.new(375, 550, 50, 50, true),
+      # Block.new(375, 550, 50, 50, true),
       # Block.new(150, 200, 20, 300, false),
-      Block.new(220, 300, 100, 20, true),
-      Block.new(485, 490, 127, 10, false),
+      # Block.new(220, 300, 100, 20, true),
+      # Block.new(485, 490, 127, 10, false),
     ]
     @ramps = [
-      Ramp.new(485, 330, 127, 160, true),
-      Ramp.new(612, 230, 105, 100, true),
-      # Ramp.new(717, 180, 83, 50, true),
-      Ramp.new(700, 380, 100, 220, true),
-      # Ramp.new(0, 200, 100, 50, false),
-      Ramp.new(100, 250, 100, 100, false),
-      Ramp.new(200, 350, 100, 250, false),
+      Ramp.new(200, 550, 200, 50, true),
+      Ramp.new(400, 340, 200, 210, true),
+      Ramp.new(600, 40, 200, 300, true),
     ]
   end
 
@@ -34,12 +31,12 @@ class MyGame < Game
     if @obj.bottom
       forces.y -= 15 if KB.key_pressed?(Gosu::KbSpace)
       if KB.key_down?(Gosu::KbLeft)
-        forces.x -= 1.2
+        forces.x -= 1
       elsif @obj.speed.x < 0
         @obj.speed.x *= 0.8
       end
       if KB.key_down?(Gosu::KbRight)
-        forces.x += 1.2
+        forces.x += 1
       elsif @obj.speed.x > 0
         @obj.speed.x *= 0.8
       end
@@ -48,6 +45,8 @@ class MyGame < Game
       forces.x += 0.2 if KB.key_down?(Gosu::KbRight)
     end
     @obj.move(forces, @obsts, @ramps)
+
+    # puts @obj.bottom
   end
 
   def draw

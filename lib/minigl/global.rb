@@ -123,10 +123,11 @@ module AGL
   class G
     # Initializes a MiniGL game. This method is called whenever a +Game+ object
     # is instantiated and must NOT be called explicitly.
-    def self.initialize(window, fullscreen, gravity, ramp_contact_threshold, kb_held_delay, kb_held_interval, double_click_delay)
+    def self.initialize(window, fullscreen, gravity, min_speed, ramp_contact_threshold, kb_held_delay, kb_held_interval, double_click_delay)
       @@window = window
       @@fullscreen = fullscreen
       @@gravity = gravity
+      @@min_speed = min_speed
       @@ramp_contact_threshold = ramp_contact_threshold
       @@kb_held_delay = kb_held_delay
       @@kb_held_interval = kb_held_interval
@@ -143,21 +144,26 @@ module AGL
     # Returns whether the game window is currently in full screen mode.
     def self.fullscreen; @@fullscreen; end
 
-    # Returns a Vector representing the force of gravity. See +initialize+ for
-    # details.
+    # Returns a Vector representing the force of gravity. See +Game#initialize+
+    # for details.
     def self.gravity; @@gravity; end
+
+    # Returns a Vector with the minimum speed for moving objects. See
+    # +Game#initialize+ for details.
+    def self.min_speed; @@min_speed; end
 
     # Returns the maximum horizontal movement an object can perform and keep
     # contact with a ramp when it's above one.
     def self.ramp_contact_threshold; @@ramp_contact_threshold; end
 
-    # Returns the value of kb_held_delay. See +initialize+ for details.
+    # Returns the value of kb_held_delay. See +Game#initialize+ for details.
     def self.kb_held_delay; @@kb_held_delay; end
 
-    # Returns the value of kb_held_interval. See +initialize+ for details.
+    # Returns the value of kb_held_interval. See +Game#initialize+ for details.
     def self.kb_held_interval; @@kb_held_interval; end
 
-    # Returns the value of double_click_delay. See +initialize+ for details.
+    # Returns the value of double_click_delay. See +Game#initialize+ for
+    # details.
     def self.double_click_delay; @@double_click_delay; end
   end
 
@@ -185,10 +191,10 @@ module AGL
     #                      clicks, to trigger the "double click" event
     #                      (checked with <code>Mouse.double_click?</code>).
     def initialize(scr_w, scr_h, fullscreen = true,
-                   gravity = Vector.new(0, 1), ramp_contact_threshold = 5,
+                   gravity = Vector.new(0, 1), min_speed = Vector.new(0.01, 0.01), ramp_contact_threshold = 5,
                    kb_held_delay = 40, kb_held_interval = 5, double_click_delay = 8)
       super scr_w, scr_h, fullscreen
-      G.initialize(self, fullscreen, gravity, ramp_contact_threshold, kb_held_delay, kb_held_interval, double_click_delay)
+      G.initialize(self, fullscreen, gravity, min_speed, ramp_contact_threshold, kb_held_delay, kb_held_interval, double_click_delay)
       KB.initialize
       Mouse.initialize
       Res.initialize

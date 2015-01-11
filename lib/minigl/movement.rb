@@ -118,7 +118,8 @@ module AGL
     def check_intersection(obj)
       if @can_collide and intersect? obj
         r = @h.to_f / @w
-        if obj.prev_speed.y > 0 && (@left && obj.prev_speed.x > 0 || !@left && obj.prev_speed.x < 0)
+        counter = @left && obj.prev_speed.x > 0 || !@left && obj.prev_speed.x < 0
+        if obj.prev_speed.y > 0 && counter
           dx = get_x(obj) - obj.x
           s = (obj.prev_speed.y.to_f / obj.prev_speed.x).abs
           dx /= s + r
@@ -127,7 +128,9 @@ module AGL
         else
           obj.y = get_y obj
         end
-        obj.speed.x = (r >= 1 ? 0 : obj.speed.x * (1 - r))
+        if counter
+          obj.speed.x = (r >= 1 ? 0 : obj.speed.x * (1 - r))
+        end
         obj.speed.y = 0
       end
     end
@@ -145,6 +148,10 @@ module AGL
       return @y - obj.h if obj.x < @x
       @y + (1.0 * (obj.x - @x) * @h / @w) - obj.h
     end
+
+    def ratio
+      @h.to_f / @w
+    end
   end
 
   # This module provides objects with physical properties and methods for
@@ -161,6 +168,10 @@ module AGL
     # A Vector with the current speed of the object (x: horizontal component,
     # y: vertical component).
     attr_reader :speed
+
+    # A Vector with the speed limits for the object (x: horizontal component,
+    # y: vertical component).
+    attr_reader :max_speed
 
     # Width of the bounding box.
     attr_reader :w
@@ -226,8 +237,8 @@ module AGL
       forces.y = 0 if (forces.y < 0 and @top) or (forces.y > 0 and @bottom)
 
       @speed.x += forces.x / @mass; @speed.y += forces.y / @mass
-      @speed.x = 0 if @speed.x.abs < @min_speed.x
-      @speed.y = 0 if @speed.y.abs < @min_speed.y
+      @speed.x = 0 if @speed.x.abs < G.min_speed.x
+      @speed.y = 0 if @speed.y.abs < G.min_speed.y
       @speed.x = (@speed.x <=> 0) * @max_speed.x if @speed.x.abs > @max_speed.x
       @speed.y = (@speed.y <=> 0) * @max_speed.y if @speed.y.abs > @max_speed.y
 
@@ -445,13 +456,16 @@ module AGL
         end
         if @bottom.nil?
           ramps.each do |r|
-            if r == prev_bottom && @x + @w > r.x && r.x + r.w > @x && @prev_speed.y >= 0
+            if r == prev_bottom && @x + @w > r.x && r.x + r.w > @x && @prev_speed.x.abs <= G.ramp_contact_threshold && @prev_speed.y >= 0
               @y = r.get_y self
               @bottom = r
               break
             end
           end
         end
+      end
+      if @bottom.is_a? Ramp and @bottom.ratio > 1
+        @stored_forces.x += (@bottom.left ? -1 : 1) * (@bottom.ratio - 1) * @mass
       end
     end
 
