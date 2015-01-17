@@ -1,9 +1,21 @@
 require_relative 'global'
 
-module AGL
+module MiniGL
   # This class is an abstract ancestor for all form components (Button,
   # ToggleButton and TextField).
   class Component
+    # The horizontal coordinate of the component
+    attr_reader :x
+
+    # The vertical coordinate of the component
+    attr_reader :y
+
+    # The width of the component
+    attr_reader :w
+
+    # The height of the component
+    attr_reader :h
+
     # Determines whether the control is enabled, i.e., will process user input.
     attr_accessor :enabled
 
@@ -32,6 +44,9 @@ module AGL
 
   # This class represents a button.
   class Button < Component
+    # The current state of the button.
+    attr_reader :state
+
     # Creates a button.
     #
     # Parameters:
@@ -689,6 +704,79 @@ module AGL
       end
       set_cursor_visible
       @on_text_changed.call @text, @params if @on_text_changed
+    end
+  end
+
+  class ProgressBar < Component
+    attr_reader :max_value
+
+    attr_accessor :value
+
+    def initialize(x, y, w, h, bg, fg, max_value = 100, value = 100, fg_margin_x = 0, fg_margin_y = 0, fg_left = nil, fg_right = nil,
+                   font = nil, text_color = 0, format = nil)
+      super x, y, font, '', text_color, text_color
+      @w = w
+      @h = h
+      if bg.is_a? Integer
+        @bg_color = bg
+      else # String or Symbol
+        @bg = Res.img bg
+      end
+      if fg.is_a? Integer
+        @fg_color = fg
+      else # String or Symbol
+        @fg = Res.img fg
+        @fg_path = "#{Res.prefix}img/#{fg.to_s.gsub('_', '/')}.png"
+        puts @fg_path
+      end
+      @fg_margin_x = fg_margin_x
+      @fg_margin_y = fg_margin_y
+      @fg_left = fg_left
+      @fg_right = fg_right
+      @max_value = max_value
+      @value = value
+      @format = format
+    end
+
+    def increase(amount)
+      @value += amount
+      @value = @max_value if @value > @max_value
+    end
+
+    def decrease(amount)
+      @value -= amount
+      @value = 0 if @value < 0
+    end
+
+    def draw
+      if @bg
+        @bg.draw @x, @y, 0
+      else
+        G.window.draw_quad @x, @y, @bg_color,
+                           @x + @w, @y, @bg_color,
+                           @x + @w, @y + @h, @bg_color,
+                           @x, @y + @h, @bg_color, 0
+      end
+      if @fg
+        w1 = @fg.width
+        w2 = (@value.to_f / @max_value * @w).round
+        x0 = @x + @fg_margin_x
+        x = 0
+        while x <= w2 - w1
+          @fg.draw x0 + x, @y + @fg_margin_y, 0
+          x += w1
+        end
+        if w2 - x > 0
+          img = Gosu::Image.new(G.window, @fg_path, true, 0, 0, w2 - x, @fg.height)
+          img.draw x0 + x, @y + @fg_margin_y, 0
+        end
+      else
+        rect_r = @x + (@value.to_f / @max_value * @w).round
+        G.window.draw_quad @x, @y, @fg_color,
+                           rect_r, @y, @fg_color,
+                           rect_r, @y + @h, @fg_color,
+                           @x, @y + @h, @fg_color, 0
+      end
     end
   end
 end

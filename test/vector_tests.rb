@@ -1,6 +1,6 @@
 require 'test/unit'
 require_relative '../lib/minigl'
-include AGL
+include MiniGL
 
 class VectorTest < Test::Unit::TestCase
   def test_vector_comparison

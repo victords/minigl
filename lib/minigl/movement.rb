@@ -1,6 +1,6 @@
 require_relative 'global'
 
-module AGL
+module MiniGL
   # Represents an object with a rectangular bounding box and the +passable+
   # property. It is the simplest structure that can be passed as an element of
   # the +obst+ array parameter of the +move+ method.

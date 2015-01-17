@@ -1,7 +1,7 @@
 require 'gosu'
 
 # The main module of the library, used only as a namespace.
-module AGL
+module MiniGL
   # This class represents a point or vector in a bidimensional space.
   class Vector
     # The x coordinate of the vector

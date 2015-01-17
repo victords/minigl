@@ -1,11 +1,10 @@
 require 'test/unit'
 require_relative '../lib/minigl'
-include AGL
+include MiniGL
 
 class ResTest < Test::Unit::TestCase
   def setup
-    @window = Gosu::Window.new 800, 600, false
-    Game.initialize @window
+    @window = Game.new 800, 600, false
     Res.prefix = File.expand_path(File.dirname(__FILE__)) + '/data'
   end
 

@@ -1,5 +1,5 @@
 require_relative '../lib/minigl'
-include AGL
+include MiniGL
 
 class MyGame < Game
   def initialize
@@ -17,6 +17,8 @@ class MyGame < Game
            }
     @txt = TextField.new(10, 520, @font, :text, nil, nil, 15, 5, 16, false, '', nil, 0, 0, 0x0000ff, 'test') { |t, x| puts "field #{x}, text: #{t}" }
     @txt.visible = false
+
+    @pb = ProgressBar.new(5, 240, 200, 20, :barbg, :barfg, 100, 70, 2, 2)
   end
 
   def needs_cursor?
@@ -35,6 +37,10 @@ class MyGame < Game
     @chk.enabled = !@chk.enabled if KB.key_pressed? Gosu::KbRightControl
     @txt.visible = !@txt.visible if KB.key_pressed? Gosu::KbReturn
     @txt.enabled = !@txt.enabled if KB.key_pressed? Gosu::KbLeftAlt
+
+    @pb.increase 1 if KB.key_down? Gosu::KbD
+    @pb.decrease 1 if KB.key_down? Gosu::KbA
+    @pb.value = 50 if KB.key_pressed? Gosu::KbS
 
     Mouse.update
     if Mouse.double_click? :left
@@ -58,6 +64,7 @@ class MyGame < Game
     @btn.draw 0xcc
     @chk.draw
     @txt.draw
+    @pb.draw
   end
 end
 

@@ -1,5 +1,5 @@
 require_relative '../lib/minigl'
-include AGL
+include MiniGL
 
 class MyGame < Gosu::Window
   def initialize

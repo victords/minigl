@@ -1,6 +1,6 @@
 require_relative 'movement'
 
-module AGL
+module MiniGL
   # This class represents an (optionally animated) image inside the game screen.
   class Sprite
     # The index of the current sprite in the spritesheet being drawn.

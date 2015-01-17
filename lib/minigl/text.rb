@@ -1,4 +1,4 @@
-module AGL
+module MiniGL
   # This class provides methods for easily drawing one or multiple lines of
   # text, with control over the text alignment and coloring.
   class TextHelper

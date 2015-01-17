@@ -1,6 +1,6 @@
 require 'test/unit'
 require_relative '../lib/minigl'
-include AGL
+include MiniGL
 
 class MapTest < Test::Unit::TestCase
   def test_map_attributes

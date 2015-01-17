@@ -1,6 +1,6 @@
 require 'gosu'
 require_relative '../lib/minigl'
-include AGL
+include MiniGL
 
 class MyGame < Game
   def initialize
@@ -18,9 +18,9 @@ class MyGame < Game
       # Block.new(485, 490, 127, 10, false),
     ]
     @ramps = [
-      Ramp.new(200, 550, 200, 50, true),
-      Ramp.new(400, 340, 200, 210, true),
-      Ramp.new(600, 40, 200, 300, true),
+      # Ramp.new(200, 550, 200, 50, true),
+      # Ramp.new(400, 340, 200, 210, true),
+      Ramp.new(600, 300, 200, 300, true),
     ]
   end
 
@@ -32,12 +32,12 @@ class MyGame < Game
       forces.y -= 15 if KB.key_pressed?(Gosu::KbSpace)
       if KB.key_down?(Gosu::KbLeft)
         forces.x -= 1
-      elsif @obj.speed.x < 0
+      elsif @obj.speed.x < 0 and @obj.stored_forces.x == 0
         @obj.speed.x *= 0.8
       end
       if KB.key_down?(Gosu::KbRight)
         forces.x += 1
-      elsif @obj.speed.x > 0
+      elsif @obj.speed.x > 0 and @obj.stored_forces.x == 0
         @obj.speed.x *= 0.8
       end
     else

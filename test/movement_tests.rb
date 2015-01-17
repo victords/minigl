@@ -1,6 +1,6 @@
 require 'test/unit'
 require_relative '../lib/minigl'
-include AGL
+include MiniGL
 
 class MovingObject
   include Movement
@@ -16,8 +16,7 @@ end
 
 class MovementTest < Test::Unit::TestCase
   def setup
-    @window = Gosu::Window.new 800, 600, false
-    Game.initialize @window
+    @window = Game.new 800, 600, false
     @obsts = [
       Block.new(-1, 0, 1, 600, false),
       Block.new(0, -1, 800, 1, false),

@@ -1,6 +1,6 @@
 require_relative 'global'
 
-module AGL
+module MiniGL
   # This class provides easy control of a tile map, i.e., a map consisting of
   # a grid of equally sized tiles. It also provides viewport control, through
   # its camera property and methods.
