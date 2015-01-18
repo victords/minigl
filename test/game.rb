@@ -18,7 +18,7 @@ class MyGame < Game
     @txt = TextField.new(10, 520, @font, :text, nil, nil, 15, 5, 16, false, '', nil, 0, 0, 0x0000ff, 'test') { |t, x| puts "field #{x}, text: #{t}" }
     @txt.visible = false
 
-    @pb = ProgressBar.new(5, 240, 200, 20, :barbg, :barfg, 100, 70, 2, 2)
+    @pb = ProgressBar.new(5, 240, 200, 20, :barbg, :barfg, 3456, 70, 2, 2, @font, 0xff000080)
   end
 
   def needs_cursor?
@@ -40,7 +40,7 @@ class MyGame < Game
 
     @pb.increase 1 if KB.key_down? Gosu::KbD
     @pb.decrease 1 if KB.key_down? Gosu::KbA
-    @pb.value = 50 if KB.key_pressed? Gosu::KbS
+    @pb.percentage = 0.5 if KB.key_pressed? Gosu::KbS
 
     Mouse.update
     if Mouse.double_click? :left
@@ -57,8 +57,8 @@ class MyGame < Game
     @obj1.draw nil, 1, 1, 255, 0x33ff33, 30, 1
     @obj2.draw nil, 0.6, 1.4, 0x99
     @writer.write_breaking "Testing multiple line text.\nThis should draw text "\
-                           "across multiple lines, respecting a limit width. "\
-                           "Furthermore, the text must be right-aligned.",
+                           'across multiple lines, respecting a limit width. '\
+                           'Furthermore, the text must be right-aligned.',
                            780, 300, 300, :right, 0xff0000, 255, 1
 
     @btn.draw 0xcc

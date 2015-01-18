@@ -712,8 +712,8 @@ module MiniGL
 
     attr_accessor :value
 
-    def initialize(x, y, w, h, bg, fg, max_value = 100, value = 100, fg_margin_x = 0, fg_margin_y = 0, fg_left = nil, fg_right = nil,
-                   font = nil, text_color = 0, format = nil)
+    def initialize(x, y, w, h, bg, fg, max_value = 100, value = 100, fg_margin_x = 0, fg_margin_y = 0, #fg_left = nil, fg_right = nil,
+                   font = nil, text_color = 0xff000000, format = '/')
       super x, y, font, '', text_color, text_color
       @w = w
       @h = h
@@ -731,8 +731,8 @@ module MiniGL
       end
       @fg_margin_x = fg_margin_x
       @fg_margin_y = fg_margin_y
-      @fg_left = fg_left
-      @fg_right = fg_right
+      # @fg_left = fg_left
+      # @fg_right = fg_right
       @max_value = max_value
       @value = value
       @format = format
@@ -746,6 +746,15 @@ module MiniGL
     def decrease(amount)
       @value -= amount
       @value = 0 if @value < 0
+    end
+
+    def percentage=(pct)
+      @value = (pct * @max_value).round
+      if @value > @max_value
+        @value = @max_value
+      elsif @value < 0
+        @value = 0
+      end
     end
 
     def draw
@@ -776,6 +785,10 @@ module MiniGL
                            rect_r, @y, @fg_color,
                            rect_r, @y + @h, @fg_color,
                            @x, @y + @h, @fg_color, 0
+      end
+      if @font
+        @text = @format == '%' ? "#{(@value.to_f / @max_value * 100).round}%" : "#{@value}/#{@max_value}"
+        @font.draw_rel @text, @x + @fg_margin_x + @w / 2, @y + @fg_margin_y + @h / 2, 0, 0.5, 0.5, 1, 1, @text_color
       end
     end
   end
