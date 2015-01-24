@@ -19,6 +19,7 @@ class MyGame < Game
     @txt.visible = false
 
     @pb = ProgressBar.new(5, 240, 200, 20, :barbg, :barfg, 3456, 70, 2, 2, @font, 0xff000080)
+    @ddl = DropDownList.new(5, 270, @font, :btn, :btn, ['olá amigos', 'opção 2', 'terceira'], 0, 0, 200, 20)
   end
 
   def needs_cursor?
@@ -42,6 +43,10 @@ class MyGame < Game
     @pb.decrease 1 if KB.key_down? Gosu::KbA
     @pb.percentage = 0.5 if KB.key_pressed? Gosu::KbS
 
+    @ddl.value = 'olá amigos' if KB.key_pressed? Gosu::Kb1
+    @ddl.value = 'segunda' if KB.key_pressed? Gosu::Kb2
+    @ddl.value = 'terceira' if KB.key_pressed? Gosu::Kb3
+
     Mouse.update
     if Mouse.double_click? :left
       @obj1.x = Mouse.x + 10
@@ -51,9 +56,12 @@ class MyGame < Game
     @btn.update
     @chk.update
     @txt.update
+    @ddl.update
   end
 
   def draw
+    clear 0xff000044
+
     @obj1.draw nil, 1, 1, 255, 0x33ff33, 30, 1
     @obj2.draw nil, 0.6, 1.4, 0x99
     @writer.write_breaking "Testing multiple line text.\nThis should draw text "\
@@ -65,6 +73,7 @@ class MyGame < Game
     @chk.draw
     @txt.draw
     @pb.draw
+    @ddl.draw
   end
 end
 

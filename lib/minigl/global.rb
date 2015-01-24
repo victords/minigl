@@ -199,6 +199,13 @@ module MiniGL
       Mouse.initialize
       Res.initialize
     end
+
+    def clear(color)
+      draw_quad 0, 0, color,
+                width, 0, color,
+                width, height, color,
+                0, height, color, 0
+    end
   end
 
   #class JSHelper

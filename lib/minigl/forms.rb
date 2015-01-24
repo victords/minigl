@@ -47,6 +47,8 @@ module MiniGL
     # The current state of the button.
     attr_reader :state
 
+    attr_accessor :text
+
     # Creates a button.
     #
     # Parameters:
@@ -790,6 +792,79 @@ module MiniGL
         @text = @format == '%' ? "#{(@value.to_f / @max_value * 100).round}%" : "#{@value}/#{@max_value}"
         @font.draw_rel @text, @x + @fg_margin_x + @w / 2, @y + @fg_margin_y + @h / 2, 0, 0.5, 0.5, 1, 1, @text_color
       end
+    end
+  end
+
+  class DropDownList < Component
+    attr_reader :value
+
+    attr_accessor :options
+
+    def initialize(x, y, font, img, opt_img, options, option = 0, text_margin = 0, width = nil, height = nil,
+                   text_color = 0xff000000, disabled_text_color = 0xff808080)
+      super x, y, font, options[option], text_color, disabled_text_color
+      @img = img
+      @opt_img = opt_img
+      @options = options
+      @value = @options[option]
+      @open = false
+      @buttons = []
+      @buttons.push(Button.new(x, y, font, @value, img, text_color, disabled_text_color, false, true, text_margin, 0, width, height) {
+        toggle
+      })
+      @w = @buttons[0].w
+      @h = @buttons[0].h
+      @options.each_with_index do |o, i|
+        b = Button.new(x, y + (i+1) * @h, font, o, opt_img, text_color, disabled_text_color, false, true, text_margin, 0, @w, @h) {
+          @value = @buttons[0].text = o
+          toggle
+        }
+        b.visible = false
+        @buttons.push b
+      end
+      @max_h = (@options.size + 1) * @h
+    end
+
+    def update
+      if @open and Mouse.button_released? :left and not Mouse.over?(@x, @y, @w, @max_h)
+        toggle
+        return
+      end
+      @buttons.each { |b| b.update }
+    end
+
+    def toggle
+      if @open
+        @buttons[1..-1].each { |b| b.visible = false }
+        @open = false
+      else
+        @buttons[1..-1].each { |b| b.visible = true }
+        @open = true
+      end
+    end
+
+    def value=(val)
+      if @options.include? val
+        @value = @buttons[0].text = val
+      end
+    end
+
+    def draw
+      unless @img
+        bottom = @open ? @y + @max_h + 1 : @y + @h + 1
+        G.window.draw_quad @x - 1, @y - 1, 0xff000000,
+                           @x + @w + 1, @y - 1, 0xff000000,
+                           @x + @w + 1, bottom, 0xff000000,
+                           @x - 1, bottom, 0xff000000, 0
+        @buttons.each do |b|
+          color = b.state == :over ? 0xffcccccc : 0xffffffff
+          G.window.draw_quad b.x, b.y, color,
+                             b.x + b.w, b.y, color,
+                             b.x + b.w, b.y + b.h, color,
+                             b.x, b.y + b.h, color, 0 if b.visible
+        end
+      end
+      @buttons.each { |b| b.draw }
     end
   end
 end
