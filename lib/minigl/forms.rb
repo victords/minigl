@@ -66,6 +66,10 @@ module MiniGL
     # [text_color] Color of the button text, in hexadecimal RRGGBB format.
     # [disabled_text_color] Color of the button text, when it's disabled, in
     #                       hexadecimal RRGGBB format.
+    # [over_text_color] Color of the button text, when the cursor is over it
+    #                   (hexadecimal RRGGBB).
+    # [down_text_color] Color of the button text, when it is pressed
+    #                   (hexadecimal RRGGBB).
     # [center_x] Whether the button text should be horizontally centered in its
     #            area (the area is defined by the image size, if an image is
     #            given, or by the +width+ and +height+ parameters, otherwise).
@@ -88,9 +92,11 @@ module MiniGL
     #          parameters.
     # [action] The block of code executed when the button is clicked (or by
     #          calling the +click+ method).
-    def initialize(x, y, font, text, img, text_color = 0, disabled_text_color = 0, center_x = true, center_y = true,
-                   margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action)
+    def initialize(x, y, font, text, img, text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0,
+                   center_x = true, center_y = true, margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action)
       super x, y, font, text, text_color, disabled_text_color
+      @over_text_color = over_text_color
+      @down_text_color = down_text_color
       @img =
         if img; Res.imgs img, 1, 4, true
         else; nil; end
@@ -192,7 +198,17 @@ module MiniGL
       return unless @visible
 
       color = (alpha << 24) | 0xffffff
-      text_color = (alpha << 24) | (@enabled ? @text_color : @disabled_text_color)
+      text_color =
+        if @enabled
+          if @state == :down
+            @down_text_color
+          else
+            @state == :over ? @over_text_color : @text_color
+          end
+        else
+          @disabled_text_color
+        end
+      text_color = (alpha << 24) | text_color
       @img[@img_index].draw @x, @y, z_index, 1, 1, color if @img
       if @text
         if @center_x or @center_y
@@ -232,9 +248,10 @@ module MiniGL
     #     puts "button was checked" if checked
     #     # do something with params
     #   }
-    def initialize(x, y, font, text, img, checked = false, text_color = 0, disabled_text_color = 0, center_x = true, center_y = true,
-                   margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action)
-      super x, y, font, text, nil, text_color, disabled_text_color, center_x, center_y, margin_x, margin_y, width, height, params, &action
+    def initialize(x, y, font, text, img, checked = false, text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0,
+                   center_x = true, center_y = true, margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action)
+      super x, y, font, text, nil, text_color, disabled_text_color, over_text_color, down_text_color,
+            center_x, center_y, margin_x, margin_y, width, height, params, &action
       @img =
         if img; Res.imgs img, 2, 4, true
         else; nil; end
@@ -709,13 +726,45 @@ module MiniGL
     end
   end
 
+  # Represents a progress bar.
   class ProgressBar < Component
+    # The maximum value for this progress bar (when the current value equals
+    # the maximum, the bar is full).
     attr_reader :max_value
 
-    attr_accessor :value
+    # The current value of the progress bar (an integer greater than or equal
+    # to zero, and less than or equal to +@max_value+).
+    attr_reader :value
 
+    # Creates a progress bar.
+    #
+    # Parameters:
+    # [x] The x-coordinate of the progress bar on the screen.
+    # [y] The y-coordinate of the progress bar on the screen.
+    # [w] Width of the progress bar, in pixels. This is the maximum space the
+    #     bar foreground can occupy. Note that the width of the foreground image
+    #     (+fg+) can be less than this.
+    # [h] Height of the progress bar. This will be the height of the bar
+    #     foreground when +fg+ is a color (when it is an image, the height of
+    #     the image will be kept).
+    # [bg] A background image (string or symbol that will be passed to
+    #      +Res.img+) or color (in AARRGGBB hexadecimal format).
+    # [fg] A foreground image (string or symbol that will be passed to
+    #      +Res.img+) or color (in AARRGGBB hexadecimal format). The image will
+    #      be horizontally repeated when needed, if its width is less than +w+.
+    # [max_value] The maximum value the progress bar can reach (an integer).
+    # [value] The starting value for the progress bar.
+    # [fg_margin_x] Horizontal margin between the background image and the
+    #               foreground image (when these are provided).
+    # [fg_margin_y] Vertical margin between the background image and the
+    #               foreground image (when these are provided).
+    # [font] Font that will be used to draw a text indicating the value of the
+    #        progress bar.
+    # [text_color] Color of the text.
+    # [format] Format to display the value. Specify '%' for a percentage and
+    #          anything else for absolute values (current/maximum).
     def initialize(x, y, w, h, bg, fg, max_value = 100, value = 100, fg_margin_x = 0, fg_margin_y = 0, #fg_left = nil, fg_right = nil,
-                   font = nil, text_color = 0xff000000, format = '/')
+                   font = nil, text_color = 0xff000000, format = nil)
       super x, y, font, '', text_color, text_color
       @w = w
       @h = h
@@ -736,7 +785,7 @@ module MiniGL
       # @fg_left = fg_left
       # @fg_right = fg_right
       @max_value = max_value
-      @value = value
+      self.value = value
       @format = format
     end
 
@@ -750,8 +799,8 @@ module MiniGL
       @value = 0 if @value < 0
     end
 
-    def percentage=(pct)
-      @value = (pct * @max_value).round
+    def value=(val)
+      @value = val
       if @value > @max_value
         @value = @max_value
       elsif @value < 0
@@ -759,7 +808,13 @@ module MiniGL
       end
     end
 
+    def percentage=(pct)
+      self.value = (pct * @max_value).round
+    end
+
     def draw
+      return unless @visible
+
       if @bg
         @bg.draw @x, @y, 0
       else
@@ -801,7 +856,7 @@ module MiniGL
     attr_accessor :options
 
     def initialize(x, y, font, img, opt_img, options, option = 0, text_margin = 0, width = nil, height = nil,
-                   text_color = 0xff000000, disabled_text_color = 0xff808080)
+                   text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0)
       super x, y, font, options[option], text_color, disabled_text_color
       @img = img
       @opt_img = opt_img
@@ -809,16 +864,20 @@ module MiniGL
       @value = @options[option]
       @open = false
       @buttons = []
-      @buttons.push(Button.new(x, y, font, @value, img, text_color, disabled_text_color, false, true, text_margin, 0, width, height) {
-        toggle
-      })
+      @buttons.push(
+        Button.new(x, y, font, @value, img, text_color, disabled_text_color, over_text_color, down_text_color,
+                   false, true, text_margin, 0, width, height) {
+                     toggle
+                   }
+      )
       @w = @buttons[0].w
       @h = @buttons[0].h
       @options.each_with_index do |o, i|
-        b = Button.new(x, y + (i+1) * @h, font, o, opt_img, text_color, disabled_text_color, false, true, text_margin, 0, @w, @h) {
-          @value = @buttons[0].text = o
-          toggle
-        }
+        b = Button.new(x, y + (i+1) * @h, font, o, opt_img, text_color, disabled_text_color, over_text_color, down_text_color,
+                       false, true, text_margin, 0, @w, @h) {
+                         @value = @buttons[0].text = o
+                         toggle
+                       }
         b.visible = false
         @buttons.push b
       end
@@ -826,7 +885,8 @@ module MiniGL
     end
 
     def update
-      if @open and Mouse.button_released? :left and not Mouse.over?(@x, @y, @w, @max_h)
+      return unless @enabled and @visible
+      if @open and Mouse.button_pressed? :left and not Mouse.over?(@x, @y, @w, @max_h)
         toggle
         return
       end
@@ -849,7 +909,14 @@ module MiniGL
       end
     end
 
+    def enabled=(value)
+      toggle if @open
+      @buttons[0].enabled = value
+      @enabled = value
+    end
+
     def draw
+      return unless @visible
       unless @img
         bottom = @open ? @y + @max_h + 1 : @y + @h + 1
         G.window.draw_quad @x - 1, @y - 1, 0xff000000,

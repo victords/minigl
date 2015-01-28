@@ -10,16 +10,17 @@ class MyGame < Game
 
     @font = Res.font :font1, 20
     @writer = TextHelper.new @font, 5
-    @btn = Button.new(10, 560, @font, 'Test', :btn, 0x008000, 0x808080, true, false, 0, 4, 0, 0, 'friends') { |x| puts "hello #{x}" }
+    @btn = Button.new(10, 560, @font, 'Test', :btn, 0x008000, 0x808080, 0xffffff, 0xff9980, true, false, 0, 4, 0, 0, 'friends') { |x| puts "hello #{x}" }
     @btn.enabled = false
-    @chk = ToggleButton.new(40, 300, @font, 'Click me', :check, false, 0xffffff, 0x808080, false, true, 36, 0, 0, 0, 'friends') { |c, x|
-             puts "hello #{x}, checked: #{c}"
-           }
+    @chk =
+      ToggleButton.new(40, 300, @font, 'Click me', :check, false, 0xffffff, 0x808080, 0x008000, 0xff9980, false, true, 36, 0, 0, 0, 'friends') { |c, x|
+        puts "hello #{x}, checked: #{c}"
+      }
     @txt = TextField.new(10, 520, @font, :text, nil, nil, 15, 5, 16, false, '', nil, 0, 0, 0x0000ff, 'test') { |t, x| puts "field #{x}, text: #{t}" }
     @txt.visible = false
 
-    @pb = ProgressBar.new(5, 240, 200, 20, :barbg, :barfg, 3456, 70, 2, 2, @font, 0xff000080)
-    @ddl = DropDownList.new(5, 270, @font, :btn, :btn, ['olá amigos', 'opção 2', 'terceira'], 0, 0, 200, 20)
+    @pb = ProgressBar.new(5, 240, :barbg, :barfg, 3456, 70, 2, 2, @font, 0xff000080)
+    @ddl = DropDownList.new(5, 270, @font, :btn, :btn, ['olá amigos', 'opção 2', 'terceira'], 0, 0, 0, 0, 0, 0x808080, 0xffffff, 0xffff00)
   end
 
   def needs_cursor?
@@ -38,10 +39,14 @@ class MyGame < Game
     @chk.enabled = !@chk.enabled if KB.key_pressed? Gosu::KbRightControl
     @txt.visible = !@txt.visible if KB.key_pressed? Gosu::KbReturn
     @txt.enabled = !@txt.enabled if KB.key_pressed? Gosu::KbLeftAlt
+    @pb.visible = !@pb.visible if KB.key_pressed? Gosu::KbE
+    @ddl.enabled = !@ddl.enabled if KB.key_pressed? Gosu::KbQ
+    @ddl.visible = !@ddl.visible if KB.key_pressed? Gosu::KbW
 
     @pb.increase 1 if KB.key_down? Gosu::KbD
     @pb.decrease 1 if KB.key_down? Gosu::KbA
     @pb.percentage = 0.5 if KB.key_pressed? Gosu::KbS
+    @pb.value = 10000 if KB.key_pressed? Gosu::KbZ
 
     @ddl.value = 'olá amigos' if KB.key_pressed? Gosu::Kb1
     @ddl.value = 'segunda' if KB.key_pressed? Gosu::Kb2
