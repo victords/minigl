@@ -19,8 +19,8 @@ class MyGame < Game
     @txt = TextField.new(10, 520, @font, :text, nil, nil, 15, 5, 16, false, '', nil, 0, 0, 0x0000ff, 'test') { |t, x| puts "field #{x}, text: #{t}" }
     @txt.visible = false
 
-    @pb = ProgressBar.new(5, 240, :barbg, :barfg, 3456, 70, 2, 2, @font, 0xff000080)
-    @ddl = DropDownList.new(5, 270, @font, :btn, :btn, ['olá amigos', 'opção 2', 'terceira'], 0, 0, 0, 0, 0, 0x808080, 0xffffff, 0xffff00)
+    @pb = ProgressBar.new(5, 240, 200, 20, 0xff0000, 0x00ff00, 3456, 70, 0, 0, @font, 0xff000080)
+    @ddl = DropDownList.new(5, 270, @font, nil, nil, ['olá amigos', 'opção 2', 'terceira'], 0, 3, 150, 25, 0, 0x808080, 0xffffff, 0xffff00)
   end
 
   def needs_cursor?
@@ -74,11 +74,11 @@ class MyGame < Game
                            'Furthermore, the text must be right-aligned.',
                            780, 300, 300, :right, 0xff0000, 255, 1
 
+    @ddl.draw 0x80, 1
     @btn.draw 0xcc
     @chk.draw
     @txt.draw
-    @pb.draw
-    @ddl.draw
+    @pb.draw 0x66
   end
 end
 

@@ -120,6 +120,7 @@ module MiniGL
     end
   end
 
+  # This class contains references to global objects/constants used by MiniGL.
   class G
     # Initializes a MiniGL game. This method is called whenever a +Game+ object
     # is instantiated and must NOT be called explicitly.
@@ -134,7 +135,7 @@ module MiniGL
       @@double_click_delay = double_click_delay
     end
 
-    def self.toggle_fullscreen
+    def self.toggle_fullscreen # :nodoc:
       # ferrou...
     end
 
@@ -200,6 +201,10 @@ module MiniGL
       Res.initialize
     end
 
+    # Draws a rectangle with the size of the entire screen, in the given color.
+    #
+    # Parameters:
+    # [color] Color of the rectangle to be drawn.
     def clear(color)
       draw_quad 0, 0, color,
                 width, 0, color,

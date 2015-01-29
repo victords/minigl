@@ -47,6 +47,7 @@ module MiniGL
     # The current state of the button.
     attr_reader :state
 
+    # The text of the button.
     attr_accessor :text
 
     # Creates a button.
@@ -748,9 +749,9 @@ module MiniGL
     #     foreground when +fg+ is a color (when it is an image, the height of
     #     the image will be kept).
     # [bg] A background image (string or symbol that will be passed to
-    #      +Res.img+) or color (in AARRGGBB hexadecimal format).
+    #      +Res.img+) or color (in RRGGBB hexadecimal format).
     # [fg] A foreground image (string or symbol that will be passed to
-    #      +Res.img+) or color (in AARRGGBB hexadecimal format). The image will
+    #      +Res.img+) or color (in RRGGBB hexadecimal format). The image will
     #      be horizontally repeated when needed, if its width is less than +w+.
     # [max_value] The maximum value the progress bar can reach (an integer).
     # [value] The starting value for the progress bar.
@@ -764,7 +765,7 @@ module MiniGL
     # [format] Format to display the value. Specify '%' for a percentage and
     #          anything else for absolute values (current/maximum).
     def initialize(x, y, w, h, bg, fg, max_value = 100, value = 100, fg_margin_x = 0, fg_margin_y = 0, #fg_left = nil, fg_right = nil,
-                   font = nil, text_color = 0xff000000, format = nil)
+                   font = nil, text_color = 0, format = nil)
       super x, y, font, '', text_color, text_color
       @w = w
       @h = h
@@ -789,16 +790,31 @@ module MiniGL
       @format = format
     end
 
+    # Increases the current value of the progress bar by the given amount.
+    #
+    # Parameters:
+    # [amount] +(Integer)+ The amount to be added to the current value. If the
+    #          sum surpasses +@max_value+, it is set to +@max_value+.
     def increase(amount)
       @value += amount
       @value = @max_value if @value > @max_value
     end
 
+    # Descreases the current value of the progress bar by the given amount.
+    #
+    # Parameters:
+    # [amount] +(Integer)+ The amount to be subtracted from the current value.
+    #          If the result is less than zero, it is set to zero.
     def decrease(amount)
       @value -= amount
       @value = 0 if @value < 0
     end
 
+    # Sets the value of the progress bar.
+    #
+    # Parameters:
+    # [val] +(Integer)+ The value to be set. It will be changed as needed to be
+    #       between zero and +@max_value+.
     def value=(val)
       @value = val
       if @value > @max_value
@@ -808,53 +824,97 @@ module MiniGL
       end
     end
 
+    # Sets the value of the progress bar to a given percentage of +@max_value+.
+    #
+    # Parameters:
+    # [pct] +(Numeric)+ The percentage of +@max_value+ to set the current value
+    #       to. The final result will be changed as needed to be between zero
+    #       and +@max_value+.
     def percentage=(pct)
       self.value = (pct * @max_value).round
     end
 
-    def draw
+    # Draws the progress bar.
+    #
+    # Parameters:
+    # [alpha] +(Fixnum)+ The opacity with which the progress bar will be drawn.
+    #         Allowed values vary between 0 (fully transparent) and 255 (fully
+    #         opaque).
+    # [z_index] +(Fixnum)+ The z-order to draw the object. Objects with larger
+    #           z-orders will be drawn on top of the ones with smaller z-orders.
+    def draw(alpha = 0xff, z_index = 0)
       return unless @visible
 
       if @bg
-        @bg.draw @x, @y, 0
+        c = (alpha << 24) | 0xffffff
+        @bg.draw @x, @y, z_index, 1, 1, c
       else
-        G.window.draw_quad @x, @y, @bg_color,
-                           @x + @w, @y, @bg_color,
-                           @x + @w, @y + @h, @bg_color,
-                           @x, @y + @h, @bg_color, 0
+        c = (alpha << 24) | @bg_color
+        G.window.draw_quad @x, @y, c,
+                           @x + @w, @y, c,
+                           @x + @w, @y + @h, c,
+                           @x, @y + @h, c, z_index
       end
       if @fg
+        c = (alpha << 24) | 0xffffff
         w1 = @fg.width
         w2 = (@value.to_f / @max_value * @w).round
         x0 = @x + @fg_margin_x
         x = 0
         while x <= w2 - w1
-          @fg.draw x0 + x, @y + @fg_margin_y, 0
+          @fg.draw x0 + x, @y + @fg_margin_y, z_index, 1, 1, c
           x += w1
         end
         if w2 - x > 0
           img = Gosu::Image.new(G.window, @fg_path, true, 0, 0, w2 - x, @fg.height)
-          img.draw x0 + x, @y + @fg_margin_y, 0
+          img.draw x0 + x, @y + @fg_margin_y, z_index, 1, 1, c
         end
       else
+        c = (alpha << 24) | @fg_color
         rect_r = @x + (@value.to_f / @max_value * @w).round
-        G.window.draw_quad @x, @y, @fg_color,
-                           rect_r, @y, @fg_color,
-                           rect_r, @y + @h, @fg_color,
-                           @x, @y + @h, @fg_color, 0
+        G.window.draw_quad @x, @y, c,
+                           rect_r, @y, c,
+                           rect_r, @y + @h, c,
+                           @x, @y + @h, c, z_index
       end
       if @font
+        c = (alpha << 24) | @text_color
         @text = @format == '%' ? "#{(@value.to_f / @max_value * 100).round}%" : "#{@value}/#{@max_value}"
-        @font.draw_rel @text, @x + @fg_margin_x + @w / 2, @y + @fg_margin_y + @h / 2, 0, 0.5, 0.5, 1, 1, @text_color
+        @font.draw_rel @text, @x + @fg_margin_x + @w / 2, @y + @fg_margin_y + @h / 2, 0, 0.5, 0.5, 1, 1, c
       end
     end
   end
 
+  # This class represents a "drop-down list" form component, here composed of a
+  # group of +Button+ objects.
   class DropDownList < Component
+    # The selected value in the drop-down list. This is one of the +@options+.
     attr_reader :value
 
+    # An array containing all the options (each of them +String+s) that can be
+    # selected in the drop-down list.
     attr_accessor :options
 
+    # Creates a new drop-down list.
+    #
+    # Parameters:
+    # [x] The x-coordinate of the object.
+    # [y] The y-coordinate of the object.
+    # [font] Font to be used by the buttons that compose the drop-donwn list.
+    # [img] Image of the main button, i.e., the one at the top, that toggles
+    #       visibility of the other buttons (the "option" buttons).
+    # [opt_img] Image for the "option" buttons, as described above.
+    # [options] Array of available options for this control (+String+s).
+    # [option] Index of the firstly selected option.
+    # [text_margin] Left margin of the text inside the buttons (vertically, the
+    #               text will always be centered).
+    # [width] Width of the control, used when no image is provided.
+    # [height] Height of the control, used when no image is provided.
+    # [text_color] Used as the +text_color+ parameter in the constructor of the
+    #              buttons.
+    # [disabled_text_color] Analogous to +text_color+.
+    # [over_text_color] Same as above.
+    # [down_text_color] Same as above.
     def initialize(x, y, font, img, opt_img, options, option = 0, text_margin = 0, width = nil, height = nil,
                    text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0)
       super x, y, font, options[option], text_color, disabled_text_color
@@ -884,6 +944,7 @@ module MiniGL
       @max_h = (@options.size + 1) * @h
     end
 
+    # Updates the control.
     def update
       return unless @enabled and @visible
       if @open and Mouse.button_pressed? :left and not Mouse.over?(@x, @y, @w, @max_h)
@@ -893,6 +954,50 @@ module MiniGL
       @buttons.each { |b| b.update }
     end
 
+    # Sets the currently selected value of the drop-down list. It is ignored if
+    # it is not among the available +@options+.
+    def value=(val)
+      if @options.include? val
+        @value = @buttons[0].text = val
+      end
+    end
+
+    def enabled=(value) # :nodoc:
+      toggle if @open
+      @buttons[0].enabled = value
+      @enabled = value
+    end
+
+    # Draws the drop-down list.
+    #
+    # Parameters:
+    # [alpha] +(Fixnum)+ The opacity with which the drop-down list will be
+    #         drawn. Allowed values vary between 0 (fully transparent) and 255
+    #         (fully opaque).
+    # [z_index] +(Fixnum)+ The z-order to draw the object. Objects with larger
+    #           z-orders will be drawn on top of the ones with smaller z-orders.
+    def draw(alpha = 0xff, z_index = 0)
+      return unless @visible
+      unless @img
+        bottom = @open ? @y + @max_h + 1 : @y + @h + 1
+        b_color = (alpha << 24)
+        G.window.draw_quad @x - 1, @y - 1, b_color,
+                           @x + @w + 1, @y - 1, b_color,
+                           @x + @w + 1, bottom, b_color,
+                           @x - 1, bottom, b_color, z_index
+        @buttons.each do |b|
+          color = (alpha << 24) | (b.state == :over ? 0xcccccc : 0xffffff)
+          G.window.draw_quad b.x, b.y, color,
+                             b.x + b.w, b.y, color,
+                             b.x + b.w, b.y + b.h, color,
+                             b.x, b.y + b.h, color, z_index if b.visible
+        end
+      end
+      @buttons.each { |b| b.draw alpha, z_index }
+    end
+
+    private
+
     def toggle
       if @open
         @buttons[1..-1].each { |b| b.visible = false }
@@ -901,37 +1006,6 @@ module MiniGL
         @buttons[1..-1].each { |b| b.visible = true }
         @open = true
       end
-    end
-
-    def value=(val)
-      if @options.include? val
-        @value = @buttons[0].text = val
-      end
-    end
-
-    def enabled=(value)
-      toggle if @open
-      @buttons[0].enabled = value
-      @enabled = value
-    end
-
-    def draw
-      return unless @visible
-      unless @img
-        bottom = @open ? @y + @max_h + 1 : @y + @h + 1
-        G.window.draw_quad @x - 1, @y - 1, 0xff000000,
-                           @x + @w + 1, @y - 1, 0xff000000,
-                           @x + @w + 1, bottom, 0xff000000,
-                           @x - 1, bottom, 0xff000000, 0
-        @buttons.each do |b|
-          color = b.state == :over ? 0xffcccccc : 0xffffffff
-          G.window.draw_quad b.x, b.y, color,
-                             b.x + b.w, b.y, color,
-                             b.x + b.w, b.y + b.h, color,
-                             b.x, b.y + b.h, color, 0 if b.visible
-        end
-      end
-      @buttons.each { |b| b.draw }
     end
   end
 end
