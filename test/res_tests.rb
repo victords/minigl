@@ -19,4 +19,19 @@ class ResTest < Test::Unit::TestCase
     assert_equal 48, t1[0].width
     assert_equal 48, t1[0].width
   end
+
+  def test_dirs_and_separator
+    assert_nothing_raised do
+      img1 = Res.img :img1
+    end
+    Res.img_dir = 'img/sub'
+    assert_nothing_raised do
+      img2 = Res.img :image
+    end
+    Res.img_dir = 'img'
+    Res.separator = '~'
+    assert_nothing_raised do
+      img3 = Res.img 'sub~image'
+    end
+  end
 end

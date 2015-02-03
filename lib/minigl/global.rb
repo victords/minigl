@@ -446,7 +446,14 @@ module MiniGL
       @@global_songs = Hash.new
       @@fonts = Hash.new
       @@global_fonts = Hash.new
+
       @@prefix = File.expand_path(File.dirname($0)) + '/data/'
+      @@img_dir = 'img/'
+      @@tileset_dir = 'tileset/'
+      @@sound_dir = 'sound/'
+      @@song_dir = 'song/'
+      @@font_dir = 'font/'
+      @@separator = '_'
     end
 
     # Get the current prefix for searching data files. This is the directory
@@ -461,14 +468,73 @@ module MiniGL
       @@prefix = value
     end
 
+    # Gets the current path to image files (under +prefix+). Default is 'img'.
+    def self.img_dir; @@img_dir; end
+
+    # Sets the path to image files (under +prefix+). Default is 'img'.
+    def self.img_dir=(value)
+      value += '/' if value[-1] != '/'
+      @@img_dir = value
+    end
+
+    # Gets the current path to tileset files (under +prefix+). Default is
+    # 'tileset'.
+    def self.tileset_dir; @@tileset_dir; end
+
+    # Sets the path to tilset files (under +prefix+). Default is 'tileset'.
+    def self.tileset_dir=(value)
+      value += '/' if value[-1] != '/'
+      @@tileset_dir = value
+    end
+
+    # Gets the current path to sound files (under +prefix+). Default is 'sound'.
+    def self.sound_dir; @@sound_dir; end
+
+    # Sets the path to sound files (under +prefix+). Default is 'sound'.
+    def self.sound_dir=(value)
+      value += '/' if value[-1] != '/'
+      @@sound_dir = value
+    end
+
+    # Gets the current path to song files (under +prefix+). Default is 'song'.
+    def self.song_dir; @@song_dir; end
+
+    # Sets the path to song files (under +prefix+). Default is 'song'.
+    def self.song_dir=(value)
+      value += '/' if value[-1] != '/'
+      @@song_dir = value
+    end
+
+    # Gets the current path to font files (under +prefix+). Default is 'font'.
+    def self.font_dir; @@font_dir; end
+
+    # Sets the path to font files (under +prefix+). Default is 'font'.
+    def self.font_dir=(value)
+      value += '/' if value[-1] != '/'
+      @@font_dir = value
+    end
+
+    # Gets the character that is currently being used in the +id+ parameter of
+    # the loading methods as a folder separator. Default is '_'. Note that if
+    # you want to use symbols to specify paths, this separator should be a valid
+    # character in a Ruby symbol. On the other hand, if you want to use only
+    # slashes in Strings, you can specify a 'weird' character that won't appear
+    # in any file name.
+    def self.separator; @@separator; end
+
+    # Sets the character (actually, any string can be given) described in the
+    # +separator+ method. The default value is '_'.
+    def self.separator=(value); @@separator = value; end
+
     # Returns a <code>Gosu::Image</code> object.
     #
     # Parameters:
     # [id] A string or symbol representing the path to the image. If the file
-    #      is inside 'data/img', only the file name is needed. If it's inside
-    #      a subdirectory, the id must be prefixed by each subdirectory name
-    #      followed by an underscore. Example: to load
-    #      'data/img/sprite/1.png', provide +:sprite_1+ or "sprite_1".
+    #      is inside +prefix+/+img_dir+, only the file name is needed. If it's
+    #      inside a subdirectory of +prefix+/+img_dir+, the id must be
+    #      prefixed by each subdirectory name followed by +separator+. Example:
+    #      to load 'data/img/sprite/1.png', with the default values of +prefix+,
+    #      +img_dir+ and +separator+, provide +:sprite_1+ or "sprite_1".
     # [global] Set to true if you want to keep the image in memory until the
     #          game execution is finished. If false, the image will be
     #          released when you call +clear+.
@@ -477,11 +543,11 @@ module MiniGL
     #            will be drawn repeated times, side by side, forming a
     #            continuous composition.
     # [ext] The extension of the file being loaded. Specify only if it is
-    #       other than ".png".
+    #       other than '.png'.
     def self.img(id, global = false, tileable = false, ext = '.png')
       if global; a = @@global_imgs; else; a = @@imgs; end
       return a[id] if a[id]
-      s = @@prefix + 'img/' + id.to_s.split('_').join('/') + ext
+      s = @@prefix + @@img_dir + id.to_s.split(@@separator).join('/') + ext
       img = Gosu::Image.new G.window, s, tileable
       a[id] = img
     end
@@ -504,7 +570,7 @@ module MiniGL
     def self.imgs(id, sprite_cols, sprite_rows, global = false, ext = '.png')
       if global; a = @@global_imgs; else; a = @@imgs; end
       return a[id] if a[id]
-      s = @@prefix + 'img/' + id.to_s.split('_').join('/') + ext
+      s = @@prefix + @@img_dir + id.to_s.split(@@separator).join('/') + ext
       imgs = Gosu::Image.load_tiles G.window, s, -sprite_cols, -sprite_rows, false
       a[id] = imgs
     end
@@ -517,7 +583,7 @@ module MiniGL
     # Parameters:
     # [id] A string or symbol representing the path to the image. It must be
     #      specified the same way as in +img+, but the base directory is
-    #      'data/tileset'.
+    #      +prefix+/+tileset_dir+.
     # [tile_width] Width of each tile, in pixels.
     # [tile_height] Height of each tile, in pixels.
     # [global] Set to true if you want to keep the image in memory until the
@@ -528,7 +594,7 @@ module MiniGL
     def self.tileset(id, tile_width = 32, tile_height = 32, global = false, ext = '.png')
       if global; a = @@global_tilesets; else; a = @@tilesets; end
       return a[id] if a[id]
-      s = @@prefix + 'tileset/' + id.to_s.split('_').join('/') + ext
+      s = @@prefix + @@tileset_dir + id.to_s.split(@@separator).join('/') + ext
       tileset = Gosu::Image.load_tiles G.window, s, tile_width, tile_height, true
       a[id] = tileset
     end
@@ -539,7 +605,7 @@ module MiniGL
     # Parameters:
     # [id] A string or symbol representing the path to the sound. It must be
     #      specified the same way as in +img+, but the base directory is
-    #      'data/sound'.
+    #      +prefix+/+sound_dir+.
     # [global] Set to true if you want to keep the sound in memory until the
     #          game execution is finished. If false, the sound will be
     #          released when you call +clear+.
@@ -548,7 +614,7 @@ module MiniGL
     def self.sound(id, global = false, ext = '.wav')
       if global; a = @@global_sounds; else; a = @@sounds; end
       return a[id] if a[id]
-      s = @@prefix + 'sound/' + id.to_s.split('_').join('/') + ext
+      s = @@prefix + @@sound_dir + id.to_s.split(@@separator).join('/') + ext
       sound = Gosu::Sample.new G.window, s
       a[id] = sound
     end
@@ -559,7 +625,7 @@ module MiniGL
     # Parameters:
     # [id] A string or symbol representing the path to the song. It must be
     #      specified the same way as in +img+, but the base directory is
-    #      'data/song'.
+    #      +prefix+/+song_dir+.
     # [global] Set to true if you want to keep the song in memory until the
     #          game execution is finished. If false, the song will be released
     #          when you call +clear+.
@@ -568,7 +634,7 @@ module MiniGL
     def self.song(id, global = false, ext = '.ogg')
       if global; a = @@global_songs; else; a = @@songs; end
       return a[id] if a[id]
-      s = @@prefix + 'song/' + id.to_s.split('_').join('/') + ext
+      s = @@prefix + @@song_dir + id.to_s.split(@@separator).join('/') + ext
       song = Gosu::Song.new G.window, s
       a[id] = song
     end
@@ -580,7 +646,7 @@ module MiniGL
     # Parameters:
     # [id] A string or symbol representing the path to the song. It must be
     #      specified the same way as in +img+, but the base directory is
-    #      'data/font'.
+    #      +prefix+/+font_dir+.
     # [size] The size of the font, in pixels. This will correspond,
     #        approximately, to the height of the tallest character when drawn.
     # [global] Set to true if you want to keep the font in memory until the
@@ -592,7 +658,7 @@ module MiniGL
       if global; a = @@global_fonts; else; a = @@fonts; end
       id_size = "#{id}_#{size}"
       return a[id_size] if a[id_size]
-      s = @@prefix + 'font/' + id.to_s.split('_').join('/') + ext
+      s = @@prefix + @@font_dir + id.to_s.split(@@separator).join('/') + ext
       font = Gosu::Font.new G.window, s, size
       a[id_size] = font
     end
