@@ -386,6 +386,12 @@ module MiniGL
     def move_free(aim, speed)
       x_d = aim.x - @x; y_d = aim.y - @y
       distance = Math.sqrt(x_d**2 + y_d**2)
+
+      if distance == 0
+        @speed.x = @speed.y = 0
+        return
+      end
+
       @speed.x = 1.0 * x_d * speed / distance
       @speed.y = 1.0 * y_d * speed / distance
 
@@ -405,34 +411,31 @@ module MiniGL
     end
 
     # Causes the object to move in cycles across multiple given points (the
-    # method must be called repeatedly, and it returns the value that must be
-    # provided to +cur_point+ after the first call). If obstacles are
-    # provided, it will behave as an elevator (as in +move_carrying+).
+    # first point in the array is the first point the object will move towards,
+    # so it doesn't need to be equal to the current/initial position). If
+    # obstacles are provided, it will behave as an elevator (as in
+    # +move_carrying+).
     #
     # Parameters:
     # [points] An array of Vectors representing the path that the object will
     #          perform.
-    # [cur_point] The index of the point in the path that the object is
-    #             currently moving to. In the first call, it is a good idea to
-    #             provide 0, while in the subsequent calls, you must provide
-    #             the return value of this method.
     # [speed] The constant speed at which the object will move. This must be
     #         provided as a scalar, not a vector.
     # [obstacles] An array of obstacles to be considered in the collision
     #             checking, and carried along when colliding from above.
     #             Obstacles must be instances of Block (or derived classes),
     #             or objects that <code>include Movement</code>.
-    def cycle(points, cur_point, speed, obstacles = nil)
+    def cycle(points, speed, obstacles = nil)
+      @cur_point = 0 if @cur_point.nil?
       if obstacles
-        move_carrying points[cur_point], speed, obstacles
+        move_carrying points[@cur_point], speed, obstacles
       else
-        move_free points[cur_point], speed
+        move_free points[@cur_point], speed
       end
       if @speed.x == 0 and @speed.y == 0
-        if cur_point == points.length - 1; cur_point = 0
-        else; cur_point += 1; end
+        if @cur_point == points.length - 1; @cur_point = 0
+        else; @cur_point += 1; end
       end
-      cur_point
     end
 
   private

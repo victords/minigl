@@ -734,7 +734,7 @@ module MiniGL
     attr_reader :max_value
 
     # The current value of the progress bar (an integer greater than or equal
-    # to zero, and less than or equal to +@max_value+).
+    # to zero, and less than or equal to +max_value+).
     attr_reader :value
 
     # Creates a progress bar.
@@ -793,8 +793,8 @@ module MiniGL
     # Increases the current value of the progress bar by the given amount.
     #
     # Parameters:
-    # [amount] +(Integer)+ The amount to be added to the current value. If the
-    #          sum surpasses +@max_value+, it is set to +@max_value+.
+    # [amount] (+Integer+) The amount to be added to the current value. If the
+    #          sum surpasses +max_value+, it is set to +max_value+.
     def increase(amount)
       @value += amount
       @value = @max_value if @value > @max_value
@@ -803,7 +803,7 @@ module MiniGL
     # Descreases the current value of the progress bar by the given amount.
     #
     # Parameters:
-    # [amount] +(Integer)+ The amount to be subtracted from the current value.
+    # [amount] (+Integer+) The amount to be subtracted from the current value.
     #          If the result is less than zero, it is set to zero.
     def decrease(amount)
       @value -= amount
@@ -813,8 +813,8 @@ module MiniGL
     # Sets the value of the progress bar.
     #
     # Parameters:
-    # [val] +(Integer)+ The value to be set. It will be changed as needed to be
-    #       between zero and +@max_value+.
+    # [val] (+Integer+) The value to be set. It will be changed as needed to be
+    #       between zero and +max_value+.
     def value=(val)
       @value = val
       if @value > @max_value
@@ -824,12 +824,12 @@ module MiniGL
       end
     end
 
-    # Sets the value of the progress bar to a given percentage of +@max_value+.
+    # Sets the value of the progress bar to a given percentage of +max_value+.
     #
     # Parameters:
-    # [pct] +(Numeric)+ The percentage of +@max_value+ to set the current value
+    # [pct] (+Numeric+) The percentage of +max_value+ to set the current value
     #       to. The final result will be changed as needed to be between zero
-    #       and +@max_value+.
+    #       and +max_value+.
     def percentage=(pct)
       self.value = (pct * @max_value).round
     end
@@ -837,10 +837,10 @@ module MiniGL
     # Draws the progress bar.
     #
     # Parameters:
-    # [alpha] +(Fixnum)+ The opacity with which the progress bar will be drawn.
+    # [alpha] (+Fixnum+) The opacity with which the progress bar will be drawn.
     #         Allowed values vary between 0 (fully transparent) and 255 (fully
     #         opaque).
-    # [z_index] +(Fixnum)+ The z-order to draw the object. Objects with larger
+    # [z_index] (+Fixnum+) The z-order to draw the object. Objects with larger
     #           z-orders will be drawn on top of the ones with smaller z-orders.
     def draw(alpha = 0xff, z_index = 0)
       return unless @visible
@@ -888,7 +888,7 @@ module MiniGL
   # This class represents a "drop-down list" form component, here composed of a
   # group of +Button+ objects.
   class DropDownList < Component
-    # The selected value in the drop-down list. This is one of the +@options+.
+    # The selected value in the drop-down list. This is one of the +options+.
     attr_reader :value
 
     # An array containing all the options (each of them +String+s) that can be
@@ -955,7 +955,7 @@ module MiniGL
     end
 
     # Sets the currently selected value of the drop-down list. It is ignored if
-    # it is not among the available +@options+.
+    # it is not among the available options.
     def value=(val)
       if @options.include? val
         @value = @buttons[0].text = val
@@ -971,10 +971,10 @@ module MiniGL
     # Draws the drop-down list.
     #
     # Parameters:
-    # [alpha] +(Fixnum)+ The opacity with which the drop-down list will be
+    # [alpha] (+Fixnum+) The opacity with which the drop-down list will be
     #         drawn. Allowed values vary between 0 (fully transparent) and 255
     #         (fully opaque).
-    # [z_index] +(Fixnum)+ The z-order to draw the object. Objects with larger
+    # [z_index] (+Fixnum+) The z-order to draw the object. Objects with larger
     #           z-orders will be drawn on top of the ones with smaller z-orders.
     def draw(alpha = 0xff, z_index = 0)
       return unless @visible
