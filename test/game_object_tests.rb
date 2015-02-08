@@ -26,6 +26,20 @@ class SpriteTest < Test::Unit::TestCase
     5.times { s.animate indices, interval }
     assert_equal 2, s.img_index
   end
+
+  def test_sprite_visibility
+    # m = Map.new(1, 1, 800, 600)
+    s = Sprite.new 10, 20, :image, 3, 1 # the sprite will be 1 x 1 pixel
+    assert s.visible?
+    s.x = 800
+    assert(!(s.visible?))
+    s.x = -1
+    assert(!(s.visible?))
+    s.x = 0
+    assert s.visible?
+    s.y = 600
+    assert(!(s.visible?))
+  end
 end
 
 class GameObjectTest < Test::Unit::TestCase
@@ -57,5 +71,23 @@ class GameObjectTest < Test::Unit::TestCase
     assert_equal 0, o.img_index
     5.times { o.animate indices, interval }
     assert_equal 1, o.img_index
+  end
+  
+  def test_game_object_visibility
+    # m = Map.new(1, 1, 800, 600)
+    o = GameObject.new 10, 20, 30, 30, :square, Vector.new(-10, -10)
+    assert o.visible?
+    o.x = 800
+    assert o.visible?
+    o.x = 810
+    assert(!(o.visible?))
+    o.x = -30
+    assert o.visible?
+    o.y = -50
+    assert(!(o.visible?))
+    o.x = 0; o.y = -30
+    assert o.visible?
+    o.y = 610
+    assert(!(o.visible?))
   end
 end

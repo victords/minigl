@@ -99,6 +99,15 @@ module MiniGL
         @img[@img_index].draw @x.round, @y.round, z_index, scale_x, scale_y, color
       end
     end
+
+    # Returns whether this sprite is visible in the given map (i.e., in the
+    # viewport determined by the camera of the given map). If no map is given,
+    # returns whether the sprite is visible on the screen.
+    def visible?(map = nil)
+      r = Rectangle.new @x, @y, @img[0].width, @img[0].height
+      return Rectangle.new(0, 0, G.window.width, G.window.height).intersect? r if map.nil?
+      map.cam.intersect? r
+    end
   end
 
   # This class represents an object with a set of properties and methods
@@ -188,6 +197,15 @@ module MiniGL
       else
         @img[@img_index].draw @x.round + @img_gap.x, @y.round + @img_gap.y, z_index, scale_x, scale_y, color
       end
+    end
+
+    # Returns whether this object is visible in the given map (i.e., in the
+    # viewport determined by the camera of the given map). If no map is given,
+    # returns whether the object is visible on the screen.
+    def visible?(map = nil)
+      r = Rectangle.new @x.round + @img_gap.x, @y.round + @img_gap.y, @img[0].width, @img[0].height
+      return Rectangle.new(0, 0, G.window.width, G.window.height).intersect? r if map.nil?
+      map.cam.intersect? r
     end
   end
 
