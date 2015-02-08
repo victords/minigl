@@ -239,7 +239,14 @@ module MiniGL
     #            of the Effect object. If +nil+, it will be set to
     #            <code>@indices.length * interval</code>, i.e., the exact time
     #            needed for one animation cycle to complete.
-    def initialize(x, y, img, sprite_cols = nil, sprite_rows = nil, interval = 10, indices = nil, lifetime = nil)
+    # [sound] The id of a sound to be played when the effect is created (id must
+    #         be given in the format specified for the +Res.sound+ method).
+    # [sound_ext] Extension of the sound file, if a sound is given. Default is
+    #             '.wav'.
+    # [sound_volume] The volume (from 0 to 1) to play the sound, if any. Default
+    #                is 1.
+    def initialize(x, y, img, sprite_cols = nil, sprite_rows = nil, interval = 10, indices = nil, lifetime = nil,
+                   sound = nil, sound_ext = '.wav', sound_volume = 1)
       super x, y, img, sprite_cols, sprite_rows
       @timer = 0
       if indices
@@ -253,6 +260,7 @@ module MiniGL
       else
         @lifetime = @indices.length * interval
       end
+      Res.sound(sound, false, sound_ext).play(sound_volume) if sound
     end
 
     # Updates the effect, animating and counting its remaining lifetime.

@@ -23,6 +23,8 @@ class MyGame < Game
 
     @pb = ProgressBar.new(5, 240, 200, 20, 0xff0000, 0x00ff00, 3456, 70, 0, 0, @font1, 0xff000080)
     @ddl = DropDownList.new(5, 270, @font1, nil, nil, ['olá amigos', 'opção 2', 'terceira'], 0, 3, 150, 25, 0, 0x808080, 0xffffff, 0xffff00)
+
+    @eff = Effect.new(100, 100, :check, 2, 4, 10, nil, nil, '1')
   end
 
   def needs_cursor?
@@ -64,6 +66,8 @@ class MyGame < Game
     @chk.update
     @txt.update
     @ddl.update
+
+    @eff.update
   end
 
   def draw
@@ -84,6 +88,8 @@ class MyGame < Game
     @chk.draw
     @txt.draw
     @pb.draw 0x66
+
+    @eff.draw
   end
 end
 
