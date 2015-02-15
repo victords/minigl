@@ -4,7 +4,7 @@ include MiniGL
 class MyGame < Gosu::Window
   def initialize
     super 800, 600, false
-    Game.initialize self
+    GameWindow.initialize self
 
     @tile1 = Res.img :tile2
     @tile2 = Res.img :tile2b

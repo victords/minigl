@@ -1,7 +1,7 @@
 require_relative '../lib/minigl'
 include MiniGL
 
-class MyGame < Game
+class MyGame < GameWindow
   def initialize
     super 800, 600, false
 

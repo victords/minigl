@@ -4,7 +4,7 @@ include MiniGL
 
 class SpriteTest < Test::Unit::TestCase
   def setup
-    @window = Game.new 800, 600, false
+    @window = GameWindow.new 800, 600, false
     Res.prefix = File.expand_path(File.dirname(__FILE__)) + '/data'
   end
 
@@ -44,7 +44,7 @@ end
 
 class GameObjectTest < Test::Unit::TestCase
   def setup
-    @window = Game.new 800, 600, false
+    @window = GameWindow.new 800, 600, false
     Res.prefix = File.expand_path(File.dirname(__FILE__)) + '/data'
   end
 
@@ -72,7 +72,7 @@ class GameObjectTest < Test::Unit::TestCase
     5.times { o.animate indices, interval }
     assert_equal 1, o.img_index
   end
-  
+
   def test_game_object_visibility
     # m = Map.new(1, 1, 800, 600)
     o = GameObject.new 10, 20, 30, 30, :square, Vector.new(-10, -10)

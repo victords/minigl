@@ -16,7 +16,7 @@ end
 
 class MovementTest < Test::Unit::TestCase
   def setup
-    @window = Game.new 800, 600, false
+    @window = GameWindow.new 800, 600, false
     @obsts = [
       Block.new(-1, 0, 1, 600, false),
       Block.new(0, -1, 800, 1, false),

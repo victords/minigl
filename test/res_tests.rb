@@ -4,7 +4,7 @@ include MiniGL
 
 class ResTest < Test::Unit::TestCase
   def setup
-    @window = Game.new 800, 600, false
+    @window = GameWindow.new 800, 600, false
     Res.prefix = File.expand_path(File.dirname(__FILE__)) + '/data'
   end
 

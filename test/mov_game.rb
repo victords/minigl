@@ -2,7 +2,7 @@ require 'gosu'
 require_relative '../lib/minigl'
 include MiniGL
 
-class MyGame < Game
+class MyGame < GameWindow
   def initialize
     super 800, 600, false
 
@@ -19,12 +19,14 @@ class MyGame < Game
     ]
     @ramps = [
       # Ramp.new(200, 550, 200, 50, true),
-      # Ramp.new(400, 340, 200, 210, true),
-      Ramp.new(600, 300, 200, 300, true),
+      Ramp.new(0, 300, 150, 200, false),
+      Ramp.new(150, 500, 150, 100, false),
+      Ramp.new(500, 500, 150, 100, true),
+      Ramp.new(650, 300, 150, 200, true),
     ]
 
-    @cyc_obj = GameObject.new(0, 0, 50, 50, :square)
-    @cycle = [Vector.new(0, 0), Vector.new(430, 107), Vector.new(265, 324)]
+    # @cyc_obj = GameObject.new(0, 0, 50, 50, :square)
+    # @cycle = [Vector.new(0, 0), Vector.new(430, 107), Vector.new(265, 324)]
   end
 
   def update
@@ -34,14 +36,14 @@ class MyGame < Game
     if @obj.bottom
       forces.y -= 15 if KB.key_pressed?(Gosu::KbSpace)
       if KB.key_down?(Gosu::KbLeft)
-        forces.x -= 1
+        forces.x -= 0.5
       elsif @obj.speed.x < 0 and @obj.stored_forces.x == 0
-        @obj.speed.x *= 0.8
+        @obj.speed.x *= 0.75
       end
       if KB.key_down?(Gosu::KbRight)
-        forces.x += 1
+        forces.x += 0.5
       elsif @obj.speed.x > 0 and @obj.stored_forces.x == 0
-        @obj.speed.x *= 0.8
+        @obj.speed.x *= 0.75
       end
     else
       forces.x -= 0.2 if KB.key_down?(Gosu::KbLeft)
@@ -49,13 +51,13 @@ class MyGame < Game
     end
     @obj.move(forces, @obsts, @ramps)
 
-    @cyc_obj.cycle(@cycle, 5)
+    # @cyc_obj.cycle(@cycle, 5)
     # puts @obj.bottom
   end
 
   def draw
     @obj.draw
-    @cyc_obj.draw
+    # @cyc_obj.draw
     @obsts.each do |o|
       draw_quad o.x, o.y, 0xffffffff,
                 o.x + o.w, o.y, 0xffffffff,
