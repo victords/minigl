@@ -124,12 +124,10 @@ module MiniGL
           s = (obj.prev_speed.y.to_f / obj.prev_speed.x).abs
           dx /= s + r
           obj.x += dx
-          obj.y -= s * dx.abs
-        else
-          obj.y = get_y obj
         end
+        obj.y = get_y obj
         if counter
-          obj.speed.x = (r >= 1 ? 0 : obj.speed.x * (1 - r))
+          obj.speed.x = (r >= G.ramp_slip_threshold ? 0 : obj.speed.x * (G.ramp_slip_threshold - r))
         end
         obj.speed.y = 0
       end
@@ -232,9 +230,12 @@ module MiniGL
       forces.x += @stored_forces.x; forces.y += @stored_forces.y
       @stored_forces.x = @stored_forces.y = 0
 
-      # check_contact obst, ramps
       forces.x = 0 if (forces.x < 0 and @left) or (forces.x > 0 and @right)
       forces.y = 0 if (forces.y < 0 and @top) or (forces.y > 0 and @bottom)
+
+      if @bottom.is_a? Ramp and @bottom.ratio >= G.ramp_slip_threshold
+        forces.x = (@bottom.left ? -1 : 1) * 0.1
+      end
 
       @speed.x += forces.x / @mass; @speed.y += forces.y / @mass
       @speed.x = 0 if @speed.x.abs < G.min_speed.x
@@ -266,8 +267,12 @@ module MiniGL
           elsif dn; y_lim = find_down_limit coll_list
           elsif up; y_lim = find_up_limit coll_list
           end
-          if rt && @x + @w + @speed.x > x_lim; @x = x_lim - @w; @speed.x = 0
-          elsif lf && @x + @speed.x < x_lim; @x = x_lim; @speed.x = 0
+          if rt && @x + @w + @speed.x > x_lim
+            @x = x_lim - @w
+            @speed.x = 0
+          elsif lf && @x + @speed.x < x_lim
+            @x = x_lim
+            @speed.x = 0
           elsif dn && @y + @h + @speed.y > y_lim; @y = y_lim - @h; @speed.y = 0
           elsif up && @y + @speed.y < y_lim; @y = y_lim; @speed.y = 0
           end
@@ -459,16 +464,15 @@ module MiniGL
         end
         if @bottom.nil?
           ramps.each do |r|
-            if r == prev_bottom && @x + @w > r.x && r.x + r.w > @x && @prev_speed.x.abs <= G.ramp_contact_threshold && @prev_speed.y >= 0
+            if r == prev_bottom && @x + @w > r.x && r.x + r.w > @x &&
+                @prev_speed.x.abs <= G.ramp_contact_threshold &&
+                @prev_speed.y >= 0
               @y = r.get_y self
               @bottom = r
               break
             end
           end
         end
-      end
-      if @bottom.is_a? Ramp and @bottom.ratio > 1
-        @stored_forces.x += (@bottom.left ? -1 : 1) * (@bottom.ratio - 1) * @mass
       end
     end
 

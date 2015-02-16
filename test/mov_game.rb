@@ -37,20 +37,17 @@ class MyGame < GameWindow
       forces.y -= 15 if KB.key_pressed?(Gosu::KbSpace)
       if KB.key_down?(Gosu::KbLeft)
         forces.x -= 0.5
-      elsif @obj.speed.x < 0 and @obj.stored_forces.x == 0
-        @obj.speed.x *= 0.75
       end
       if KB.key_down?(Gosu::KbRight)
         forces.x += 0.5
-      elsif @obj.speed.x > 0 and @obj.stored_forces.x == 0
-        @obj.speed.x *= 0.75
       end
+      forces.x -= @obj.speed.x * 0.1
     else
       forces.x -= 0.2 if KB.key_down?(Gosu::KbLeft)
       forces.x += 0.2 if KB.key_down?(Gosu::KbRight)
     end
     @obj.move(forces, @obsts, @ramps)
-
+    # puts @obj.x
     # @cyc_obj.cycle(@cycle, 5)
     # puts @obj.bottom
   end
