@@ -306,6 +306,10 @@ module MiniGL
     # The current text inside the text field.
     attr_reader :text
 
+    # The current 'locale' used for detecting the keys. THIS FEATURE IS
+    # INCOMPLETE!
+    attr_reader :locale
+
     # Creates a new text field.
     #
     # Parameters:
@@ -341,6 +345,10 @@ module MiniGL
     # [selection_color] The color of the rectangle highlighting selected text,
     #                   in hexadecimal RRGGBB format. The rectangle will
     #                   always be drawn with 50% of opacity.
+    # [locale] The locale to be used when detecting keys. By now, only 'en-US'
+    #          and 'pt-BR' are **partially** supported. Default is 'en-US'. If
+    #          any different value is supplied, all typed characters will be
+    #          mapped to '#'.
     # [params] An object containing any parameters you want passed to the
     #          +on_text_changed+ block. When the text of the text field is
     #          changed, the following is called:
@@ -352,7 +360,7 @@ module MiniGL
     #                   +text=+. The new text is passed as a first parameter
     #                   to this block, followed by +params+. Can be +nil+.
     def initialize(x, y, font, img, cursor_img = nil, disabled_img = nil, margin_x = 0, margin_y = 0, max_length = 100, active = false, text = '',
-                   allowed_chars = nil, text_color = 0, disabled_text_color = 0, selection_color = 0, params = nil, &on_text_changed)
+                   allowed_chars = nil, text_color = 0, disabled_text_color = 0, selection_color = 0, locale = 'en-us', params = nil, &on_text_changed)
       super x, y, font, text, text_color, disabled_text_color
       @img = Res.img img
       @w = @img.width
@@ -383,16 +391,11 @@ module MiniGL
         Gosu::KbDelete, Gosu::KbLeft, Gosu::KbRight, Gosu::KbHome,
         Gosu::KbEnd, Gosu::KbLeftShift, Gosu::KbRightShift,
         Gosu::KbBacktick, Gosu::KbMinus, Gosu::KbEqual, Gosu::KbBracketLeft,
-        Gosu::KbBracketRight, Gosu::KbBackslash, Gosu::KbApostrophe,
-        Gosu::KbComma, Gosu::KbPeriod, Gosu::KbSlash
+        Gosu::KbBracketRight, Gosu::KbBackslash, Gosu::KbSemicolon,
+        Gosu::KbApostrophe, Gosu::KbComma, Gosu::KbPeriod, Gosu::KbSlash
       ]
-      @chars = "abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ'-=/[]\\,.;\"_+?{}|<>:!@#$%¨&*()"
-      @allowed_chars =
-        if allowed_chars
-          allowed_chars
-        else
-          @chars
-        end
+      @user_allowed_chars = allowed_chars
+      self.locale = locale
 
       @on_text_changed = on_text_changed
       @params = params
@@ -465,10 +468,10 @@ module MiniGL
               insert_char @chars[i]
             end
           elsif i < 36
-            if shift; insert_char @chars[i + 57]
+            if shift; insert_char @chars[i + 59]
             else; insert_char @chars[i]; end
           elsif shift
-            insert_char(@chars[i + 47])
+            insert_char(@chars[i + 49])
           else
             insert_char(@chars[i - 10])
           end
@@ -478,9 +481,9 @@ module MiniGL
       end
 
       return if inserted
-      for i in 55..64 # special
+      for i in 55..65 # special
         if KB.key_pressed?(@k[i]) or KB.key_held?(@k[i])
-          if shift; insert_char @chars[i + 18]
+          if shift; insert_char @chars[i + 19]
           else; insert_char @chars[i + 8]; end
           inserted = true
           break
@@ -574,6 +577,25 @@ module MiniGL
       @anchor2 = nil
       set_cursor_visible
       @on_text_changed.call @text, @params if @on_text_changed
+    end
+
+    # Sets the locale used by the text field to detect keys. Only 'en-us' and
+    # 'pt-br' are **partially** supported. If any different value is supplied,
+    # all typed characters will be mapped to '#'.
+    def locale=(value)
+      @locale = value.downcase
+      @chars =
+          case @locale
+            when 'en-us' then "abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ`-=[]\\;',./~_+{}|:\"<>?!@#$%^&*()"
+            when 'pt-br' then "abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ'-=/[]ç~,.;\"_+?{}Ç^<>:!@#$%¨&*()"
+            else              '###############################################################################################'
+          end
+      @allowed_chars =
+          if @user_allowed_chars
+            @user_allowed_chars
+          else
+            @chars
+          end
     end
 
     # Returns the currently selected text.
