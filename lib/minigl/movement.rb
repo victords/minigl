@@ -66,6 +66,8 @@ module MiniGL
     # from left to right when +false+).
     attr_reader :left
 
+    attr_reader :ratio # :nodoc:
+
     # Creates a new ramp.
     #
     # Parameters:
@@ -88,6 +90,8 @@ module MiniGL
       @w = w
       @h = h
       @left = left
+      @ratio = @h.to_f / @w
+      @factor = Math.cos(@w / Math.sqrt(@w**2 + @h**2))
     end
 
     # Checks if an object is in contact with this ramp (standing over it).
@@ -117,17 +121,16 @@ module MiniGL
 
     def check_intersection(obj)
       if @can_collide and intersect? obj
-        r = @h.to_f / @w
         counter = @left && obj.prev_speed.x > 0 || !@left && obj.prev_speed.x < 0
         if obj.prev_speed.y > 0 && counter
           dx = get_x(obj) - obj.x
           s = (obj.prev_speed.y.to_f / obj.prev_speed.x).abs
-          dx /= s + r
+          dx /= s + @ratio
           obj.x += dx
         end
         obj.y = get_y obj
         if counter
-          obj.speed.x = (r >= G.ramp_slip_threshold ? 0 : obj.speed.x * (G.ramp_slip_threshold - r))
+          obj.speed.x *= @factor
         end
         obj.speed.y = 0
       end
@@ -145,10 +148,6 @@ module MiniGL
       return @y + (1.0 * (@x + @w - obj.x - obj.w) * @h / @w) - obj.h if @left
       return @y - obj.h if obj.x < @x
       @y + (1.0 * (obj.x - @x) * @h / @w) - obj.h
-    end
-
-    def ratio
-      @h.to_f / @w
     end
   end
 
@@ -351,6 +350,12 @@ module MiniGL
     def move_carrying(aim, speed, obstacles)
       x_d = aim.x - @x; y_d = aim.y - @y
       distance = Math.sqrt(x_d**2 + y_d**2)
+
+      if distance == 0
+        @speed.x = @speed.y = 0
+        return
+      end
+
       @speed.x = 1.0 * x_d * speed / distance
       @speed.y = 1.0 * y_d * speed / distance
 

@@ -25,8 +25,8 @@ class MyGame < GameWindow
       Ramp.new(650, 300, 150, 200, true),
     ]
 
-    # @cyc_obj = GameObject.new(0, 0, 50, 50, :square)
-    # @cycle = [Vector.new(0, 0), Vector.new(430, 107), Vector.new(265, 324)]
+    @cyc_obj = GameObject.new(0, 0, 50, 50, :square)
+    @cycle = [Vector.new(0, 0), Vector.new(430, 107), Vector.new(265, 324)]
   end
 
   def update
@@ -48,13 +48,13 @@ class MyGame < GameWindow
     end
     @obj.move(forces, @obsts, @ramps)
     # puts @obj.x
-    # @cyc_obj.cycle(@cycle, 5)
+    @cyc_obj.cycle(@cycle, 5, [@obj])
     # puts @obj.bottom
   end
 
   def draw
     @obj.draw
-    # @cyc_obj.draw
+    @cyc_obj.draw
     @obsts.each do |o|
       draw_quad o.x, o.y, 0xffffffff,
                 o.x + o.w, o.y, 0xffffffff,
