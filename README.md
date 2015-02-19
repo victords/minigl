@@ -26,16 +26,22 @@ After installing the gosu dependencies, you can just `gem install minigl`.
 Please note:
 
   * The test package is not complete! Most of the functionality
-provided by the gem is difficult to test automatically, but you can check out
-this [working game example](https://github.com/victords/aventura-do-saber).
-  * The RDoc documentation is now available.
+provided by the gem is difficult to test automatically, but you can check the
+examples provided with the gem.
+  * The library is 100% RDoc-documented.
   * An auxiliary, tutorial-like documentation is under construction
-[here](https://github.com/victords/minigl/wiki).
+[here](https://github.com/victords/minigl/wiki/How-To).
 
-**Version 1.3.10**
+**Version 2.0.0**
 
-  * Split the `center` parameter in `Button` and `ToggleButton` constructors
-into `center_x` and `center_y` (see doc. for details).
+MiniGL 2.0.0 is finally released!
 
-**P.S.** This version can cause incompatibility because of the parameter order
-in the constructors of `Button` and `ToggleButton`.
+It brings new features, improvements to existing features and some bug fixes.
+For details on what has changed, visit
+[the changelog](https://github.com/victords/minigl/wiki/Changelog-(2.0.0)).
+
+As the semantic versioning implies, **this version is incompatible with the 1.x
+series**, so you'll need to adjust your code a little if you wish to upgrade.
+
+A new tutorial has to be built, because there have been some changes even in the
+basics of the usage. So please be patient while it doesn't come out!
