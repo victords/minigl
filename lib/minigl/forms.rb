@@ -392,7 +392,9 @@ module MiniGL
         Gosu::KbEnd, Gosu::KbLeftShift, Gosu::KbRightShift,
         Gosu::KbBacktick, Gosu::KbMinus, Gosu::KbEqual, Gosu::KbBracketLeft,
         Gosu::KbBracketRight, Gosu::KbBackslash, Gosu::KbSemicolon,
-        Gosu::KbApostrophe, Gosu::KbComma, Gosu::KbPeriod, Gosu::KbSlash
+        Gosu::KbApostrophe, Gosu::KbComma, Gosu::KbPeriod, Gosu::KbSlash,
+        Gosu::KbNumpadAdd, Gosu::KbNumpadSubtract,
+        Gosu::KbNumpadMultiply, Gosu::KbNumpadDivide
       ]
       @user_allowed_chars = allowed_chars
       self.locale = locale
@@ -483,8 +485,19 @@ module MiniGL
       return if inserted
       for i in 55..65 # special
         if KB.key_pressed?(@k[i]) or KB.key_held?(@k[i])
+          remove_interval true if @anchor1 and @anchor2
           if shift; insert_char @chars[i + 19]
           else; insert_char @chars[i + 8]; end
+          inserted = true
+          break
+        end
+      end
+
+      return if inserted
+      for i in 66..69 # numpad operators
+        if KB.key_pressed?(@k[i]) or KB.key_held?(@k[i])
+          remove_interval true if @anchor1 and @anchor2
+          insert_char @chars[i + 19]
           inserted = true
           break
         end
@@ -586,9 +599,9 @@ module MiniGL
       @locale = value.downcase
       @chars =
           case @locale
-            when 'en-us' then "abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ`-=[]\\;',./~_+{}|:\"<>?!@#$%^&*()"
-            when 'pt-br' then "abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ'-=/[]ç~,.;\"_+?{}Ç^<>:!@#$%¨&*()"
-            else              '###############################################################################################'
+            when 'en-us' then "abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ`-=[]\\;',./~_+{}|:\"<>?!@#$%^&*()+-*/"
+            when 'pt-br' then "abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ'-=/[]ç~,.;\"_+?{}Ç^<>:!@#$%¨&*()+-*/"
+            else              '###################################################################################################'
           end
       @allowed_chars =
           if @user_allowed_chars

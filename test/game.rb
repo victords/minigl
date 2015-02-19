@@ -18,7 +18,7 @@ class MyGame < GameWindow
       ToggleButton.new(40, 300, @font1, 'Click me', :check, false, 0xffffff, 0x808080, 0x008000, 0xff9980, false, true, 36, 0, 0, 0, 'friends') { |c, x|
         puts "hello #{x}, checked: #{c}"
       }
-    @txt = TextField.new(10, 520, @font1, :text, nil, nil, 15, 5, 16, false, '', 'abcdefghijkl-+/?[{', 0, 0, 0x0000ff, 'PT-BR')
+    @txt = TextField.new(10, 520, @font1, :text, nil, nil, 15, 5, 16, false, '', nil, 0, 0, 0x0000ff, 'PT-BR')
     @txt.visible = false
 
     @pb = ProgressBar.new(5, 240, 200, 20, 0xff0000, 0x00ff00, 3456, 70, 0, 0, @font1, 0xff000080)
