@@ -235,7 +235,7 @@ module MiniGL
 
       if @bottom.is_a? Ramp
         if @bottom.ratio >= G.ramp_slip_threshold
-          forces.x = (@bottom.left ? -1 : 1) * 0.1
+          forces.x = (@bottom.left ? -1 : 1) * G.ramp_slip_force
         elsif forces.x > 0 && @bottom.left || forces.x < 0 && !@bottom.left
           forces.x *= @bottom.factor
         end

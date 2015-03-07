@@ -142,6 +142,10 @@ module MiniGL
       # <code>GameWindow#initialize</code> for details.
       attr_accessor :ramp_slip_threshold
 
+      # Gets or sets the value of ramp_slip_force. See
+      # <code>GameWindow#initialize</code> for details.
+      attr_accessor :ramp_slip_force
+
       # Gets or sets the value of kb_held_delay. See
       # <code>GameWindow#initialize</code> for details.
       attr_accessor :kb_held_delay
@@ -178,6 +182,8 @@ module MiniGL
     # [ramp_slip_threshold] The maximum ratio between height and width of a ramp
     #                       above which the objects will always slip down when
     #                       trying to 'climb' that ramp.
+    # [ramp_slip_force] The force that will be applied in the horizontal
+    #                   direction when the object is slipping from a steep ramp.
     # [kb_held_delay] The number of frames a key must be held by the user
     #                 before the "held" event (that can be checked with
     #                 <code>KB.key_held?</code>) starts to trigger.
@@ -189,7 +195,7 @@ module MiniGL
     #                      (checked with <code>Mouse.double_click?</code>).
     def initialize(scr_w, scr_h, fullscreen = true,
                    gravity = Vector.new(0, 1), min_speed = Vector.new(0.01, 0.01),
-                   ramp_contact_threshold = 10, ramp_slip_threshold = 1.2,
+                   ramp_contact_threshold = 4, ramp_slip_threshold = 1.2, ramp_slip_force = 0.1,
                    kb_held_delay = 40, kb_held_interval = 5, double_click_delay = 8)
       super scr_w, scr_h, fullscreen
       G.window = self
@@ -197,6 +203,7 @@ module MiniGL
       G.min_speed = min_speed
       G.ramp_contact_threshold = ramp_contact_threshold
       G.ramp_slip_threshold = ramp_slip_threshold
+      G.ramp_slip_force = ramp_slip_force
       G.kb_held_delay = kb_held_delay
       G.kb_held_interval = kb_held_interval
       G.double_click_delay = double_click_delay
