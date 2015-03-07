@@ -67,6 +67,7 @@ module MiniGL
     attr_reader :left
 
     attr_reader :ratio # :nodoc:
+    attr_reader :factor # :nodoc:
 
     # Creates a new ramp.
     #
@@ -91,7 +92,7 @@ module MiniGL
       @h = h
       @left = left
       @ratio = @h.to_f / @w
-      @factor = Math.cos(@w / Math.sqrt(@w**2 + @h**2))
+      @factor = @w / Math.sqrt(@w**2 + @h**2)
     end
 
     # Checks if an object is in contact with this ramp (standing over it).
@@ -129,7 +130,7 @@ module MiniGL
           obj.x += dx
         end
         obj.y = get_y obj
-        if counter
+        if counter && obj.bottom != self
           obj.speed.x *= @factor
         end
         obj.speed.y = 0
@@ -232,8 +233,12 @@ module MiniGL
       forces.x = 0 if (forces.x < 0 and @left) or (forces.x > 0 and @right)
       forces.y = 0 if (forces.y < 0 and @top) or (forces.y > 0 and @bottom)
 
-      if @bottom.is_a? Ramp and @bottom.ratio >= G.ramp_slip_threshold
-        forces.x = (@bottom.left ? -1 : 1) * 0.1
+      if @bottom.is_a? Ramp
+        if @bottom.ratio >= G.ramp_slip_threshold
+          forces.x = (@bottom.left ? -1 : 1) * 0.1
+        elsif forces.x > 0 && @bottom.left || forces.x < 0 && !@bottom.left
+          forces.x *= @bottom.factor
+        end
       end
 
       @speed.x += forces.x / @mass; @speed.y += forces.y / @mass
