@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.authors               = ['Victor David Santos']
   s.email                 = 'victordavidsantos@gmail.com'
   s.files                 = Dir['lib/*.rb', 'lib/minigl/*.rb', 'Rakefile', 'LICENSE', 'README.md']
-  s.test_files            = Dir['test/*.rb', 'test/data/*/*']
+  s.test_files            = Dir['test/*.rb', 'test/*.png', 'test/data/*/*', 'test/data/*/*/*']
   s.license               = 'MIT'
   s.homepage              = 'https://github.com/victords/minigl'
   s.required_ruby_version = '~> 2.0'
