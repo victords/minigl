@@ -24,14 +24,22 @@ class ResTest < Test::Unit::TestCase
     assert_nothing_raised do
       img1 = Res.img :img1
     end
+
     Res.img_dir = 'img/sub'
     assert_nothing_raised do
       img2 = Res.img :image
     end
+
     Res.img_dir = 'img'
     Res.separator = '~'
     assert_nothing_raised do
       img3 = Res.img 'sub~image'
+    end
+
+    Res.prefix = File.expand_path(File.dirname(__FILE__))
+    Res.img_dir = ''
+    assert_nothing_raised do
+      img4 = Res.img :test
     end
   end
 end

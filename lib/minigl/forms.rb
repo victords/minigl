@@ -813,7 +813,7 @@ module MiniGL
         @fg_color = fg
       else # String or Symbol
         @fg = Res.img fg
-        @fg_path = "#{Res.prefix}img/#{fg.to_s.gsub('_', '/')}.png"
+        @fg_path = "#{Res.prefix}#{Res.img_dir}#{fg.to_s.gsub(Res.separator, '/')}.png"
         puts @fg_path
       end
       @fg_margin_x = fg_margin_x

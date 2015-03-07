@@ -32,16 +32,9 @@ examples provided with the gem.
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki/How-To).
 
-**Version 2.0.0**
+**Version 2.0.1**
 
-MiniGL 2.0.0 is finally released!
-
-It brings new features, improvements to existing features and some bug fixes.
-For details on what has changed, visit
-[the changelog](https://github.com/victords/minigl/wiki/Changelog-(2.0.0)).
-
-As the semantic versioning implies, **this version is incompatible with the 1.x
-series**, so you'll need to adjust your code a little if you wish to upgrade.
-
-A new tutorial has to be built, because there have been some changes even in the
-basics of the usage. So please be patient while it doesn't come out!
+  * Adjustment in the ramp slip system. Parameterized the force applied by steep
+ramps (`G.ramp_slip_force`).
+  * Adjustment in the methods that change the prefix and directories used by
+`Res`, allowing empty prefixes/directory names.

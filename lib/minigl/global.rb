@@ -508,37 +508,37 @@ module MiniGL
       # directory of the game script. The prefix is the directory under which
       # 'img', 'sound', 'song', etc. folders are located.
       def prefix=(value)
-        value += '/' if value[-1] != '/'
+        value += '/' if value != '' and value[-1] != '/'
         @prefix = value
       end
 
       # Sets the path to image files (under +prefix+). Default is 'img'.
       def img_dir=(value)
-        value += '/' if value[-1] != '/'
+        value += '/' if value != '' and value[-1] != '/'
         @img_dir = value
       end
 
       # Sets the path to tilset files (under +prefix+). Default is 'tileset'.
       def tileset_dir=(value)
-        value += '/' if value[-1] != '/'
+        value += '/' if value != '' and value[-1] != '/'
         @tileset_dir = value
       end
 
       # Sets the path to sound files (under +prefix+). Default is 'sound'.
       def sound_dir=(value)
-        value += '/' if value[-1] != '/'
+        value += '/' if value != '' and value[-1] != '/'
         @sound_dir = value
       end
 
       # Sets the path to song files (under +prefix+). Default is 'song'.
       def song_dir=(value)
-        value += '/' if value[-1] != '/'
+        value += '/' if value != '' and value[-1] != '/'
         @song_dir = value
       end
 
       # Sets the path to font files (under +prefix+). Default is 'font'.
       def font_dir=(value)
-        value += '/' if value[-1] != '/'
+        value += '/' if value != '' and value[-1] != '/'
         @font_dir = value
       end
 
