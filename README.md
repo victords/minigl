@@ -32,9 +32,9 @@ examples provided with the gem.
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki/How-To).
 
-**Version 2.0.1**
+**Version 2.0.2**
 
-  * Adjustment in the ramp slip system. Parameterized the force applied by steep
-ramps (`G.ramp_slip_force`).
-  * Adjustment in the methods that change the prefix and directories used by
-`Res`, allowing empty prefixes/directory names.
+  * Small adjustment in `GameWindow#clear`, changing the format of the color
+parameter from AARRGGBB to RRGGBB (as the alpha would have no effect).
+  * Addition of the `flip` parameter to the `draw` method of `Sprite` and
+`GameObject`.

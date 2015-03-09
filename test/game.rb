@@ -7,6 +7,9 @@ class MyGame < GameWindow
 
     @obj1 = GameObject.new 10, 10, 80, 80, :img1, Vector.new(-10, -10)
     @obj2 = Sprite.new 400, 0, :img1
+    @obj3 = GameObject.new 4, 50, 24, 24, :check, Vector.new(-4, -4), 2, 4
+    @obj3.set_animation 1
+    @flip = nil
 
     @font1 = Res.font :font1, 20
     @font2 = Res.font :font1, 50
@@ -63,6 +66,10 @@ class MyGame < GameWindow
       @obj1.x = Mouse.x + 10
       @obj1.y = Mouse.y + 10
     end
+    if Mouse.button_released? :right
+      if @flip.nil?; @flip = :horiz
+      else; @flip = nil; end
+    end
 
     @btn.update
     @chk.update
@@ -73,10 +80,11 @@ class MyGame < GameWindow
   end
 
   def draw
-    clear 0xffabcdef
+    clear 0xabcdef
 
     @obj1.draw nil, 1, 1, 255, 0x33ff33, 30, 1
-    @obj2.draw nil, 0.6, 1.4, 0x99
+    @obj2.draw nil, 0.6, 1.4, 0x99, 0xffffff, nil, :vert
+    @obj3.draw nil, 1, 1, 255, 0xffffff, nil, @flip
     @writer1.write_line 'Testing effect 1', 400, 260, :center, 0xffffff, :border
     @writer2.write_line 'Second effect test', 400, 280, :center, 0xffffff, :border, 0xff0000, 2
     @writer2.write_line 'Text with shadow!!', 400, 340, :center, 0xffff00, :shadow, 0, 2, 0x80

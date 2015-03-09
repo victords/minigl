@@ -215,8 +215,9 @@ module MiniGL
     # Draws a rectangle with the size of the entire screen, in the given color.
     #
     # Parameters:
-    # [color] Color of the rectangle to be drawn.
+    # [color] Color of the rectangle to be drawn, in hexadecimal RRGGBB format.
     def clear(color)
+      color |= 0xff000000
       draw_quad 0, 0, color,
                 width, 0, color,
                 width, height, color,
@@ -375,7 +376,7 @@ module MiniGL
 
         k1 = [Gosu::MsLeft, Gosu::MsMiddle, Gosu::MsRight]
         k2 = [:left, :middle, :right]
-        for i in 0..2
+        (0..2).each do |i|
           if G.window.button_down? k1[i]
             @down[k2[i]] = true
             @dbl_click[k2[i]] = true if @dbl_click_timer[k2[i]]
