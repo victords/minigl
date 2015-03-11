@@ -193,10 +193,27 @@ module MiniGL
     # [double_click_delay] The maximum interval, in frames, between two
     #                      clicks, to trigger the "double click" event
     #                      (checked with <code>Mouse.double_click?</code>).
-    def initialize(scr_w, scr_h, fullscreen = true,
+    #
+    # *Obs.:* This method accepts named parameters, but +scr_w+ and +scr_h+ are
+    # mandatory.
+    def initialize(scr_w, scr_h = nil, fullscreen = true,
                    gravity = Vector.new(0, 1), min_speed = Vector.new(0.01, 0.01),
-                   ramp_contact_threshold = 4, ramp_slip_threshold = 1.2, ramp_slip_force = 0.1,
+                   ramp_contact_threshold = 4, ramp_slip_threshold = 1.1, ramp_slip_force = 0.1,
                    kb_held_delay = 40, kb_held_interval = 5, double_click_delay = 8)
+      if scr_w.is_a? Hash
+        scr_h = scr_w[:scr_h]
+        fullscreen = scr_w.fetch(:fullscreen, true)
+        gravity = scr_w.fetch(:gravity, Vector.new(0, 1))
+        min_speed = scr_w.fetch(:min_speed, Vector.new(0.01, 0.01))
+        ramp_contact_threshold = scr_w.fetch(:ramp_contact_threshold, 4)
+        ramp_slip_threshold = scr_w.fetch(:ramp_slip_threshold, 1.1)
+        ramp_slip_force = scr_w.fetch(:ramp_slip_force, 0.1)
+        kb_held_delay = scr_w.fetch(:kb_held_delay, 40)
+        kb_held_interval = scr_w.fetch(:kb_held_interval, 5)
+        double_click_delay = scr_w.fetch(:double_click_delay, 8)
+        scr_w = scr_w[:scr_w]
+      end
+
       super scr_w, scr_h, fullscreen
       G.window = self
       G.gravity = gravity
@@ -435,8 +452,16 @@ module MiniGL
       # [y] The y-coordinate of the top left corner of the area.
       # [w] The width of the area.
       # [h] The height of the area.
-      def over?(x, y, w, h)
-        @x >= x and @x < x + w and @y >= y and @y < y + h
+      #
+      # <b>Alternate syntax</b>
+      #
+      # <code>over?(rectangle)</code>
+      #
+      # Parameters:
+      # [rectangle] A rectangle representing the area to be checked.
+      def over?(x, y = nil, w = nil, h = nil)
+        return @x >= x.x && @x < x.x + x.w && @y >= x.y && @y < x.y + x.h if x.is_a? Rectangle
+        @x >= x && @x < x + w && @y >= y && @y < y + h
       end
     end
   end

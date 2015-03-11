@@ -27,6 +27,8 @@ module MiniGL
     # [mode] The alignment of the text. Valid values are +:left+, +:right+ and
     #        +:center+.
     # [color] The color of the text, in hexadecimal RRGGBB format.
+    # [alpha] The opacity of the text. Valid values vary from 0 (fully
+    #         transparent) to 255 (fully opaque).
     # [effect] Effect to add to the text. It can be either +nil+, for no effect,
     #          +:border+ for bordered text, or +:shadow+ for shadowed text (the
     #          shadow is always placed below and to the right of the text).
@@ -38,13 +40,28 @@ module MiniGL
     #               distance between the text and the shadow.
     # [effect_alpha] Opacity of the effect, if any. For shadows, it is usual to
     #                provide less than 255.
-    # [alpha] The opacity of the text. Valid values vary from 0 (fully
-    #         transparent) to 255 (fully opaque).
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
-    def write_line(text, x, y, mode = :left, color = 0,
+    #
+    # *Obs.:* This method accepts named parameters, but +text+, +x+ and +y+ are
+    # mandatory.
+    def write_line(text, x = nil, y = nil, mode = :left, color = 0, alpha = 0xff,
                    effect = nil, effect_color = 0, effect_size = 1, effect_alpha = 0xff,
-                   alpha = 0xff, z_index = 0)
+                   z_index = 0)
+      if text.is_a? Hash
+        x = text[:x]
+        y = text[:y]
+        mode = text.fetch(:mode, :left)
+        color = text.fetch(:color, 0)
+        alpha = text.fetch(:alpha, 0xff)
+        effect = text.fetch(:effect, nil)
+        effect_color = text.fetch(:effect_color, 0)
+        effect_size = text.fetch(:effect_size, 1)
+        effect_alpha = text.fetch(:effect_alpha, 0xff)
+        z_index = text.fetch(:z_index, 0)
+        text = text[:text]
+      end
+
       color = (alpha << 24) | color
       rel =
         case mode

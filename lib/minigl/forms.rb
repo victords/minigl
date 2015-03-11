@@ -29,9 +29,7 @@ module MiniGL
     # for each specific component class.
     attr_accessor :params
 
-    # This constructor is for internal use of the subclasses only. Do not
-    # instantiate objects of this class.
-    def initialize(x, y, font, text, text_color, disabled_text_color)
+    def initialize(x, y, font, text, text_color, disabled_text_color) # :nodoc:
       @x = x
       @y = y
       @font = font
@@ -93,8 +91,32 @@ module MiniGL
     #          parameters.
     # [action] The block of code executed when the button is clicked (or by
     #          calling the +click+ method).
-    def initialize(x, y, font, text, img, text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0,
+    #
+    # *Obs.:* This method accepts named parameters, but +x+ and +y+ are
+    # mandatory (also, +img+ is mandatory when +width+ and +height+ are not
+    # provided, and vice-versa).
+    def initialize(x, y = nil, font = nil, text = nil, img = nil,
+                   text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0,
                    center_x = true, center_y = true, margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action)
+      if x.is_a? Hash
+        y = x[:y]
+        font = x[:font]
+        text = x[:text]
+        img = x[:img]
+        text_color = x.fetch(:text_color, 0)
+        disabled_text_color = x.fetch(:disabled_text_color, 0)
+        over_text_color = x.fetch(:over_text_color, 0)
+        down_text_color = x.fetch(:down_text_color, 0)
+        center_x = x.fetch(:center_x, true)
+        center_y = x.fetch(:center_y, true)
+        margin_x = x.fetch(:margin_x, 0)
+        margin_y = x.fetch(:margin_y, 0)
+        width = x.fetch(:width, nil)
+        height = x.fetch(:height, nil)
+        params = x.fetch(:params, nil)
+        x = x[:x]
+      end
+
       super x, y, font, text, text_color, disabled_text_color
       @over_text_color = over_text_color
       @down_text_color = down_text_color
@@ -249,8 +271,33 @@ module MiniGL
     #     puts "button was checked" if checked
     #     # do something with params
     #   }
-    def initialize(x, y, font, text, img, checked = false, text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0,
+    #
+    # *Obs.:* This method accepts named parameters, but +x+ and +y+ are
+    # mandatory (also, +img+ is mandatory when +width+ and +height+ are not
+    # provided, and vice-versa).
+    def initialize(x, y = nil, font = nil, text = nil, img = nil, checked = false,
+                   text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0,
                    center_x = true, center_y = true, margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action)
+      if x.is_a? Hash
+        y = x[:y]
+        font = x[:font]
+        text = x[:text]
+        img = x[:img]
+        checked = x.fetch(:checked, false)
+        text_color = x.fetch(:text_color, 0)
+        disabled_text_color = x.fetch(:disabled_text_color, 0)
+        over_text_color = x.fetch(:over_text_color, 0)
+        down_text_color = x.fetch(:down_text_color, 0)
+        center_x = x.fetch(:center_x, true)
+        center_y = x.fetch(:center_y, true)
+        margin_x = x.fetch(:margin_x, 0)
+        margin_y = x.fetch(:margin_y, 0)
+        width = x.fetch(:width, nil)
+        height = x.fetch(:height, nil)
+        params = x.fetch(:params, nil)
+        x = x[:x]
+      end
+
       super x, y, font, text, nil, text_color, disabled_text_color, over_text_color, down_text_color,
             center_x, center_y, margin_x, margin_y, width, height, params, &action
       @img =
@@ -359,8 +406,32 @@ module MiniGL
     #                   field is changed, either by user input or by calling
     #                   +text=+. The new text is passed as a first parameter
     #                   to this block, followed by +params+. Can be +nil+.
-    def initialize(x, y, font, img, cursor_img = nil, disabled_img = nil, margin_x = 0, margin_y = 0, max_length = 100, active = false, text = '',
-                   allowed_chars = nil, text_color = 0, disabled_text_color = 0, selection_color = 0, locale = 'en-us', params = nil, &on_text_changed)
+    #
+    # *Obs.:* This method accepts named parameters, but +x+, +y+, +font+ and
+    # +img+ are mandatory.
+    def initialize(x, y = nil, font = nil, img = nil, cursor_img = nil, disabled_img = nil, margin_x = 0, margin_y = 0,
+                   max_length = 100, active = false, text = '', allowed_chars = nil,
+                   text_color = 0, disabled_text_color = 0, selection_color = 0, locale = 'en-us', params = nil, &on_text_changed)
+      if x.is_a? Hash
+        y = x[:y]
+        font = x[:font]
+        img = x[:img]
+        cursor_img = x.fetch(:cursor_img, nil)
+        disabled_img = x.fetch(:disabled_img, nil)
+        margin_x = x.fetch(:margin_x, 0)
+        margin_y = x.fetch(:margin_y, 0)
+        max_length = x.fetch(:max_length, 100)
+        active = x.fetch(:active, false)
+        text = x.fetch(:text, '')
+        allowed_chars = x.fetch(:allowed_chars, nil)
+        text_color = x.fetch(:text_color, 0)
+        disabled_text_color = x.fetch(:disabled_text_color, 0)
+        selection_color = x.fetch(:selection_color, 0)
+        locale = x.fetch(:locale, 'en-us')
+        params = x.fetch(:params, nil)
+        x = x[:x]
+      end
+
       super x, y, font, text, text_color, disabled_text_color
       @img = Res.img img
       @w = @img.width
@@ -598,17 +669,17 @@ module MiniGL
     def locale=(value)
       @locale = value.downcase
       @chars =
-          case @locale
-            when 'en-us' then "abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ`-=[]\\;',./~_+{}|:\"<>?!@#$%^&*()+-*/"
-            when 'pt-br' then "abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ'-=/[]ç~,.;\"_+?{}Ç^<>:!@#$%¨&*()+-*/"
-            else              '###################################################################################################'
-          end
+        case @locale
+          when 'en-us' then "abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ`-=[]\\;',./~_+{}|:\"<>?!@#$%^&*()+-*/"
+          when 'pt-br' then "abcdefghijklmnopqrstuvwxyz1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ'-=/[]ç~,.;\"_+?{}Ç^<>:!@#$%¨&*()+-*/"
+          else              '###################################################################################################'
+        end
       @allowed_chars =
-          if @user_allowed_chars
-            @user_allowed_chars
-          else
-            @chars
-          end
+        if @user_allowed_chars
+          @user_allowed_chars
+        else
+          @chars
+        end
     end
 
     # Returns the currently selected text.
@@ -799,8 +870,28 @@ module MiniGL
     # [text_color] Color of the text.
     # [format] Format to display the value. Specify '%' for a percentage and
     #          anything else for absolute values (current/maximum).
-    def initialize(x, y, w, h, bg, fg, max_value = 100, value = 100, fg_margin_x = 0, fg_margin_y = 0, #fg_left = nil, fg_right = nil,
+    #
+    # *Obs.:* This method accepts named parameters, but +x+, +y+, +w+, +h+, +bg+
+    # and +fg+ are mandatory.
+    def initialize(x, y = nil, w = nil, h = nil, bg = nil, fg = nil,
+                   max_value = 100, value = 100, fg_margin_x = 0, fg_margin_y = 0, #fg_left = nil, fg_right = nil,
                    font = nil, text_color = 0, format = nil)
+      if x.is_a? Hash
+        y = x[:y]
+        w = x[:w]
+        h = x[:h]
+        bg = x[:bg]
+        fg = x[:fg]
+        max_value = x.fetch(:max_value, 100)
+        value = x.fetch(:value, 100)
+        fg_margin_x = x.fetch(:fg_margin_x, 0)
+        fg_margin_y = x.fetch(:fg_margin_y, 0)
+        font = x.fetch(:font, nil)
+        text_color = x.fetch(:text_color, 0)
+        format = x.fetch(:format, nil)
+        x = x[:x]
+      end
+
       super x, y, font, '', text_color, text_color
       @w = w
       @h = h
@@ -950,8 +1041,30 @@ module MiniGL
     # [disabled_text_color] Analogous to +text_color+.
     # [over_text_color] Same as above.
     # [down_text_color] Same as above.
-    def initialize(x, y, font, img, opt_img, options, option = 0, text_margin = 0, width = nil, height = nil,
+    #
+    # *Obs.:* This method accepts named parameters, but +x+, +y+, +font+ and
+    # +options+ are mandatory (also, +img+ and +opt_img+ are mandatory when
+    # +width+ and +height+ are not provided, and vice-versa).
+    def initialize(x, y = nil, font = nil, img = nil, opt_img = nil, options = nil,
+                   option = 0, text_margin = 0, width = nil, height = nil,
                    text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0)
+      if x.is_a? Hash
+        y = x[:y]
+        font = x[:font]
+        img = x[:img]
+        opt_img = x[:opt_img]
+        options = x[:options]
+        option = x.fetch(:option, 0)
+        text_margin = x.fetch(:text_margin, 0)
+        width = x.fetch(:width, nil)
+        height = x.fetch(:height, nil)
+        text_color = x.fetch(:text_color, 0)
+        disabled_text_color = x.fetch(:disabled_text_color, 0)
+        over_text_color = x.fetch(:over_text_color, 0)
+        down_text_color = x.fetch(:down_text_color, 0)
+        x = x[:x]
+      end
+
       super x, y, font, options[option], text_color, disabled_text_color
       @img = img
       @opt_img = opt_img

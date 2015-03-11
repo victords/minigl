@@ -18,10 +18,10 @@ class MyGame < GameWindow
     @btn = Button.new(10, 560, @font1, 'Test', :btn, 0x008000, 0x808080, 0xffffff, 0xff9980, true, false, 0, 4, 0, 0, 'friends') { |x| puts "hello #{x}" }
     @btn.enabled = false
     @chk =
-      ToggleButton.new(40, 300, @font1, 'Click me', :check, false, 0xffffff, 0x808080, 0x008000, 0xff9980, false, true, 36, 0, 0, 0, 'friends') { |c, x|
+      ToggleButton.new(x: 40, y: 300, font: @font1, text: 'Click me', img: :check, center_x: false, margin_x: 36, params: 'friends') { |c, x|
         puts "hello #{x}, checked: #{c}"
       }
-    @txt = TextField.new(10, 520, @font1, :text, nil, nil, 15, 5, 16, false, '', nil, 0, 0, 0x0000ff, 'PT-BR')
+    @txt = TextField.new(x: 10, y: 520, font: @font1, img: :text, margin_x: 15, margin_y: 5, max_length: 16, locale: 'PT-BR')
     @txt.visible = false
 
     @pb = ProgressBar.new(5, 240, 200, 20, 0xff0000, 0x00ff00, 3456, 70, 0, 0, @font1, 0xff000080)
@@ -83,11 +83,11 @@ class MyGame < GameWindow
     clear 0xabcdef
 
     @obj1.draw nil, 1, 1, 255, 0x33ff33, 30, 1
-    @obj2.draw nil, 0.6, 1.4, 0x99, 0xffffff, nil, :vert
-    @obj3.draw nil, 1, 1, 255, 0xffffff, nil, @flip
-    @writer1.write_line 'Testing effect 1', 400, 260, :center, 0xffffff, :border
-    @writer2.write_line 'Second effect test', 400, 280, :center, 0xffffff, :border, 0xff0000, 2
-    @writer2.write_line 'Text with shadow!!', 400, 340, :center, 0xffff00, :shadow, 0, 2, 0x80
+    @obj2.draw flip: :vert, scale_x: 0.5, scale_y: 1.4
+    @obj3.draw flip: @flip
+    @writer1.write_line text: 'Testing effect 1', x: 400, y: 260, color: 0xffffff, effect: :border
+    @writer2.write_line 'Second effect test', 400, 280, :center, 0xffffff, 255, :border, 0xff0000, 2
+    @writer2.write_line 'Text with shadow!!', 400, 340, :center, 0xffff00, 255, :shadow, 0, 2, 0x80
     @writer1.write_breaking "Testing multiple line text.\nThis should draw text "\
                            'across multiple lines, respecting a limit width. '\
                            'Furthermore, the text must be right-aligned.',

@@ -30,8 +30,8 @@ module MiniGL
     # [h] The height of the bounding box.
     # [passable] Whether a moving object can pass through this block when
     # coming from below. This is a common feature of platforms in platform
-    # games.
-    def initialize(x, y, w, h, passable)
+    # games. Default is +false+.
+    def initialize(x, y, w, h, passable = false)
       @x = x; @y = y; @w = w; @h = h
       @passable = passable
     end

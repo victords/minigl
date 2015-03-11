@@ -66,6 +66,17 @@ module MiniGL
       end
     end
 
+    # Resets the animation timer and immediately changes the image index to
+    # the specified value.
+    #
+    # Parameters:
+    # [index] The image index to be set.
+    def set_animation(index)
+      @anim_counter = 0
+      @img_index = index
+      @index_index = 0
+    end
+
     # Draws the sprite in the screen
     #
     # Parameters:
@@ -87,7 +98,20 @@ module MiniGL
     #        to draw it vertically flipped.
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
+    #
+    # *Obs.:* This method accepts named parameters.
     def draw(map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, flip = nil, z_index = 0)
+      if map.is_a? Hash
+        scale_x = map.fetch(:scale_x, 1)
+        scale_y = map.fetch(:scale_y, 1)
+        alpha = map.fetch(:alpha, 0xff)
+        color = map.fetch(:color, 0xffffff)
+        angle = map.fetch(:angle, nil)
+        flip = map.fetch(:flip, nil)
+        z_index = map.fetch(:z_index, 0)
+        map = map.fetch(:map, nil)
+      end
+
       color = (alpha << 24) | color
       if angle
         @img[@img_index].draw_rot @x.round - (map ? map.cam.x : 0) + (flip == :horiz ? scale_x * @img[0].width : 0),
@@ -154,17 +178,6 @@ module MiniGL
       @stored_forces = Vector.new 0, 0
     end
 
-    # Resets the animation timer and immediately changes the image index to
-    # the specified value.
-    #
-    # Parameters:
-    # [index] The image index to be set.
-    def set_animation(index)
-      @anim_counter = 0
-      @img_index = index
-      @index_index = 0
-    end
-
     # Draws the game object in the screen.
     #
     # Parameters:
@@ -186,7 +199,20 @@ module MiniGL
     #        to draw it vertically flipped.
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
+    #
+    # *Obs.:* This method accepts named parameters.
     def draw(map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, flip = nil, z_index = 0)
+      if map.is_a? Hash
+        scale_x = map.fetch(:scale_x, 1)
+        scale_y = map.fetch(:scale_y, 1)
+        alpha = map.fetch(:alpha, 0xff)
+        color = map.fetch(:color, 0xffffff)
+        angle = map.fetch(:angle, nil)
+        flip = map.fetch(:flip, nil)
+        z_index = map.fetch(:z_index, 0)
+        map = map.fetch(:map, nil)
+      end
+
       color = (alpha << 24) | color
       if angle
         @img[@img_index].draw_rot @x.round + (flip == :horiz ? -1 : 1) * @img_gap.x - (map ? map.cam.x : 0) + (flip == :horiz ? scale_x * @w : 0),
@@ -247,8 +273,25 @@ module MiniGL
     #             '.wav'.
     # [sound_volume] The volume (from 0 to 1) to play the sound, if any. Default
     #                is 1.
-    def initialize(x, y, img, sprite_cols = nil, sprite_rows = nil, interval = 10, indices = nil, lifetime = nil,
+    #
+    # *Obs.:* This method accepts named parameters, but +x+, +y+ and +img+ are
+    # mandatory.
+    def initialize(x, y = nil, img = nil, sprite_cols = nil, sprite_rows = nil, interval = 10, indices = nil, lifetime = nil,
                    sound = nil, sound_ext = '.wav', sound_volume = 1)
+      if x.is_a? Hash
+        y = x[:y]
+        img = x[:img]
+        sprite_cols = x.fetch(:sprite_cols, nil)
+        sprite_rows = x.fetch(:sprite_rows, nil)
+        interval = x.fetch(:interval, 10)
+        indices = x.fetch(:indices, nil)
+        lifetime = x.fetch(:lifetime, nil)
+        sound = x.fetch(:sound, nil)
+        sound_ext = x.fetch(:sound_ext, '.wav')
+        sound_volume = x.fetch(:sound_volume, 1)
+        x = x[:x]
+      end
+
       super x, y, img, sprite_cols, sprite_rows
       @timer = 0
       if indices
