@@ -32,29 +32,9 @@ examples provided with the gem.
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki/How-To).
 
-## Version 2.0.3
+## Version 2.0.4
 
-  * Flexibilization of various methods and constructors with named parameters.
-Please note I haven't used the "official" Ruby syntax for named parameters, but
-the "first parameter as hash" technique (in order to keep the positional call
-available), so you will need to be careful to include all the mandatory
-parameters in your hash, or you could face some strange errors (you can find out
-the mandatory parameters in the documentation). Here is the list of flexibilized
-methods:
-    * `GameWindow::new`
-    * `Sprite#draw`
-    * `GameObject#draw`
-    * `TextHelper#write_line`
-    * `Button::new`
-    * `ToggleButton::new`
-    * `TextField::new`
-    * `ProgressBar::new`
-    * `DropDownList::new`
-  * Flexibilization of `Mouse::over?` with the possibility of passing a single
-parameter (a `Rectangle` object) instead of four coordinates.
-  * Passing of the `set_animation` method from `GameObject` to `Sprite`, so the
-sprites also support it (`GameObject` still supports because it inherits from
-`Sprite`).
-  * Change of the parameter order in `TextHelper#write_line`, so that `alpha`
-comes right after `color`, and not after all the `effect_...` parameters. **This
-could generate incompatibility.**
+  * Adjustment in the ramp physics.
+  * Adjustment in the `move_carrying` method (from `Movement`) to perform
+collision checking for the carried objects (and corresponding adjustment in the
+`cycle` method).

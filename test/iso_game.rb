@@ -1,10 +1,9 @@
 require_relative '../lib/minigl'
 include MiniGL
 
-class MyGame < Gosu::Window
+class MyGame < GameWindow
   def initialize
     super 800, 600, false
-    GameWindow.initialize self
 
     @tile1 = Res.img :tile2
     @tile2 = Res.img :tile2b
@@ -31,7 +30,7 @@ class MyGame < Gosu::Window
 
   def draw
     @map.foreach do |i, j, x, y|
-      if i == @p.x and j == @p.y; @tile2.draw x, y, 0
+      if (i - @p.x).abs <= 1 and (j - @p.y).abs <= 1; @tile2.draw x, y, 0
       else; @tile1.draw x, y, 0; end
     end
   end

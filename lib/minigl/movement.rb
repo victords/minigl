@@ -235,7 +235,7 @@ module MiniGL
 
       if @bottom.is_a? Ramp
         if @bottom.ratio >= G.ramp_slip_threshold
-          forces.x = (@bottom.left ? -1 : 1) * G.ramp_slip_force
+          forces.x += (@bottom.left ? -1 : 1) * G.ramp_slip_force
         elsif forces.x > 0 && @bottom.left || forces.x < 0 && !@bottom.left
           forces.x *= @bottom.factor
         end
@@ -352,7 +352,13 @@ module MiniGL
     #             checking, and carried along when colliding from above.
     #             Obstacles must be instances of Block (or derived classes),
     #             or objects that <code>include Movement</code>.
-    def move_carrying(aim, speed, obstacles)
+    # [obst_obstacles] Obstacles that should be considered when moving objects
+    #                  from the +obstacles+ array, i.e., these obstacles won't
+    #                  interfere in the elevator's movement, but in the movement
+    #                  of the objects being carried.
+    # [obst_ramps] Ramps to consider when moving objects from the +obstacles+
+    #              array, as described for +obst_obstacles+.
+    def move_carrying(aim, speed, obstacles, obst_obstacles, obst_ramps)
       x_d = aim.x - @x; y_d = aim.y - @y
       distance = Math.sqrt(x_d**2 + y_d**2)
 
@@ -375,11 +381,10 @@ module MiniGL
         end
       end
 
+      prev_x = @x; prev_y = @y
       if @speed.x > 0 && x_aim >= aim.x || @speed.x < 0 && x_aim <= aim.x
-        passengers.each do |p| p.x += aim.x - @x end
         @x = aim.x; @speed.x = 0
       else
-        passengers.each do |p| p.x += @speed.x end
         @x = x_aim
       end
       if @speed.y > 0 && y_aim >= aim.y || @speed.y < 0 && y_aim <= aim.y
@@ -388,7 +393,24 @@ module MiniGL
         @y = y_aim
       end
 
-      passengers.each do |p| p.y = @y - p.h end
+      forces = Vector.new @x - prev_x, @y - prev_y
+      prev_g = G.gravity.clone
+      G.gravity.x = G.gravity.y = 0
+      passengers.each do |p|
+        prev_speed = p.speed.clone
+        prev_forces = p.stored_forces.clone
+        prev_bottom = p.bottom
+        p.speed.x = p.speed.y = 0
+        p.stored_forces.x = p.stored_forces.y = 0
+        p.instance_exec { @bottom = nil }
+        p.move forces * p.mass, obst_obstacles, obst_ramps
+        p.speed.x = prev_speed.x
+        p.speed.y = prev_speed.y
+        p.stored_forces.x = prev_forces.x
+        p.stored_forces.y = prev_forces.y
+        p.instance_exec(prev_bottom) { |b| @bottom = b }
+      end
+      G.gravity = prev_g
     end
 
     # Moves this object, without performing any collision checking, towards
@@ -440,10 +462,16 @@ module MiniGL
     #             checking, and carried along when colliding from above.
     #             Obstacles must be instances of Block (or derived classes),
     #             or objects that <code>include Movement</code>.
-    def cycle(points, speed, obstacles = nil)
+    # [obst_obstacles] Obstacles that should be considered when moving objects
+    #                  from the +obstacles+ array, i.e., these obstacles won't
+    #                  interfere in the elevator's movement, but in the movement
+    #                  of the objects being carried.
+    # [obst_ramps] Ramps to consider when moving objects from the +obstacles+
+    #              array, as described for +obst_obstacles+.
+    def cycle(points, speed, obstacles = nil, obst_obstacles = nil, obst_ramps = nil)
       @cur_point = 0 if @cur_point.nil?
       if obstacles
-        move_carrying points[@cur_point], speed, obstacles
+        move_carrying points[@cur_point], speed, obstacles, obst_obstacles, obst_ramps
       else
         move_free points[@cur_point], speed
       end
