@@ -19,18 +19,18 @@ class MyGame < GameWindow
       # Block.new(485, 490, 127, 10, false),
     ]
     @ramps = [
-      # Ramp.new(200, 550, 200, 50, true),
-      # Ramp.new(0, 200, 150, 300, false),
-      # Ramp.new(150, 500, 150, 100, false),
-      # Ramp.new(500, 500, 150, 100, true),
-      # Ramp.new(650, 300, 150, 200, true),
-      # Ramp.new(650, 500, 150, 100, true),
+      Ramp.new(200, 550, 200, 50, true),
+      Ramp.new(0, 200, 150, 300, false),
+      Ramp.new(150, 500, 150, 100, false),
+      Ramp.new(500, 500, 150, 100, true),
+      Ramp.new(650, 300, 150, 200, true),
+      Ramp.new(650, 500, 150, 100, true),
     ]
 
-    @cycle = [Vector.new(100, 530), Vector.new(650, 500)]
-    @cyc_obj = GameObject.new(@cycle[0].x, @cycle[0].y, 50, 50, :square)
-    @cyc_obj.instance_eval('@passable = true')
-    @obsts.push @cyc_obj
+    # @cycle = [Vector.new(100, 530), Vector.new(650, 500)]
+    # @cyc_obj = GameObject.new(@cycle[0].x, @cycle[0].y, 50, 50, :square)
+    # @cyc_obj.instance_eval('@passable = true')
+    # @obsts.push @cyc_obj
   end
 
   def update
@@ -52,13 +52,13 @@ class MyGame < GameWindow
     end
     @obj.move(forces, @obsts, @ramps)
     # puts @obj.x
-    @cyc_obj.cycle(@cycle, 5, [@obj], @obsts, @ramps)
+    # @cyc_obj.cycle(@cycle, 5, [@obj], @obsts, @ramps)
     # puts @obj.bottom
   end
 
   def draw
     @obj.draw
-    @cyc_obj.draw
+    # @cyc_obj.draw
     @obsts.each do |o|
       draw_quad o.x, o.y, 0xffffffff,
                 o.x + o.w, o.y, 0xffffffff,

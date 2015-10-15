@@ -177,10 +177,6 @@ module MiniGL
     # Height of the bounding box.
     attr_reader :h
 
-    # Whether a moving object can pass through this block when coming from
-    # below. This is a common feature of platforms in platform games.
-    attr_reader :passable
-
     # The object that is making contact with this from above. If there's no
     # contact, returns +nil+.
     attr_reader :top
@@ -202,6 +198,10 @@ module MiniGL
 
     # The y-coordinate of the top left corner of the bounding box.
     attr_accessor :y
+
+    # Whether a moving object can pass through this block when coming from
+    # below. This is a common feature of platforms in platform games.
+    attr_accessor :passable
 
     # A Vector with the horizontal and vertical components of a force that
     # be applied in the next time +move+ is called.
@@ -234,8 +234,8 @@ module MiniGL
       forces.y = 0 if (forces.y < 0 and @top) or (forces.y > 0 and @bottom)
 
       if @bottom.is_a? Ramp
-        if @bottom.ratio >= G.ramp_slip_threshold
-          forces.x += (@bottom.left ? -1 : 1) * G.ramp_slip_force
+        if @bottom.ratio > G.ramp_slip_threshold
+          forces.x += (@bottom.left ? -1 : 1) * (@bottom.ratio - G.ramp_slip_threshold) * G.ramp_slip_force / G.ramp_slip_threshold
         elsif forces.x > 0 && @bottom.left || forces.x < 0 && !@bottom.left
           forces.x *= @bottom.factor
         end
@@ -414,35 +414,46 @@ module MiniGL
     end
 
     # Moves this object, without performing any collision checking, towards
-    # the specified point.
+    # a specified point or in a specified direction.
     #
     # Parameters:
-    # [aim] A Vector specifying where the object will move to.
+    # [aim] A +Vector+ specifying where the object will move to or an angle (in
+    #       degrees) indicating the direction of the movement. Angles are
+    #       measured starting from the right (i.e., to move to the right, the
+    #       angle must be 0) and raising clockwise.
     # [speed] The constant speed at which the object will move. This must be
     #         provided as a scalar, not a vector.
     def move_free(aim, speed)
-      x_d = aim.x - @x; y_d = aim.y - @y
-      distance = Math.sqrt(x_d**2 + y_d**2)
+      if aim.is_a? Vector
+        x_d = aim.x - @x; y_d = aim.y - @y
+        distance = Math.sqrt(x_d**2 + y_d**2)
 
-      if distance == 0
-        @speed.x = @speed.y = 0
-        return
-      end
+        if distance == 0
+          @speed.x = @speed.y = 0
+          return
+        end
 
-      @speed.x = 1.0 * x_d * speed / distance
-      @speed.y = 1.0 * y_d * speed / distance
+        @speed.x = 1.0 * x_d * speed / distance
+        @speed.y = 1.0 * y_d * speed / distance
 
-      if (@speed.x < 0 and @x + @speed.x <= aim.x) or (@speed.x >= 0 and @x + @speed.x >= aim.x)
-        @x = aim.x
-        @speed.x = 0
+        if (@speed.x < 0 and @x + @speed.x <= aim.x) or (@speed.x >= 0 and @x + @speed.x >= aim.x)
+          @x = aim.x
+          @speed.x = 0
+        else
+          @x += @speed.x
+        end
+
+        if (@speed.y < 0 and @y + @speed.y <= aim.y) or (@speed.y >= 0 and @y + @speed.y >= aim.y)
+          @y = aim.y
+          @speed.y = 0
+        else
+          @y += @speed.y
+        end
       else
+        rads = aim * Math::PI / 180
+        @speed.x = speed * Math.cos(rads)
+        @speed.y = speed * Math.sin(rads)
         @x += @speed.x
-      end
-
-      if (@speed.y < 0 and @y + @speed.y <= aim.y) or (@speed.y >= 0 and @y + @speed.y >= aim.y)
-        @y = aim.y
-        @speed.y = 0
-      else
         @y += @speed.y
       end
     end

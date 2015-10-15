@@ -5,10 +5,13 @@ class MyGame < GameWindow
   def initialize
     super 800, 600, false
 
+    # @img = Res.img :img1
     @obj1 = GameObject.new 10, 10, 80, 80, :img1, Vector.new(-10, -10)
     @obj2 = Sprite.new 400, 0, :img1
     @obj3 = GameObject.new 4, 50, 24, 24, :check, Vector.new(-4, -4), 2, 4
     @obj3.set_animation 1
+    @objs = []
+    8.times { @objs << GameObject.new(384, 284, 32, 32, :check, Vector.new(0, 0), 2, 4) }
     @flip = nil
 
     @font1 = Res.font :font1, 20
@@ -25,9 +28,13 @@ class MyGame < GameWindow
     @txt.visible = false
 
     @pb = ProgressBar.new(5, 240, 200, 20, 0xff0000, 0x00ff00, 3456, 70, 0, 0, @font1, 0xff000080)
-    @ddl = DropDownList.new(5, 270, @font1, nil, nil, ['olá amigos', 'opção 2', 'terceira'], 0, 3, 150, 25, 0, 0x808080, 0xffffff, 0xffff00)
+    @ddl = DropDownList.new(5, 270, @font1, nil, nil, ['olá amigos', 'opção 2', 'terceira'], 0, 3, 150, 25, 0, 0x808080, 0xffffff, 0xffff00) { |a, b|
+      puts "mudou de #{a} para #{b}"
+    }
 
     @eff = Effect.new(100, 100, :check, 2, 4, 10, nil, nil, '1')
+
+    @angle = 0
   end
 
   def needs_cursor?
@@ -70,6 +77,9 @@ class MyGame < GameWindow
       if @flip.nil?; @flip = :horiz
       else; @flip = nil; end
     end
+    if Mouse.button_down? :left
+      @angle += 1
+    end
 
     @btn.update
     @chk.update
@@ -77,21 +87,27 @@ class MyGame < GameWindow
     @ddl.update
 
     @eff.update
+
+    @objs.each_with_index do |o, i|
+      o.move_free(i * 45, 3)
+    end
   end
 
   def draw
     clear 0xabcdef
 
-    @obj1.draw nil, 1, 1, 255, 0x33ff33, 30, 1
-    @obj2.draw flip: :vert, scale_x: 0.5, scale_y: 1.4
+    # @img.draw_rot 400, 100, 0, @angle, 1, 1
+    @obj1.draw color: 0x33ff33, angle: (@angle == 0 ? nil : @angle)
+    @obj2.draw angle: (@angle == 0 ? nil : @angle), scale_x: 0.5, scale_y: 1.4
     @obj3.draw flip: @flip
+    @objs.each { |o| o.draw }
     @writer1.write_line text: 'Testing effect 1', x: 400, y: 260, color: 0xffffff, effect: :border
     @writer2.write_line 'Second effect test', 400, 280, :center, 0xffffff, 255, :border, 0xff0000, 2
     @writer2.write_line 'Text with shadow!!', 400, 340, :center, 0xffff00, 255, :shadow, 0, 2, 0x80
     @writer1.write_breaking "Testing multiple line text.\nThis should draw text "\
-                           'across multiple lines, respecting a limit width. '\
-                           'Furthermore, the text must be right-aligned.',
-                           780, 450, 300, :right, 0xff0000, 255, 1
+                            'across multiple lines, respecting a limit width. '\
+                            'Furthermore, the text must be right-aligned.',
+                            780, 450, 300, :right, 0xff0000, 255, 1
 
     @ddl.draw 0x80, 1
     @btn.draw 0xcc

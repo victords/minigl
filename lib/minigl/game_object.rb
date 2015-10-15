@@ -114,13 +114,13 @@ module MiniGL
 
       color = (alpha << 24) | color
       if angle
-        @img[@img_index].draw_rot @x.round - (map ? map.cam.x : 0) + (flip == :horiz ? scale_x * @img[0].width : 0),
-                                  @y.round - (map ? map.cam.y : 0) + (flip == :vert ? scale_y * @img[0].height : 0),
+        @img[@img_index].draw_rot @x - (map ? map.cam.x : 0) + @img[0].width * scale_x * 0.5,
+                                  @y - (map ? map.cam.y : 0) + @img[0].height * scale_y * 0.5,
                                   z_index, angle, 0.5, 0.5, (flip == :horiz ? -scale_x : scale_x),
                                   (flip == :vert ? -scale_y : scale_y), color
       else
-        @img[@img_index].draw @x.round - (map ? map.cam.x : 0) + (flip == :horiz ? scale_x * @img[0].width : 0),
-                              @y.round - (map ? map.cam.y : 0) + (flip == :vert ? scale_y * @img[0].height : 0),
+        @img[@img_index].draw @x - (map ? map.cam.x : 0) + (flip == :horiz ? scale_x * @img[0].width : 0),
+                              @y - (map ? map.cam.y : 0) + (flip == :vert ? scale_y * @img[0].height : 0),
                               z_index, (flip == :horiz ? -scale_x : scale_x),
                               (flip == :vert ? -scale_y : scale_y), color
       end
@@ -215,13 +215,13 @@ module MiniGL
 
       color = (alpha << 24) | color
       if angle
-        @img[@img_index].draw_rot @x.round + (flip == :horiz ? -1 : 1) * @img_gap.x - (map ? map.cam.x : 0) + (flip == :horiz ? scale_x * @w : 0),
-                                  @y.round + (flip == :vert ? -1 : 1) * @img_gap.y - (map ? map.cam.y : 0) + (flip == :vert ? scale_y * @h : 0),
+        @img[@img_index].draw_rot @x + (flip == :horiz ? -1 : 1) * @img_gap.x - (map ? map.cam.x : 0) + @img[0].width * scale_x * 0.5,
+                                  @y + (flip == :vert ? -1 : 1) * @img_gap.y - (map ? map.cam.y : 0) + @img[0].height * scale_y * 0.5,
                                   z_index, angle, 0.5, 0.5, (flip == :horiz ? -scale_x : scale_x),
                                   (flip == :vert ? -scale_y : scale_y), color
       else
-        @img[@img_index].draw @x.round + (flip == :horiz ? -1 : 1) * @img_gap.x - (map ? map.cam.x : 0) + (flip == :horiz ? scale_x * @w : 0),
-                              @y.round + (flip == :vert ? -1 : 1) * @img_gap.y - (map ? map.cam.y : 0) + (flip == :vert ? scale_y * @h : 0),
+        @img[@img_index].draw @x + (flip == :horiz ? -1 : 1) * @img_gap.x - (map ? map.cam.x : 0) + (flip == :horiz ? scale_x * @w : 0),
+                              @y + (flip == :vert ? -1 : 1) * @img_gap.y - (map ? map.cam.y : 0) + (flip == :vert ? scale_y * @h : 0),
                               z_index, (flip == :horiz ? -scale_x : scale_x),
                               (flip == :vert ? -scale_y : scale_y), color
       end

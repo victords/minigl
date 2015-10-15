@@ -32,9 +32,11 @@ examples provided with the gem.
   * An auxiliary, tutorial-like documentation is under construction
 [here](https://github.com/victords/minigl/wiki/How-To).
 
-## Version 2.0.4
+## Version 2.0.5
 
-  * Adjustment in the ramp physics.
-  * Adjustment in the `move_carrying` method (from `Movement`) to perform
-collision checking for the carried objects (and corresponding adjustment in the
-`cycle` method).
+  * Further refined the ramp physics.
+  * Flexibilized the `move_free` method with the possibility of passing an angle
+as argument, instead of a point.
+  * Added `on_changed` event for the `DropDownList` control.
+  * Adjusted `draw` in `Sprite` and `GameObject` so that, when drawing objects
+rotated or not rotated, the origin of the image is consistent.

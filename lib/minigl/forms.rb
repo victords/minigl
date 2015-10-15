@@ -1041,13 +1041,16 @@ module MiniGL
     # [disabled_text_color] Analogous to +text_color+.
     # [over_text_color] Same as above.
     # [down_text_color] Same as above.
+    # [on_changed] Action performed when the value of the dropdown is changed.
+    #              It must be a block with two parameters, which will receive
+    #              the old and the new value, respectively.
     #
     # *Obs.:* This method accepts named parameters, but +x+, +y+, +font+ and
     # +options+ are mandatory (also, +img+ and +opt_img+ are mandatory when
     # +width+ and +height+ are not provided, and vice-versa).
     def initialize(x, y = nil, font = nil, img = nil, opt_img = nil, options = nil,
                    option = 0, text_margin = 0, width = nil, height = nil,
-                   text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0)
+                   text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0, &on_changed)
       if x.is_a? Hash
         y = x[:y]
         font = x[:font]
@@ -1083,13 +1086,17 @@ module MiniGL
       @options.each_with_index do |o, i|
         b = Button.new(x, y + (i+1) * @h, font, o, opt_img, text_color, disabled_text_color, over_text_color, down_text_color,
                        false, true, text_margin, 0, @w, @h) {
+                         old = @value
                          @value = @buttons[0].text = o
+                         @on_changed.call(old, o) if @on_changed
                          toggle
                        }
         b.visible = false
         @buttons.push b
       end
       @max_h = (@options.size + 1) * @h
+
+      @on_changed = on_changed
     end
 
     # Updates the control.
@@ -1106,7 +1113,9 @@ module MiniGL
     # it is not among the available options.
     def value=(val)
       if @options.include? val
+        old = @value
         @value = @buttons[0].text = val
+        @on_changed.call(old, val) if @on_changed
       end
     end
 

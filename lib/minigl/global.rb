@@ -198,7 +198,7 @@ module MiniGL
     # mandatory.
     def initialize(scr_w, scr_h = nil, fullscreen = true,
                    gravity = Vector.new(0, 1), min_speed = Vector.new(0.01, 0.01),
-                   ramp_contact_threshold = 4, ramp_slip_threshold = 1.1, ramp_slip_force = 0.1,
+                   ramp_contact_threshold = 4, ramp_slip_threshold = 1, ramp_slip_force = 1,
                    kb_held_delay = 40, kb_held_interval = 5, double_click_delay = 8)
       if scr_w.is_a? Hash
         scr_h = scr_w[:scr_h]
