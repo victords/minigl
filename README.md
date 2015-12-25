@@ -21,16 +21,13 @@ compiling extensions. Visit
 [this page](https://github.com/jlnr/gosu/wiki/Getting-Started-on-Linux) for
 details.
 
-After installing the gosu dependencies, you can just `gem install minigl`.
+After installing the Gosu dependencies, you can just `gem install minigl`.
 
-Please note:
+## Documentation
 
-  * The test package is not complete! Most of the functionality
-provided by the gem is difficult to test automatically, but you can check the
-examples provided with the gem.
-  * The library is 100% RDoc-documented.
-  * An auxiliary, tutorial-like documentation is under construction
-[here](https://github.com/victords/minigl/wiki/How-To).
+  * The library is 100% RDoc-documented [here](http://www.rubydoc.info/gems/minigl/2.0.4) (2.0.4).
+  * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
+  * Test package and examples aren't complete!
 
 ## Version 2.0.5
 
