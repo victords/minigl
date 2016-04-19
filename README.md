@@ -29,11 +29,8 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.0.5
+## Version 2.0.6
 
-  * Further refined the ramp physics.
-  * Flexibilized the `move_free` method with the possibility of passing an angle
-as argument, instead of a point.
-  * Added `on_changed` event for the `DropDownList` control.
-  * Adjusted `draw` in `Sprite` and `GameObject` so that, when drawing objects
-rotated or not rotated, the origin of the image is consistent.
+  * Fixed the `draw` method of `GameObject` when using both scale and flip.
+  * Flexibilized the `move_carrying` method from `Movement` with the possibility
+of specifying a forces vector instead of an aim and fixed speed.

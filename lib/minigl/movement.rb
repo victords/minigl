@@ -342,12 +342,14 @@ module MiniGL
     end
 
     # Moves this object as an elevator (i.e., potentially carrying other
-    # objects) towards a given point.
+    # objects) with the specified forces or towards a given point.
     #
     # Parameters:
-    # [aim] A Vector specifying where the object will move to.
-    # [speed] The constant speed at which the object will move. This must be
-    #         provided as a scalar, not a vector.
+    # [arg] A Vector specifying either the forces acting on this object or a
+    #       point towards the object should move.
+    # [speed] If the first argument is a forces vector, then this should be
+    #         +nil+. If it is a point, then this is the constant speed at which
+    #         the object will move (provided as a scalar, not a vector).
     # [obstacles] An array of obstacles to be considered in the collision
     #             checking, and carried along when colliding from above.
     #             Obstacles must be instances of Block (or derived classes),
@@ -358,17 +360,26 @@ module MiniGL
     #                  of the objects being carried.
     # [obst_ramps] Ramps to consider when moving objects from the +obstacles+
     #              array, as described for +obst_obstacles+.
-    def move_carrying(aim, speed, obstacles, obst_obstacles, obst_ramps)
-      x_d = aim.x - @x; y_d = aim.y - @y
-      distance = Math.sqrt(x_d**2 + y_d**2)
+    def move_carrying(arg, speed, obstacles, obst_obstacles, obst_ramps)
+      if speed
+        x_d = arg.x - @x; y_d = arg.y - @y
+        distance = Math.sqrt(x_d**2 + y_d**2)
 
-      if distance == 0
-        @speed.x = @speed.y = 0
-        return
+        if distance == 0
+          @speed.x = @speed.y = 0
+          return
+        end
+
+        @speed.x = 1.0 * x_d * speed / distance
+        @speed.y = 1.0 * y_d * speed / distance
+      else
+        arg += G.gravity
+        @speed.x += arg.x / @mass; @speed.y += arg.y / @mass
+        @speed.x = 0 if @speed.x.abs < G.min_speed.x
+        @speed.y = 0 if @speed.y.abs < G.min_speed.y
+        @speed.x = (@speed.x <=> 0) * @max_speed.x if @speed.x.abs > @max_speed.x
+        @speed.y = (@speed.y <=> 0) * @max_speed.y if @speed.y.abs > @max_speed.y
       end
-
-      @speed.x = 1.0 * x_d * speed / distance
-      @speed.y = 1.0 * y_d * speed / distance
 
       x_aim = @x + @speed.x; y_aim = @y + @speed.y
       passengers = []
@@ -382,15 +393,19 @@ module MiniGL
       end
 
       prev_x = @x; prev_y = @y
-      if @speed.x > 0 && x_aim >= aim.x || @speed.x < 0 && x_aim <= aim.x
-        @x = aim.x; @speed.x = 0
+      if speed
+        if @speed.x > 0 && x_aim >= arg.x || @speed.x < 0 && x_aim <= arg.x
+          @x = arg.x; @speed.x = 0
+        else
+          @x = x_aim
+        end
+        if @speed.y > 0 && y_aim >= arg.y || @speed.y < 0 && y_aim <= arg.y
+          @y = arg.y; @speed.y = 0
+        else
+          @y = y_aim
+        end
       else
-        @x = x_aim
-      end
-      if @speed.y > 0 && y_aim >= aim.y || @speed.y < 0 && y_aim <= aim.y
-        @y = aim.y; @speed.y = 0
-      else
-        @y = y_aim
+        @x = x_aim; @y = y_aim
       end
 
       forces = Vector.new @x - prev_x, @y - prev_y
