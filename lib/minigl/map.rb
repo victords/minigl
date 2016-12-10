@@ -181,10 +181,10 @@ module MiniGL
             v4.y = @iso_abs_size.y + @max_offset
           end
         else
-          @cam.x = 0 if @cam.x < 0
           @cam.x = @max_x if @cam.x > @max_x
-          @cam.y = 0 if @cam.y < 0
+          @cam.x = 0 if @cam.x < 0
           @cam.y = @max_y if @cam.y > @max_y
+          @cam.y = 0 if @cam.y < 0
         end
       end
 

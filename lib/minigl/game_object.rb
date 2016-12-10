@@ -43,6 +43,7 @@ module MiniGL
       @anim_counter = 0
       @img_index = 0
       @index_index = 0
+      @animate_once_control = 0
     end
 
     # Performs time checking to update the image index according to the
@@ -57,6 +58,8 @@ module MiniGL
     #            A frame will usually represent 1/60 second (roughly 17
     #            milliseconds).
     def animate(indices, interval)
+      @animate_once_control = 0 if @animate_once_control != 0
+
       @anim_counter += 1
       if @anim_counter >= interval
         @index_index += 1
@@ -64,6 +67,41 @@ module MiniGL
         @img_index = indices[@index_index]
         @anim_counter = 0
       end
+    end
+
+    # Causes the sprite to animate through the +indices+ array exactly once,
+    # so that the animation stops once it reaches the last index in the array.
+    # Subsequent calls with the same parameters will have no effect, but if
+    # the index or interval changes, or if +set_animation+ is called, then a
+    # new animation cycle will begin.
+    #
+    # Parameters:
+    # [indices] The sequence of image indices used in the animation. See
+    #           +animate+ for details.
+    # [interval] The amount of frames between each change in the image index.
+    #            See +animate+ for details.
+    def animate_once(indices, interval)
+      if @animate_once_control == 2
+        return if indices == @animate_once_indices && interval == @animate_once_interval
+        @animate_once_control = 0
+      end
+
+      unless @animate_once_control == 1
+        @anim_counter = 0
+        @img_index = indices[0]
+        @index_index = 0
+        @animate_once_indices = indices
+        @animate_once_interval = interval
+        @animate_once_control = 1
+        return
+      end
+
+      @anim_counter += 1
+      return unless @anim_counter >= interval
+
+      @index_index += 1
+      @img_index = indices[@index_index]
+      @animate_once_control = 2 if @index_index == indices.length - 1
     end
 
     # Resets the animation timer and immediately changes the image index to
@@ -75,6 +113,7 @@ module MiniGL
       @anim_counter = 0
       @img_index = index
       @index_index = 0
+      @animate_once_control = 0
     end
 
     # Draws the sprite in the screen

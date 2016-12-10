@@ -25,6 +25,21 @@ class SpriteTest < Test::Unit::TestCase
     assert_equal 0, s.img_index
     5.times { s.animate indices, interval }
     assert_equal 2, s.img_index
+
+    10.times { s.animate_once indices, interval }
+    assert_equal 2, s.img_index
+    s.animate_once indices, interval
+    assert_equal 2, s.img_index
+
+    indices2 = [0, 1, 2, 3]
+    s.animate_once indices2, 1
+    assert_equal 0, s.img_index
+    10.times { s.animate_once indices2, interval }
+    assert_equal 3, s.img_index
+
+    s.set_animation 0
+    2.times { s.animate_once indices2, 1 }
+    assert_equal 1, s.img_index
   end
 
   def test_sprite_visibility
