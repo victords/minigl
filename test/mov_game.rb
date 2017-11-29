@@ -7,7 +7,8 @@ class MyGame < GameWindow
     super 800, 600, false
 
     @obj = GameObject.new(0, 0, 50, 50, :square)
-    # @obj.max_speed.x = 3
+    @obj2 = GameObject.new(100, 0, 50, 50, :square2)
+
     @obsts = [
       Block.new(0, 600, 800, 1, false),
       Block.new(-1, 0, 1, 600, false),
@@ -39,26 +40,26 @@ class MyGame < GameWindow
     forces = Vector.new(0, 0)
     if @obj.bottom
       forces.y -= 15 if KB.key_pressed?(Gosu::KbSpace)
-      if KB.key_down?(Gosu::KbLeft)
-        forces.x -= 0.5
-      end
-      if KB.key_down?(Gosu::KbRight)
-        forces.x += 0.5
-      end
+      forces.x -= 0.5 if KB.key_down?(Gosu::KbLeft)
+      forces.x += 0.5 if KB.key_down?(Gosu::KbRight)
       forces.x -= @obj.speed.x * 0.1
     else
       forces.x -= 0.2 if KB.key_down?(Gosu::KbLeft)
       forces.x += 0.2 if KB.key_down?(Gosu::KbRight)
     end
     @obj.move(forces, @obsts, @ramps)
-    # puts @obj.x
-    # @cyc_obj.cycle(@cycle, 5, [@obj], @obsts, @ramps)
-    # puts @obj.bottom
+
+    speed = Vector.new(0, 0)
+    speed.y -= 3 if KB.key_down? Gosu::KbW
+    speed.y += 3 if KB.key_down? Gosu::KbS
+    speed.x -= 3 if KB.key_down? Gosu::KbA
+    speed.x += 3 if KB.key_down? Gosu::KbD
+    @obj2.move(speed, @obsts, @ramps, true)
   end
 
   def draw
     @obj.draw
-    # @cyc_obj.draw
+    @obj2.draw
     @obsts.each do |o|
       draw_quad o.x, o.y, 0xffffffff,
                 o.x + o.w, o.y, 0xffffffff,

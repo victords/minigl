@@ -29,7 +29,6 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.0.7
+## Version 2.0.8
 
-  * Fixed the camera position for maps smaller than the screen.
-  * Added `animate_once` method to `Sprite`.
+  * Added the `set_speed` option to `Movement#move`.

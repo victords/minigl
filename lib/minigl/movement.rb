@@ -225,28 +225,37 @@ module MiniGL
     #        objects that <code>include Movement</code>.
     # [ramps] An array of ramps to be considered in the collision checking.
     #         Ramps must be instances of Ramp (or derived classes).
-    def move(forces, obst, ramps)
-      forces.x += G.gravity.x; forces.y += G.gravity.y
-      forces.x += @stored_forces.x; forces.y += @stored_forces.y
-      @stored_forces.x = @stored_forces.y = 0
+    # [set_speed] Set this flag to +true+ to cause the +forces+ vector to be
+    #             treated as a speed vector, i.e., the object's speed will be
+    #             directly set to the given values. The force of gravity will
+    #             also be ignored in this case.
+    def move(forces, obst, ramps, set_speed = false)
+      if set_speed
+        @speed.x = forces.x
+        @speed.y = forces.y
+      else
+        forces.x += G.gravity.x; forces.y += G.gravity.y
+        forces.x += @stored_forces.x; forces.y += @stored_forces.y
+        @stored_forces.x = @stored_forces.y = 0
 
-      forces.x = 0 if (forces.x < 0 and @left) or (forces.x > 0 and @right)
-      forces.y = 0 if (forces.y < 0 and @top) or (forces.y > 0 and @bottom)
+        forces.x = 0 if (forces.x < 0 and @left) or (forces.x > 0 and @right)
+        forces.y = 0 if (forces.y < 0 and @top) or (forces.y > 0 and @bottom)
 
-      if @bottom.is_a? Ramp
-        if @bottom.ratio > G.ramp_slip_threshold
-          forces.x += (@bottom.left ? -1 : 1) * (@bottom.ratio - G.ramp_slip_threshold) * G.ramp_slip_force / G.ramp_slip_threshold
-        elsif forces.x > 0 && @bottom.left || forces.x < 0 && !@bottom.left
-          forces.x *= @bottom.factor
+        if @bottom.is_a? Ramp
+          if @bottom.ratio > G.ramp_slip_threshold
+            forces.x += (@bottom.left ? -1 : 1) * (@bottom.ratio - G.ramp_slip_threshold) * G.ramp_slip_force / G.ramp_slip_threshold
+          elsif forces.x > 0 && @bottom.left || forces.x < 0 && !@bottom.left
+            forces.x *= @bottom.factor
+          end
         end
+
+        @speed.x += forces.x / @mass; @speed.y += forces.y / @mass
       end
 
-      @speed.x += forces.x / @mass; @speed.y += forces.y / @mass
       @speed.x = 0 if @speed.x.abs < G.min_speed.x
       @speed.y = 0 if @speed.y.abs < G.min_speed.y
       @speed.x = (@speed.x <=> 0) * @max_speed.x if @speed.x.abs > @max_speed.x
       @speed.y = (@speed.y <=> 0) * @max_speed.y if @speed.y.abs > @max_speed.y
-
       @prev_speed = @speed.clone
 
       x = @speed.x < 0 ? @x + @speed.x : @x
