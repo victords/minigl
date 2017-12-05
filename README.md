@@ -25,7 +25,7 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
 
 ## Documentation
 
-  * The library is 100% RDoc-documented [here](http://www.rubydoc.info/gems/minigl/2.0.5).
+  * The library is 100% RDoc-documented [here](http://www.rubydoc.info/gems/minigl).
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
