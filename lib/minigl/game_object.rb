@@ -137,9 +137,12 @@ module MiniGL
     #        to draw it vertically flipped.
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
+    # [round] Specify whether the drawing coordinates should be rounded to an
+    #         integer before drawing, to avoid little distortions of the image.
+    #         Only applies when the image is not rotated.
     #
     # *Obs.:* This method accepts named parameters.
-    def draw(map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, flip = nil, z_index = 0)
+    def draw(map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, flip = nil, z_index = 0, round = false)
       if map.is_a? Hash
         scale_x = map.fetch(:scale_x, 1)
         scale_y = map.fetch(:scale_y, 1)
@@ -148,6 +151,7 @@ module MiniGL
         angle = map.fetch(:angle, nil)
         flip = map.fetch(:flip, nil)
         z_index = map.fetch(:z_index, 0)
+        round = map.fetch(:round, false)
         map = map.fetch(:map, nil)
       end
 
@@ -158,8 +162,9 @@ module MiniGL
                                   z_index, angle, 0.5, 0.5, (flip == :horiz ? -scale_x : scale_x),
                                   (flip == :vert ? -scale_y : scale_y), color
       else
-        @img[@img_index].draw @x - (map ? map.cam.x : 0) + (flip == :horiz ? scale_x * @img[0].width : 0),
-                              @y - (map ? map.cam.y : 0) + (flip == :vert ? scale_y * @img[0].height : 0),
+        x = @x - (map ? map.cam.x : 0) + (flip == :horiz ? scale_x * @img[0].width : 0)
+        y = @y - (map ? map.cam.y : 0) + (flip == :vert ? scale_y * @img[0].height : 0)
+        @img[@img_index].draw (round ? x.round : x), (round ? y.round : y),
                               z_index, (flip == :horiz ? -scale_x : scale_x),
                               (flip == :vert ? -scale_y : scale_y), color
       end
@@ -238,9 +243,12 @@ module MiniGL
     #        to draw it vertically flipped.
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
+    # [round] Specify whether the drawing coordinates should be rounded to an
+    #         integer before drawing, to avoid little distortions of the image.
+    #         Only applies when the image is not rotated.
     #
     # *Obs.:* This method accepts named parameters.
-    def draw(map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, flip = nil, z_index = 0)
+    def draw(map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, flip = nil, z_index = 0, round = false)
       if map.is_a? Hash
         scale_x = map.fetch(:scale_x, 1)
         scale_y = map.fetch(:scale_y, 1)
@@ -249,18 +257,24 @@ module MiniGL
         angle = map.fetch(:angle, nil)
         flip = map.fetch(:flip, nil)
         z_index = map.fetch(:z_index, 0)
+        round = map.fetch(:round, false)
         map = map.fetch(:map, nil)
       end
 
       color = (alpha << 24) | color
       if angle
-        @img[@img_index].draw_rot @x + (flip == :horiz ? -1 : 1) * @img_gap.x - (map ? map.cam.x : 0) + @w * 0.5,
-                                  @y + (flip == :vert ? -1 : 1) * @img_gap.y - (map ? map.cam.y : 0) + @h * 0.5,
-                                  z_index, angle, 0.5, 0.5, (flip == :horiz ? -scale_x : scale_x),
-                                  (flip == :vert ? -scale_y : scale_y), color
+        center_x = @x + @w * 0.5
+        center_y = @y + @h * 0.5
+        o_x = center_x - @x - @img_gap.x
+        o_y = center_y - @y - @img_gap.y
+        @img[@img_index].draw_rot @x + (flip == :horiz ? -1 : 1) * (@img_gap.x + o_x) - (map ? map.cam.x : 0),
+                                  @y + (flip == :vert ? -1 : 1) * (@img_gap.y + o_y) - (map ? map.cam.y : 0),
+                                  z_index, angle, o_x.to_f / @img[0].width, o_y.to_f / @img[0].height,
+                                  (flip == :horiz ? -scale_x : scale_x), (flip == :vert ? -scale_y : scale_y), color
       else
-        @img[@img_index].draw @x + (flip == :horiz ? -1 : 1) * @img_gap.x - (map ? map.cam.x : 0) + (flip == :horiz ? @w : 0),
-                              @y + (flip == :vert ? -1 : 1) * @img_gap.y - (map ? map.cam.y : 0) + (flip == :vert ? @h : 0),
+        x = @x + (flip == :horiz ? -1 : 1) * @img_gap.x - (map ? map.cam.x : 0) + (flip == :horiz ? @w : 0)
+        y = @y + (flip == :vert ? -1 : 1) * @img_gap.y - (map ? map.cam.y : 0) + (flip == :vert ? @h : 0)
+        @img[@img_index].draw (round ? x.round : x), (round ? y.round : y),
                               z_index, (flip == :horiz ? -scale_x : scale_x),
                               (flip == :vert ? -scale_y : scale_y), color
       end

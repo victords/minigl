@@ -6,10 +6,11 @@ class MyGame < GameWindow
     super 800, 600, false
 
     # @img = Res.img :img1
-    @obj1 = GameObject.new 10, 10, 80, 80, :img1, Vector.new(-10, -10)
+    @obj1 = GameObject.new 50, 50, 40, 40, :square3, Vector.new(-50, -50)
     @obj2 = Sprite.new 400, 0, :img1
     @obj3 = GameObject.new 4, 50, 24, 24, :check, Vector.new(-4, -4), 2, 4
     @obj3.set_animation 1
+    @obj4 = Sprite.new 500, 0, :img1
     @objs = []
     8.times { @objs << GameObject.new(384, 284, 32, 32, :check, Vector.new(0, 0), 2, 4) }
     @flip = nil
@@ -43,10 +44,10 @@ class MyGame < GameWindow
 
   def update
     KB.update
-    @obj1.y -= 1 if KB.key_held? Gosu::KbUp
-    @obj1.x += 1 if KB.key_down? Gosu::KbRight
-    @obj1.y += 1 if KB.key_held? Gosu::KbDown
-    @obj1.x -= 1 if KB.key_down? Gosu::KbLeft
+    begin @obj1.y -= 0.714; @obj4.y -= 0.714 end if KB.key_held? Gosu::KbUp
+    begin @obj1.x += 0.714; @obj4.x += 0.714 end if KB.key_down? Gosu::KbRight
+    begin @obj1.y += 0.714; @obj4.y += 0.714 end if KB.key_held? Gosu::KbDown
+    begin @obj1.x -= 0.714; @obj4.x -= 0.714 end if KB.key_down? Gosu::KbLeft
     @btn.set_position rand(700), rand(550) if KB.key_pressed? Gosu::KbSpace
     @btn.enabled = !@btn.enabled if KB.key_pressed? Gosu::KbLeftControl
     @chk.checked = false if KB.key_pressed? Gosu::KbEscape
@@ -70,8 +71,8 @@ class MyGame < GameWindow
 
     Mouse.update
     if Mouse.double_click? :left
-      @obj1.x = Mouse.x + 10
-      @obj1.y = Mouse.y + 10
+      @obj1.x = Mouse.x
+      @obj1.y = Mouse.y
     end
     if Mouse.button_released? :right
       if @flip.nil?; @flip = :horiz
@@ -100,6 +101,7 @@ class MyGame < GameWindow
     @obj1.draw color: 0x33ff33, angle: (@angle == 0 ? nil : @angle)
     @obj2.draw angle: (@angle == 0 ? nil : @angle), scale_x: 0.5, scale_y: 1.4
     @obj3.draw flip: @flip
+    @obj4.draw round: true
     @objs.each { |o| o.draw }
     @writer1.write_line text: 'Testing effect 1', x: 400, y: 260, color: 0xffffff, effect: :border
     @writer2.write_line 'Second effect test', 400, 280, :center, 0xffffff, 255, :border, 0xff0000, 2
