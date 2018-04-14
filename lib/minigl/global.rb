@@ -256,24 +256,29 @@ module MiniGL
       # explicitly.
       def initialize
         @keys = [
-          Gosu::KbUp, Gosu::KbDown,
-          Gosu::KbReturn, Gosu::KbEscape,
-          Gosu::KbLeftControl, Gosu::KbRightControl,
-          Gosu::KbLeftAlt, Gosu::KbRightAlt,
-          Gosu::KbA, Gosu::KbB, Gosu::KbC, Gosu::KbD, Gosu::KbE, Gosu::KbF,
-          Gosu::KbG, Gosu::KbH, Gosu::KbI, Gosu::KbJ, Gosu::KbK, Gosu::KbL,
-          Gosu::KbM, Gosu::KbN, Gosu::KbO, Gosu::KbP, Gosu::KbQ, Gosu::KbR,
-          Gosu::KbS, Gosu::KbT, Gosu::KbU, Gosu::KbV, Gosu::KbW, Gosu::KbX,
-          Gosu::KbY, Gosu::KbZ, Gosu::Kb1, Gosu::Kb2, Gosu::Kb3, Gosu::Kb4,
-          Gosu::Kb5, Gosu::Kb6, Gosu::Kb7, Gosu::Kb8, Gosu::Kb9, Gosu::Kb0,
-          Gosu::KbNumpad1, Gosu::KbNumpad2, Gosu::KbNumpad3, Gosu::KbNumpad4,
-          Gosu::KbNumpad5, Gosu::KbNumpad6, Gosu::KbNumpad7, Gosu::KbNumpad8,
-          Gosu::KbNumpad9, Gosu::KbNumpad0, Gosu::KbSpace, Gosu::KbBackspace,
-          Gosu::KbDelete, Gosu::KbLeft, Gosu::KbRight, Gosu::KbHome,
-          Gosu::KbEnd, Gosu::KbLeftShift, Gosu::KbRightShift, Gosu::KbTab,
-          Gosu::KbBacktick, Gosu::KbMinus, Gosu::KbEqual, Gosu::KbBracketLeft,
-          Gosu::KbBracketRight, Gosu::KbBackslash, Gosu::KbApostrophe,
-          Gosu::KbComma, Gosu::KbPeriod, Gosu::KbSlash
+          Gosu::KB_A, Gosu::KB_B, Gosu::KB_C, Gosu::KB_D, Gosu::KB_E, Gosu::KB_F,
+          Gosu::KB_G, Gosu::KB_H, Gosu::KB_I, Gosu::KB_J, Gosu::KB_K, Gosu::KB_L,
+          Gosu::KB_M, Gosu::KB_N, Gosu::KB_O, Gosu::KB_P, Gosu::KB_Q, Gosu::KB_R,
+          Gosu::KB_S, Gosu::KB_T, Gosu::KB_U, Gosu::KB_V, Gosu::KB_W, Gosu::KB_X,
+          Gosu::KB_Y, Gosu::KB_Z, Gosu::KB_1, Gosu::KB_2, Gosu::KB_3, Gosu::KB_4,
+          Gosu::KB_5, Gosu::KB_6, Gosu::KB_7, Gosu::KB_8, Gosu::KB_9, Gosu::KB_0,
+          Gosu::KB_NUMPAD_1, Gosu::KB_NUMPAD_2, Gosu::KB_NUMPAD_3, Gosu::KB_NUMPAD_4,
+          Gosu::KB_NUMPAD_5, Gosu::KB_NUMPAD_6, Gosu::KB_NUMPAD_7, Gosu::KB_NUMPAD_8,
+          Gosu::KB_NUMPAD_9, Gosu::KB_NUMPAD_0, Gosu::KB_F1, Gosu::KB_F2,
+          Gosu::KB_F3, Gosu::KB_F4, Gosu::KB_F5, Gosu::KB_F6, Gosu::KB_F7,
+          Gosu::KB_F8, Gosu::KB_F9, Gosu::KB_F10, Gosu::KB_F11, Gosu::KB_F12,
+          Gosu::KB_APOSTROPHE, Gosu::KB_BACKSLASH, Gosu::KB_BACKSPACE,
+          Gosu::KB_BACKTICK, Gosu::KB_COMMA, Gosu::KB_DELETE, Gosu::KB_DOWN,
+          Gosu::KB_END, Gosu::KB_ENTER, Gosu::KB_EQUALS, Gosu::KB_ESCAPE,
+          Gosu::KB_HOME, Gosu::KB_INSERT, Gosu::KB_ISO, Gosu::KB_LEFT,
+          Gosu::KB_LEFT_ALT, Gosu::KB_LEFT_BRACKET, Gosu::KB_LEFT_CONTROL,
+          Gosu::KB_LEFT_META, Gosu::KB_LEFT_SHIFT, Gosu::KB_MINUS,
+          Gosu::KB_NUMPAD_DIVIDE, Gosu::KB_NUMPAD_MINUS,
+          Gosu::KB_NUMPAD_MULTIPLY, Gosu::KB_NUMPAD_PLUS, Gosu::KB_PAGE_DOWN,
+          Gosu::KB_PAGE_UP, Gosu::KB_PERIOD, Gosu::KB_RETURN, Gosu::KB_RIGHT,
+          Gosu::KB_RIGHT_ALT, Gosu::KB_RIGHT_BRACKET, Gosu::KB_RIGHT_CONTROL,
+          Gosu::KB_RIGHT_META, Gosu::KB_RIGHT_SHIFT, Gosu::KB_SEMICOLON,
+          Gosu::KB_SLASH, Gosu::KB_SPACE, Gosu::KB_TAB, Gosu::KB_UP
         ]
         @down = []
         @prev_down = []
@@ -313,24 +318,8 @@ module MiniGL
       # down in the frame before.
       #
       # Parameters:
-      # [key] Code of the key to be checked. The available codes are <code>
-      #       Gosu::KbUp, Gosu::KbDown, Gosu::KbReturn, Gosu::KbEscape,
-      #       Gosu::KbLeftControl, Gosu::KbRightControl,
-      #       Gosu::KbLeftAlt, Gosu::KbRightAlt,
-      #       Gosu::KbA, Gosu::KbB, Gosu::KbC, Gosu::KbD, Gosu::KbE, Gosu::KbF,
-      #       Gosu::KbG, Gosu::KbH, Gosu::KbI, Gosu::KbJ, Gosu::KbK, Gosu::KbL,
-      #       Gosu::KbM, Gosu::KbN, Gosu::KbO, Gosu::KbP, Gosu::KbQ, Gosu::KbR,
-      #       Gosu::KbS, Gosu::KbT, Gosu::KbU, Gosu::KbV, Gosu::KbW, Gosu::KbX,
-      #       Gosu::KbY, Gosu::KbZ, Gosu::Kb1, Gosu::Kb2, Gosu::Kb3, Gosu::Kb4,
-      #       Gosu::Kb5, Gosu::Kb6, Gosu::Kb7, Gosu::Kb8, Gosu::Kb9, Gosu::Kb0,
-      #       Gosu::KbNumpad1, Gosu::KbNumpad2, Gosu::KbNumpad3, Gosu::KbNumpad4,
-      #       Gosu::KbNumpad5, Gosu::KbNumpad6, Gosu::KbNumpad7, Gosu::KbNumpad8,
-      #       Gosu::KbNumpad9, Gosu::KbNumpad0, Gosu::KbSpace, Gosu::KbBackspace,
-      #       Gosu::KbDelete, Gosu::KbLeft, Gosu::KbRight, Gosu::KbHome,
-      #       Gosu::KbEnd, Gosu::KbLeftShift, Gosu::KbRightShift, Gosu::KbTab,
-      #       Gosu::KbBacktick, Gosu::KbMinus, Gosu::KbEqual, Gosu::KbBracketLeft,
-      #       Gosu::KbBracketRight, Gosu::KbBackslash, Gosu::KbApostrophe,
-      #       Gosu::KbComma, Gosu::KbPeriod, Gosu::KbSlash</code>.
+      # [key] Code of the key to be checked. The available codes are all the
+      #       constants in +Gosu+ started with +KB_+.
       def key_pressed?(key)
         @prev_down.index(key).nil? and @down.index(key)
       end
@@ -338,7 +327,8 @@ module MiniGL
       # Returns whether the given key is down in the current frame.
       #
       # Parameters:
-      # [key] Code of the key to be checked. See +key_pressed?+ for details.
+      # [key] Code of the key to be checked. The available codes are all the
+      #       constants in +Gosu+ started with +KB_+.
       def key_down?(key)
         @down.index(key)
       end
@@ -347,7 +337,8 @@ module MiniGL
       # down in the frame before.
       #
       # Parameters:
-      # [key] Code of the key to be checked. See +key_pressed?+ for details.
+      # [key] Code of the key to be checked. The available codes are all the
+      #       constants in +Gosu+ started with +KB_+.
       def key_released?(key)
         @prev_down.index(key) and @down.index(key).nil?
       end
@@ -356,7 +347,8 @@ module MiniGL
       # <code>GameWindow.initialize</code> for details.
       #
       # Parameters:
-      # [key] Code of the key to be checked. See +key_pressed?+ for details.
+      # [key] Code of the key to be checked. The available codes are all the
+      #       constants in +Gosu+ started with +KB_+.
       def key_held?(key)
         @held_interval[key] == G.kb_held_interval
       end

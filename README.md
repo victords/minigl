@@ -29,8 +29,6 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.0.10
+## Version 2.0.11
 
-  * **Updated Gosu version to ~> 0.11 in dependencies.**
-  * Eliminated references to `Window` instance when loading resources with `Res`.
-  * Added `GameWindow#toggle_fullscreen` method.
+  * Updated the available keys for the `KB` methods.
