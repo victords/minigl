@@ -69,6 +69,8 @@ class MyGame < GameWindow
     @ddl.value = 'segunda' if KB.key_pressed? Gosu::Kb2
     @ddl.value = 'terceira' if KB.key_pressed? Gosu::Kb3
 
+    G.window.toggle_fullscreen if KB.key_pressed?(Gosu::KB_RIGHT_ALT)
+
     Mouse.update
     if Mouse.double_click? :left
       @obj1.x = Mouse.x

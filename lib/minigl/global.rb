@@ -241,9 +241,10 @@ module MiniGL
                 0, height, color, 0
     end
 
-    # def toggle_fullscreen
-    #   # TODO
-    # end
+    # Toggles the window between windowed and full screen mode.
+    def toggle_fullscreen
+      self.fullscreen = !fullscreen?
+    end
   end
 
   #class JSHelper
@@ -587,10 +588,10 @@ module MiniGL
       # [ext] The extension of the file being loaded. Specify only if it is
       #       other than '.png'.
       def img(id, global = false, tileable = false, ext = '.png')
-        if global; a = @global_imgs; else; a = @imgs; end
+        a = global ? @global_imgs : @imgs
         return a[id] if a[id]
         s = @prefix + @img_dir + id.to_s.split(@separator).join('/') + ext
-        img = Gosu::Image.new G.window, s, tileable
+        img = Gosu::Image.new s, tileable: tileable
         a[id] = img
       end
 
@@ -610,10 +611,10 @@ module MiniGL
       # [ext] The extension of the file being loaded. Specify only if it is
       #       other than ".png".
       def imgs(id, sprite_cols, sprite_rows, global = false, ext = '.png')
-        if global; a = @global_imgs; else; a = @imgs; end
+        a = global ? @global_imgs : @imgs
         return a[id] if a[id]
         s = @prefix + @img_dir + id.to_s.split(@separator).join('/') + ext
-        imgs = Gosu::Image.load_tiles G.window, s, -sprite_cols, -sprite_rows, false
+        imgs = Gosu::Image.load_tiles s, -sprite_cols, -sprite_rows, tileable: false
         a[id] = imgs
       end
 
@@ -634,10 +635,10 @@ module MiniGL
       # [ext] The extension of the file being loaded. Specify only if it is
       #       other than ".png".
       def tileset(id, tile_width = 32, tile_height = 32, global = false, ext = '.png')
-        if global; a = @global_tilesets; else; a = @tilesets; end
+        a = global ? @global_tilesets : @tilesets
         return a[id] if a[id]
         s = @prefix + @tileset_dir + id.to_s.split(@separator).join('/') + ext
-        tileset = Gosu::Image.load_tiles G.window, s, tile_width, tile_height, true
+        tileset = Gosu::Image.load_tiles s, tile_width, tile_height, tileable: true
         a[id] = tileset
       end
 
@@ -654,10 +655,10 @@ module MiniGL
       # [ext] The extension of the file being loaded. Specify only if it is
       #       other than ".wav".
       def sound(id, global = false, ext = '.wav')
-        if global; a = @global_sounds; else; a = @sounds; end
+        a = global ? @global_sounds : @sounds
         return a[id] if a[id]
         s = @prefix + @sound_dir + id.to_s.split(@separator).join('/') + ext
-        sound = Gosu::Sample.new G.window, s
+        sound = Gosu::Sample.new s
         a[id] = sound
       end
 
@@ -674,10 +675,10 @@ module MiniGL
       # [ext] The extension of the file being loaded. Specify only if it is
       #       other than ".ogg".
       def song(id, global = false, ext = '.ogg')
-        if global; a = @global_songs; else; a = @songs; end
+        a = global ? @global_songs : @songs
         return a[id] if a[id]
         s = @prefix + @song_dir + id.to_s.split(@separator).join('/') + ext
-        song = Gosu::Song.new G.window, s
+        song = Gosu::Song.new s
         a[id] = song
       end
 
@@ -697,11 +698,11 @@ module MiniGL
       # [ext] The extension of the file being loaded. Specify only if it is
       #       other than ".ttf".
       def font(id, size, global = true, ext = '.ttf')
-        if global; a = @global_fonts; else; a = @fonts; end
+        a = global ? @global_fonts : @fonts
         id_size = "#{id}_#{size}"
         return a[id_size] if a[id_size]
         s = @prefix + @font_dir + id.to_s.split(@separator).join('/') + ext
-        font = Gosu::Font.new G.window, s, size
+        font = Gosu::Font.new size, name: s
         a[id_size] = font
       end
 

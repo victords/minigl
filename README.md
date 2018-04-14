@@ -29,7 +29,8 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.0.9
+## Version 2.0.10
 
-  * Added the `round` option to `Sprite#draw` and `GameObject#draw`.
-  * Fixed `GameObject#draw` when drawing rotated with non-null `img_gap`.
+  * **Updated Gosu version to ~> 0.11 in dependencies.**
+  * Eliminated references to `Window` instance when loading resources with `Res`.
+  * Added `GameWindow#toggle_fullscreen` method.
