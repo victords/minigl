@@ -29,6 +29,6 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.0.11
+## Version 2.0.12
 
-  * Updated the available keys for the `KB` methods.
+  * Fixed `Movement#move` so that an object doesn't collide with itself.

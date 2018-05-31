@@ -207,7 +207,8 @@ module MiniGL
     # be applied in the next time +move+ is called.
     attr_accessor :stored_forces
 
-    attr_reader :prev_speed # :nodoc:
+    # A Vector containing the speed of the object in the previous frame.
+    attr_reader :prev_speed
 
     # Returns the bounding box as a Rectangle.
     def bounds
@@ -265,7 +266,7 @@ module MiniGL
       move_bounds = Rectangle.new x, y, w, h
       coll_list = []
       obst.each do |o|
-        coll_list << o if move_bounds.intersect? o.bounds
+        coll_list << o if o != self && move_bounds.intersect?(o.bounds)
       end
       ramps.each do |r|
         r.check_can_collide move_bounds
