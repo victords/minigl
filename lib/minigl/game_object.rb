@@ -101,6 +101,7 @@ module MiniGL
 
       @index_index += 1
       @img_index = indices[@index_index]
+      @anim_counter = 0
       @animate_once_control = 2 if @index_index == indices.length - 1
     end
 
