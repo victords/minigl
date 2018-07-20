@@ -63,7 +63,7 @@ module MiniGL
       @anim_counter += 1
       if @anim_counter >= interval
         @index_index += 1
-        @index_index = 0 if @index_index == indices.length
+        @index_index = 0 if @index_index >= indices.length
         @img_index = indices[@index_index]
         @anim_counter = 0
       end

@@ -29,6 +29,6 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.0.13
+## Version 2.0.14
 
-  * Bug fix in `Sprite#animate_once`.
+  * Bug fix in `Sprite#animate` (for very specific scenarios when switching between indices arrays).
