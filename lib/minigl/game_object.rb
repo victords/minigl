@@ -32,13 +32,14 @@ module MiniGL
     #               image is not a spritesheet.
     # [sprite_rows] The number of rows in the spritesheet. Use +nil+ if the
     #               image is not a spritesheet.
-    def initialize(x, y, img, sprite_cols = nil, sprite_rows = nil)
+    def initialize(x, y, img, sprite_cols = nil, sprite_rows = nil, retro = nil)
       @x = x; @y = y
+      retro = Res.retro_images if retro.nil?
       @img =
         if sprite_cols.nil?
-          [Res.img(img)]
+          [Res.img(img, false, false, '.png', retro)]
         else
-          Res.imgs img, sprite_cols, sprite_rows
+          Res.imgs img, sprite_cols, sprite_rows, false, '.png', retro
         end
       @anim_counter = 0
       @img_index = 0
@@ -208,8 +209,8 @@ module MiniGL
     #               image is not a spritesheet.
     # [mass] The mass of the object. Details on how it is used can be found
     #        in the Movement module.
-    def initialize(x, y, w, h, img, img_gap = nil, sprite_cols = nil, sprite_rows = nil, mass = 1.0)
-      super x, y, img, sprite_cols, sprite_rows
+    def initialize(x, y, w, h, img, img_gap = nil, sprite_cols = nil, sprite_rows = nil, mass = 1.0, retro = nil)
+      super x, y, img, sprite_cols, sprite_rows, retro
       @w = w; @h = h
       @img_gap =
         if img_gap.nil?

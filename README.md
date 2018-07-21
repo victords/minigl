@@ -29,6 +29,6 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.0.14
+## Version 2.0.15
 
-  * Bug fix in `Sprite#animate` (for very specific scenarios when switching between indices arrays).
+  * Added the `retro_images` global option to `Res` and the `retro` option to `Res::img`, `Res::imgs`, `Res::tileset` and to the constructors of `Sprite` and `GameObject`.

@@ -500,6 +500,11 @@ module MiniGL
       # that won't appear in any file name.
       attr_accessor :separator
 
+      # Gets or sets a flag that indicates whether images will be loaded with
+      # the 'retro' option set (see +Gosu::Image+ for details), when this
+      # option is not specified in a 'Res.img' or 'Res.imgs' call.
+      attr_accessor :retro_images
+
       # This is called by <code>GameWindow.initialize</code>. Don't call it
       # explicitly.
       def initialize
@@ -521,6 +526,7 @@ module MiniGL
         @song_dir = 'song/'
         @font_dir = 'font/'
         @separator = '_'
+        @retro_images = false
       end
 
       # Set a custom prefix for loading resources. By default, the prefix is the
@@ -579,11 +585,12 @@ module MiniGL
       #            continuous composition.
       # [ext] The extension of the file being loaded. Specify only if it is
       #       other than '.png'.
-      def img(id, global = false, tileable = false, ext = '.png')
+      def img(id, global = false, tileable = false, ext = '.png', retro = nil)
         a = global ? @global_imgs : @imgs
         return a[id] if a[id]
         s = @prefix + @img_dir + id.to_s.split(@separator).join('/') + ext
-        img = Gosu::Image.new s, tileable: tileable
+        retro = Res.retro_images if retro.nil?
+        img = Gosu::Image.new s, tileable: tileable, retro: retro
         a[id] = img
       end
 
@@ -602,11 +609,12 @@ module MiniGL
       #          released when you call +clear+.
       # [ext] The extension of the file being loaded. Specify only if it is
       #       other than ".png".
-      def imgs(id, sprite_cols, sprite_rows, global = false, ext = '.png')
+      def imgs(id, sprite_cols, sprite_rows, global = false, ext = '.png', retro = nil)
         a = global ? @global_imgs : @imgs
         return a[id] if a[id]
         s = @prefix + @img_dir + id.to_s.split(@separator).join('/') + ext
-        imgs = Gosu::Image.load_tiles s, -sprite_cols, -sprite_rows, tileable: false
+        retro = Res.retro_images if retro.nil?
+        imgs = Gosu::Image.load_tiles s, -sprite_cols, -sprite_rows, tileable: false, retro: retro
         a[id] = imgs
       end
 
@@ -626,11 +634,12 @@ module MiniGL
       #          released when you call +clear+.
       # [ext] The extension of the file being loaded. Specify only if it is
       #       other than ".png".
-      def tileset(id, tile_width = 32, tile_height = 32, global = false, ext = '.png')
+      def tileset(id, tile_width = 32, tile_height = 32, global = false, ext = '.png', retro = nil)
         a = global ? @global_tilesets : @tilesets
         return a[id] if a[id]
         s = @prefix + @tileset_dir + id.to_s.split(@separator).join('/') + ext
-        tileset = Gosu::Image.load_tiles s, tile_width, tile_height, tileable: true
+        retro = Res.retro_images if retro.nil?
+        tileset = Gosu::Image.load_tiles s, tile_width, tile_height, tileable: true, retro: retro
         a[id] = tileset
       end
 
