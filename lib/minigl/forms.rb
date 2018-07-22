@@ -89,6 +89,11 @@ module MiniGL
     #            @action.call @params
     #          Note that this doesn't force you to declare a block that takes
     #          parameters.
+    # [retro] Whether the image should be loaded with the 'retro' option set
+    #         (see +Gosu::Image+ for details). If the value is omitted, the
+    #         +Res.retro_images+ value will be used.
+    # [scale_x] Horizontal scale to draw the component with.
+    # [scale_y] Vertical scale to draw the component with.
     # [action] The block of code executed when the button is clicked (or by
     #          calling the +click+ method).
     #
@@ -97,7 +102,8 @@ module MiniGL
     # provided, and vice-versa).
     def initialize(x, y = nil, font = nil, text = nil, img = nil,
                    text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0,
-                   center_x = true, center_y = true, margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action)
+                   center_x = true, center_y = true, margin_x = 0, margin_y = 0, width = nil, height = nil,
+                   params = nil, retro = nil, scale_x = 1, scale_y = 1, &action)
       if x.is_a? Hash
         y = x[:y]
         font = x[:font]
@@ -114,25 +120,31 @@ module MiniGL
         width = x.fetch(:width, nil)
         height = x.fetch(:height, nil)
         params = x.fetch(:params, nil)
+        retro = x.fetch(:retro, nil)
+        scale_x = x.fetch(:scale_x, 1)
+        scale_y = x.fetch(:scale_y, 1)
         x = x[:x]
       end
 
       super x, y, font, text, text_color, disabled_text_color
       @over_text_color = over_text_color
       @down_text_color = down_text_color
+      retro = Res.retro_images if retro.nil?
+      @scale_x = scale_x
+      @scale_y = scale_y
       @img =
-        if img; Res.imgs img, 1, 4, true
+        if img; Res.imgs img, 1, 4, true, '.png', retro
         else; nil; end
       @w =
-        if img; @img[0].width
-        else; width; end
+        if img; @img[0].width * @scale_x
+        else; width * @scale_x; end
       @h =
-        if img; @img[0].height
-        else; height; end
+        if img; @img[0].height * @scale_y
+        else; height * @scale_y; end
       if center_x; @text_x = x + @w / 2 if @w
-      else; @text_x = x + margin_x; end
+      else; @text_x = x + margin_x * @scale_x; end
       if center_y; @text_y = y + @h / 2 if @h
-      else; @text_y = y + margin_y; end
+      else; @text_y = y + margin_y * @scale_y; end
       @center_x = center_x
       @center_y = center_y
       @action = action
@@ -217,10 +229,11 @@ module MiniGL
     #         vary between 0 (fully transparent) and 255 (fully opaque).
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
-    def draw(alpha = 0xff, z_index = 0)
+    # [color] Color to apply a filter to the image.
+    def draw(alpha = 0xff, z_index = 0, color = 0xffffff)
       return unless @visible
 
-      color = (alpha << 24) | 0xffffff
+      color = (alpha << 24) | color
       text_color =
         if @enabled
           if @state == :down
@@ -232,14 +245,14 @@ module MiniGL
           @disabled_text_color
         end
       text_color = (alpha << 24) | text_color
-      @img[@img_index].draw @x, @y, z_index, 1, 1, color if @img
+      @img[@img_index].draw @x, @y, z_index, @scale_x, @scale_y, color if @img
       if @text
         if @center_x or @center_y
           rel_x = @center_x ? 0.5 : 0
           rel_y = @center_y ? 0.5 : 0
-          @font.draw_rel @text, @text_x, @text_y, z_index, rel_x, rel_y, 1, 1, text_color
+          @font.draw_rel @text, @text_x, @text_y, z_index, rel_x, rel_y, @scale_x, @scale_y, text_color
         else
-          @font.draw @text, @text_x, @text_y, z_index, 1, 1, text_color
+          @font.draw @text, @text_x, @text_y, z_index, @scale_x, @scale_y, text_color
         end
       end
     end
@@ -277,7 +290,8 @@ module MiniGL
     # provided, and vice-versa).
     def initialize(x, y = nil, font = nil, text = nil, img = nil, checked = false,
                    text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0,
-                   center_x = true, center_y = true, margin_x = 0, margin_y = 0, width = nil, height = nil, params = nil, &action)
+                   center_x = true, center_y = true, margin_x = 0, margin_y = 0, width = nil, height = nil,
+                   params = nil, retro = nil, scale_x = 1, scale_y = 1, &action)
       if x.is_a? Hash
         y = x[:y]
         font = x[:font]
@@ -295,20 +309,23 @@ module MiniGL
         width = x.fetch(:width, nil)
         height = x.fetch(:height, nil)
         params = x.fetch(:params, nil)
+        retro = x.fetch(:retro, nil)
+        scale_x = x.fetch(:scale_x, 1)
+        scale_y = x.fetch(:scale_y, 1)
         x = x[:x]
       end
 
       super x, y, font, text, nil, text_color, disabled_text_color, over_text_color, down_text_color,
-            center_x, center_y, margin_x, margin_y, width, height, params, &action
+            center_x, center_y, margin_x, margin_y, 0, 0, params, retro, scale_x, scale_y, &action
       @img =
-        if img; Res.imgs img, 2, 4, true
+        if img; Res.imgs img, 2, 4, true, '.png', retro
         else; nil; end
       @w =
-        if img; @img[0].width
-        else; width; end
+        if img; @img[0].width * @scale_x
+        else; width * @scale_x; end
       @h =
-        if img; @img[0].height
-        else; height; end
+        if img; @img[0].height * @scale_y
+        else; height * @scale_y; end
       @text_x = x + @w / 2 if center_x
       @text_y = y + @h / 2 if center_y
       @checked = checked
@@ -402,6 +419,11 @@ module MiniGL
     #            @on_text_changed.call @text, @params
     #          Thus, +params+ will be the second parameter. Note that this
     #          doesn't force you to declare a block that takes parameters.
+    # [retro] Whether the images should be loaded with the 'retro' option set
+    #         (see +Gosu::Image+ for details). If the value is omitted, the
+    #         +Res.retro_images+ value will be used.
+    # [scale_x] Horizontal scale to draw the component with.
+    # [scale_y] Vertical scale to draw the component with.
     # [on_text_changed] The block of code executed when the text in the text
     #                   field is changed, either by user input or by calling
     #                   +text=+. The new text is passed as a first parameter
@@ -411,7 +433,8 @@ module MiniGL
     # +img+ are mandatory.
     def initialize(x, y = nil, font = nil, img = nil, cursor_img = nil, disabled_img = nil, margin_x = 0, margin_y = 0,
                    max_length = 100, active = false, text = '', allowed_chars = nil,
-                   text_color = 0, disabled_text_color = 0, selection_color = 0, locale = 'en-us', params = nil, &on_text_changed)
+                   text_color = 0, disabled_text_color = 0, selection_color = 0, locale = 'en-us',
+                   params = nil, retro = nil, scale_x = 1, scale_y = 1, &on_text_changed)
       if x.is_a? Hash
         y = x[:y]
         font = x[:font]
@@ -429,22 +452,28 @@ module MiniGL
         selection_color = x.fetch(:selection_color, 0)
         locale = x.fetch(:locale, 'en-us')
         params = x.fetch(:params, nil)
+        retro = x.fetch(:retro, nil)
+        scale_x = x.fetch(:scale_x, 1)
+        scale_y = x.fetch(:scale_y, 1)
         x = x[:x]
       end
 
       super x, y, font, text, text_color, disabled_text_color
-      @img = Res.img img
-      @w = @img.width
-      @h = @img.height
-      @cursor_img = Res.img(cursor_img) if cursor_img
-      @disabled_img = Res.img(disabled_img) if disabled_img
+      retro = Res.retro_images if retro.nil?
+      @scale_x = scale_x
+      @scale_y = scale_y
+      @img = Res.img img, false, false, '.png', retro
+      @w = @img.width * @scale_x
+      @h = @img.height * @scale_y
+      @cursor_img = Res.img(cursor_img, false, false, '.png', retro) if cursor_img
+      @disabled_img = Res.img(disabled_img, false, false, '.png', retro) if disabled_img
       @max_length = max_length
       @active = active
-      @text_x = x + margin_x
-      @text_y = y + margin_y
+      @text_x = x + margin_x * @scale_x
+      @text_y = y + margin_y * @scale_y
       @selection_color = selection_color
 
-      @nodes = [x + margin_x]
+      @nodes = [x + margin_x * @scale_x]
       @cur_node = 0
       @cursor_visible = false
       @cursor_timer = 0
@@ -653,7 +682,7 @@ module MiniGL
       @nodes.clear; @nodes << @text_x
       x = @nodes[0]
       @text.chars.each { |char|
-        x += @font.text_width char
+        x += @font.text_width(char) * @scale_x
         @nodes << x
       }
       @cur_node = @nodes.size - 1
@@ -727,14 +756,17 @@ module MiniGL
     #         values vary between 0 (fully transparent) and 255 (fully opaque).
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
-    def draw(alpha = 0xff, z_index = 0)
+    # [color] Color to apply a filter to the image.
+    # [disabled_color] Color to apply a filter to the image when the field is
+    #                  disabled.
+    def draw(alpha = 0xff, z_index = 0, color = 0xffffff, disabled_color = 0x808080)
       return unless @visible
 
-      color = (alpha << 24) | ((@enabled or @disabled_img) ? 0xffffff : 0x808080)
+      color = (alpha << 24) | ((@enabled or @disabled_img) ? color : disabled_color)
       text_color = (alpha << 24) | (@enabled ? @text_color : @disabled_text_color)
       img = ((@enabled or @disabled_img.nil?) ? @img : @disabled_img)
-      img.draw @x, @y, z_index, 1, 1, color
-      @font.draw @text, @text_x, @text_y, z_index, 1, 1, text_color
+      img.draw @x, @y, z_index, @scale_x, @scale_y, color
+      @font.draw @text, @text_x, @text_y, z_index, @scale_x, @scale_y, text_color
 
       if @anchor1 and @anchor2
         selection_color = ((alpha / 2) << 24) | @selection_color
@@ -746,13 +778,13 @@ module MiniGL
 
       if @cursor_visible
         if @cursor_img
-          @cursor_img.draw @nodes[@cur_node] - @cursor_img.width / 2, @text_y, z_index
+          @cursor_img.draw @nodes[@cur_node] - (@cursor_img.width * @scale_x) / 2, @text_y, z_index, @scale_x, @scale_y
         else
           cursor_color = alpha << 24
           G.window.draw_quad @nodes[@cur_node], @text_y, cursor_color,
                              @nodes[@cur_node] + 1, @text_y, cursor_color,
-                             @nodes[@cur_node] + 1, @text_y + @font.height, cursor_color,
-                             @nodes[@cur_node], @text_y + @font.height, cursor_color, z_index
+                             @nodes[@cur_node] + 1, @text_y + @font.height * @scale_y, cursor_color,
+                             @nodes[@cur_node], @text_y + @font.height * @scale_y, cursor_color, z_index
         end
       end
     end
@@ -792,9 +824,9 @@ module MiniGL
     def insert_char(char)
       return unless @allowed_chars.index char and @text.length < @max_length
       @text.insert @cur_node, char
-      @nodes.insert @cur_node + 1, @nodes[@cur_node] + @font.text_width(char)
+      @nodes.insert @cur_node + 1, @nodes[@cur_node] + @font.text_width(char) * @scale_x
       for i in (@cur_node + 2)..(@nodes.size - 1)
-        @nodes[i] += @font.text_width(char)
+        @nodes[i] += @font.text_width(char) * @scale_x
       end
       @cur_node += 1
       set_cursor_visible
@@ -806,7 +838,7 @@ module MiniGL
       max = min == @anchor1 ? @anchor2 : @anchor1
       interval_width = 0
       for i in min...max
-        interval_width += @font.text_width(@text[i])
+        interval_width += @font.text_width(@text[i]) * @scale_x
         @nodes.delete_at min + 1
       end
       @text[min...max] = ''
@@ -822,7 +854,7 @@ module MiniGL
 
     def remove_char(back)
       @cur_node -= 1 if back
-      char_width = @font.text_width(@text[@cur_node])
+      char_width = @font.text_width(@text[@cur_node]) * @scale_x
       @text[@cur_node] = ''
       @nodes.delete_at @cur_node + 1
       for i in (@cur_node + 1)..(@nodes.size - 1)
@@ -850,7 +882,8 @@ module MiniGL
     # [y] The y-coordinate of the progress bar on the screen.
     # [w] Width of the progress bar, in pixels. This is the maximum space the
     #     bar foreground can occupy. Note that the width of the foreground image
-    #     (+fg+) can be less than this.
+    #     (+fg+) can be less than this, in which case the image will be
+    #     horizontally repeated to fill all the needed space.
     # [h] Height of the progress bar. This will be the height of the bar
     #     foreground when +fg+ is a color (when it is an image, the height of
     #     the image will be kept).
@@ -870,12 +903,17 @@ module MiniGL
     # [text_color] Color of the text.
     # [format] Format to display the value. Specify '%' for a percentage and
     #          anything else for absolute values (current/maximum).
+    # [retro] Whether the images should be loaded with the 'retro' option set
+    #         (see +Gosu::Image+ for details). If the value is omitted, the
+    #         +Res.retro_images+ value will be used.
+    # [scale_x] Horizontal scale to draw the component with.
+    # [scale_y] Vertical scale to draw the component with.
     #
     # *Obs.:* This method accepts named parameters, but +x+, +y+, +w+, +h+, +bg+
     # and +fg+ are mandatory.
     def initialize(x, y = nil, w = nil, h = nil, bg = nil, fg = nil,
-                   max_value = 100, value = 100, fg_margin_x = 0, fg_margin_y = 0, #fg_left = nil, fg_right = nil,
-                   font = nil, text_color = 0, format = nil)
+                   max_value = 100, value = 100, fg_margin_x = 0, fg_margin_y = 0, # fg_left = nil, fg_right = nil,
+                   font = nil, text_color = 0, format = nil, retro = nil, scale_x = 1, scale_y = 1)
       if x.is_a? Hash
         y = x[:y]
         w = x[:w]
@@ -889,31 +927,37 @@ module MiniGL
         font = x.fetch(:font, nil)
         text_color = x.fetch(:text_color, 0)
         format = x.fetch(:format, nil)
+        retro = x.fetch(:retro, nil)
+        scale_x = x.fetch(:scale_x, 1)
+        scale_y = x.fetch(:scale_y, 1)
         x = x[:x]
       end
 
       super x, y, font, '', text_color, text_color
-      @w = w
-      @h = h
+      @scale_x = scale_x
+      @scale_y = scale_y
+      @w = w * @scale_x
+      @h = h * @scale_y
+      retro = Res.retro_images if retro.nil?
       if bg.is_a? Integer
         @bg_color = bg
       else # String or Symbol
-        @bg = Res.img bg
+        @bg = Res.img bg, false, false, '.png', retro
       end
       if fg.is_a? Integer
         @fg_color = fg
       else # String or Symbol
-        @fg = Res.img fg
+        @fg = Res.img fg, false, false, '.png', retro
         @fg_path = "#{Res.prefix}#{Res.img_dir}#{fg.to_s.gsub(Res.separator, '/')}.png"
-        puts @fg_path
       end
-      @fg_margin_x = fg_margin_x
-      @fg_margin_y = fg_margin_y
+      @fg_margin_x = fg_margin_x * @scale_x
+      @fg_margin_y = fg_margin_y * @scale_y
       # @fg_left = fg_left
       # @fg_right = fg_right
       @max_value = max_value
       self.value = value
       @format = format
+      @retro = retro
     end
 
     # Increases the current value of the progress bar by the given amount.
@@ -968,12 +1012,13 @@ module MiniGL
     #         opaque).
     # [z_index] (+Fixnum+) The z-order to draw the object. Objects with larger
     #           z-orders will be drawn on top of the ones with smaller z-orders.
-    def draw(alpha = 0xff, z_index = 0)
+    # [color] Color to apply a filter to the images (when these are provided).
+    def draw(alpha = 0xff, z_index = 0, color = 0xffffff)
       return unless @visible
 
       if @bg
-        c = (alpha << 24) | 0xffffff
-        @bg.draw @x, @y, z_index, 1, 1, c
+        c = (alpha << 24) | color
+        @bg.draw @x, @y, z_index, @scale_x, @scale_y, c
       else
         c = (alpha << 24) | @bg_color
         G.window.draw_quad @x, @y, c,
@@ -982,18 +1027,18 @@ module MiniGL
                            @x, @y + @h, c, z_index
       end
       if @fg
-        c = (alpha << 24) | 0xffffff
-        w1 = @fg.width
+        c = (alpha << 24) | color
+        w1 = @fg.width * @scale_x
         w2 = (@value.to_f / @max_value * @w).round
         x0 = @x + @fg_margin_x
         x = 0
         while x <= w2 - w1
-          @fg.draw x0 + x, @y + @fg_margin_y, z_index, 1, 1, c
+          @fg.draw x0 + x, @y + @fg_margin_y, z_index, @scale_x, @scale_y, c
           x += w1
         end
         if w2 - x > 0
-          img = Gosu::Image.new(G.window, @fg_path, true, 0, 0, w2 - x, @fg.height)
-          img.draw x0 + x, @y + @fg_margin_y, z_index, 1, 1, c
+          img = Gosu::Image.new(@fg_path, tileable: true, retro: @retro, rect: [0, 0, ((w2 - x) / @scale_x).round, @fg.height])
+          img.draw x0 + x, @y + @fg_margin_y, z_index, @scale_x, @scale_y, c
         end
       else
         c = (alpha << 24) | @fg_color
@@ -1006,7 +1051,7 @@ module MiniGL
       if @font
         c = (alpha << 24) | @text_color
         @text = @format == '%' ? "#{(@value.to_f / @max_value * 100).round}%" : "#{@value}/#{@max_value}"
-        @font.draw_rel @text, @x + @fg_margin_x + @w / 2, @y + @fg_margin_y + @h / 2, 0, 0.5, 0.5, 1, 1, c
+        @font.draw_rel @text, @x + @fg_margin_x + @w / 2, @y + @fg_margin_y + @h / 2, 0, 0.5, 0.5, @scale_x, @scale_y, c
       end
     end
   end
@@ -1041,6 +1086,11 @@ module MiniGL
     # [disabled_text_color] Analogous to +text_color+.
     # [over_text_color] Same as above.
     # [down_text_color] Same as above.
+    # [retro] Whether the images should be loaded with the 'retro' option set
+    #         (see +Gosu::Image+ for details). If the value is omitted, the
+    #         +Res.retro_images+ value will be used.
+    # [scale_x] Horizontal scale to draw the component with.
+    # [scale_y] Vertical scale to draw the component with.
     # [on_changed] Action performed when the value of the dropdown is changed.
     #              It must be a block with two parameters, which will receive
     #              the old and the new value, respectively.
@@ -1050,7 +1100,8 @@ module MiniGL
     # +width+ and +height+ are not provided, and vice-versa).
     def initialize(x, y = nil, font = nil, img = nil, opt_img = nil, options = nil,
                    option = 0, text_margin = 0, width = nil, height = nil,
-                   text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0, &on_changed)
+                   text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0,
+                   retro = nil, scale_x = 1, scale_y = 1, &on_changed)
       if x.is_a? Hash
         y = x[:y]
         font = x[:font]
@@ -1065,6 +1116,9 @@ module MiniGL
         disabled_text_color = x.fetch(:disabled_text_color, 0)
         over_text_color = x.fetch(:over_text_color, 0)
         down_text_color = x.fetch(:down_text_color, 0)
+        retro = x.fetch(:retro, nil)
+        scale_x = x.fetch(:scale_x, 1)
+        scale_y = x.fetch(:scale_y, 1)
         x = x[:x]
       end
 
@@ -1077,15 +1131,20 @@ module MiniGL
       @buttons = []
       @buttons.push(
         Button.new(x, y, font, @value, img, text_color, disabled_text_color, over_text_color, down_text_color,
-                   false, true, text_margin, 0, width, height) {
+                   false, true, text_margin, 0, width, height, nil, retro, scale_x, scale_y) {
                      toggle
                    }
       )
+      
+      @scale_x = scale_x
+      @scale_y = scale_y
       @w = @buttons[0].w
       @h = @buttons[0].h
+      @max_h = (@options.size + 1) * @h
+
       @options.each_with_index do |o, i|
         b = Button.new(x, y + (i+1) * @h, font, o, opt_img, text_color, disabled_text_color, over_text_color, down_text_color,
-                       false, true, text_margin, 0, @w, @h) {
+                       false, true, text_margin, 0, width, height, nil, retro, scale_x, scale_y) {
                          old = @value
                          @value = @buttons[0].text = o
                          @on_changed.call(old, o) if @on_changed
@@ -1094,7 +1153,6 @@ module MiniGL
         b.visible = false
         @buttons.push b
       end
-      @max_h = (@options.size + 1) * @h
 
       @on_changed = on_changed
     end
@@ -1133,24 +1191,28 @@ module MiniGL
     #         (fully opaque).
     # [z_index] (+Fixnum+) The z-order to draw the object. Objects with larger
     #           z-orders will be drawn on top of the ones with smaller z-orders.
-    def draw(alpha = 0xff, z_index = 0)
+    # [color] Color of the buttons, if no image was provided, or color to apply
+    #         a filter to the images.
+    # [over_color] Color of the buttons when the mouse is over them (when no
+    #              image was provided).
+    def draw(alpha = 0xff, z_index = 0, color = 0xffffff, over_color = 0xcccccc)
       return unless @visible
       unless @img
-        bottom = @open ? @y + @max_h + 1 : @y + @h + 1
+        bottom = @y + (@open ? @max_h : @h) + @scale_y
         b_color = (alpha << 24)
-        G.window.draw_quad @x - 1, @y - 1, b_color,
-                           @x + @w + 1, @y - 1, b_color,
-                           @x + @w + 1, bottom, b_color,
-                           @x - 1, bottom, b_color, z_index
+        G.window.draw_quad @x - @scale_x, @y - @scale_y, b_color,
+                           @x + @w + @scale_x, @y - @scale_y, b_color,
+                           @x + @w + @scale_x, bottom, b_color,
+                           @x - @scale_x, bottom, b_color, z_index
         @buttons.each do |b|
-          color = (alpha << 24) | (b.state == :over ? 0xcccccc : 0xffffff)
-          G.window.draw_quad b.x, b.y, color,
-                             b.x + b.w, b.y, color,
-                             b.x + b.w, b.y + b.h, color,
-                             b.x, b.y + b.h, color, z_index if b.visible
+          c = (alpha << 24) | (b.state == :over ? over_color : color)
+          G.window.draw_quad b.x, b.y, c,
+                             b.x + b.w, b.y, c,
+                             b.x + b.w, b.y + b.h, c,
+                             b.x, b.y + b.h, c, z_index if b.visible
         end
       end
-      @buttons.each { |b| b.draw alpha, z_index }
+      @buttons.each { |b| b.draw alpha, z_index, color }
     end
 
     private

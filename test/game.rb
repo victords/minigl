@@ -19,17 +19,17 @@ class MyGame < GameWindow
     @font2 = Res.font :font1, 50
     @writer1 = TextHelper.new @font1, 5
     @writer2 = TextHelper.new @font2, 5
-    @btn = Button.new(10, 560, @font1, 'Test', :btn, 0x008000, 0x808080, 0xffffff, 0xff9980, true, false, 0, 4, 0, 0, 'friends') { |x| puts "hello #{x}" }
+    @btn = Button.new(10, 560, @font1, 'Test', :btn, 0x008000, 0x808080, 0xffffff, 0xff9980, true, true, 0, 4, 0, 0, 'friends', nil, 2, 2) { |x| puts "hello #{x}" }
     @btn.enabled = false
     @chk =
-      ToggleButton.new(x: 40, y: 300, font: @font1, text: 'Click me', img: :check, center_x: false, margin_x: 36, params: 'friends') { |c, x|
+      ToggleButton.new(x: 40, y: 300, font: @font1, text: 'Click me', img: :check, center_x: false, margin_x: 36, params: 'friends', scale_x: 2.3, scale_y: 1.4) { |c, x|
         puts "hello #{x}, checked: #{c}"
       }
-    @txt = TextField.new(x: 10, y: 520, font: @font1, img: :text, margin_x: 15, margin_y: 5, max_length: 16, locale: 'PT-BR')
+    @txt = TextField.new(x: 10, y: 520, font: @font1, img: :text, margin_x: 15, margin_y: 5, max_length: 16, locale: 'PT-BR', scale_x: 1.2, scale_y: 0.8)
     @txt.visible = false
 
-    @pb = ProgressBar.new(5, 240, 200, 20, 0xff0000, 0x00ff00, 3456, 70, 0, 0, @font1, 0xff000080)
-    @ddl = DropDownList.new(5, 270, @font1, nil, nil, ['olá amigos', 'opção 2', 'terceira'], 0, 3, 150, 25, 0, 0x808080, 0xffffff, 0xffff00) { |a, b|
+    @pb = ProgressBar.new(5, 240, 200, 20, :barbg, :barfg, 3456, 70, 2, 2, @font1, 0xff000080, nil, nil, 1.8, 2)
+    @ddl = DropDownList.new(5, 270, @font1, nil, nil, ['olá amigos', 'opção 2', 'terceira'], 0, 3, 150, 25, 0, 0x808080, 0xffffff, 0xffff00, nil, 2, 2.5) { |a, b|
       puts "mudou de #{a} para #{b}"
     }
 
@@ -113,8 +113,8 @@ class MyGame < GameWindow
                             'Furthermore, the text must be right-aligned.',
                             780, 450, 300, :right, 0xff0000, 255, 1
 
-    @ddl.draw 0x80, 1
-    @btn.draw 0xcc
+    @ddl.draw 0x80, 1, 0xff8080
+    @btn.draw 0xcc, 1, 0x33ff33
     @chk.draw
     @txt.draw
     @pb.draw 0x66

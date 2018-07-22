@@ -585,6 +585,9 @@ module MiniGL
       #            continuous composition.
       # [ext] The extension of the file being loaded. Specify only if it is
       #       other than '.png'.
+      # [retro] Whether the image should be loaded with the 'retro' option set
+      #         (see +Gosu::Image+ for details). If the value is omitted, the
+      #         +Res.retro_images+ value will be used.
       def img(id, global = false, tileable = false, ext = '.png', retro = nil)
         a = global ? @global_imgs : @imgs
         return a[id] if a[id]
@@ -609,6 +612,9 @@ module MiniGL
       #          released when you call +clear+.
       # [ext] The extension of the file being loaded. Specify only if it is
       #       other than ".png".
+      # [retro] Whether the image should be loaded with the 'retro' option set
+      #         (see +Gosu::Image+ for details). If the value is omitted, the
+      #         +Res.retro_images+ value will be used.
       def imgs(id, sprite_cols, sprite_rows, global = false, ext = '.png', retro = nil)
         a = global ? @global_imgs : @imgs
         return a[id] if a[id]
@@ -634,6 +640,9 @@ module MiniGL
       #          released when you call +clear+.
       # [ext] The extension of the file being loaded. Specify only if it is
       #       other than ".png".
+      # [retro] Whether the image should be loaded with the 'retro' option set
+      #         (see +Gosu::Image+ for details). If the value is omitted, the
+      #         +Res.retro_images+ value will be used.
       def tileset(id, tile_width = 32, tile_height = 32, global = false, ext = '.png', retro = nil)
         a = global ? @global_tilesets : @tilesets
         return a[id] if a[id]
