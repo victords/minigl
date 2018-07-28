@@ -29,8 +29,6 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.1.0
+## Version 2.1.1
 
-  * Added the missing documentation for the `retro` option in `Res.img`, `Res.imgs` and `Res.tileset`.
-  * Added the `retro`, `scale_x` and `scale_y` options to the constructors of all form controls.
-  * Added color options to the `draw` methods of all form controls.
+  * Fixed the `TextField`'s selection when scaled.

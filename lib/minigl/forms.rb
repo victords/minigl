@@ -772,8 +772,8 @@ module MiniGL
         selection_color = ((alpha / 2) << 24) | @selection_color
         G.window.draw_quad @nodes[@anchor1], @text_y, selection_color,
                            @nodes[@anchor2] + 1, @text_y, selection_color,
-                           @nodes[@anchor2] + 1, @text_y + @font.height, selection_color,
-                           @nodes[@anchor1], @text_y + @font.height, selection_color, z_index
+                           @nodes[@anchor2] + 1, @text_y + @font.height * @scale_y, selection_color,
+                           @nodes[@anchor1], @text_y + @font.height * @scale_y, selection_color, z_index
       end
 
       if @cursor_visible
