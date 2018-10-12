@@ -271,7 +271,7 @@ module MiniGL
         o_y = center_y - @y - @img_gap.y
         @img[@img_index].draw_rot @x + (flip == :horiz ? -1 : 1) * (@img_gap.x + o_x) - (map ? map.cam.x : 0),
                                   @y + (flip == :vert ? -1 : 1) * (@img_gap.y + o_y) - (map ? map.cam.y : 0),
-                                  z_index, angle, o_x.to_f / @img[0].width, o_y.to_f / @img[0].height,
+                                  z_index, angle, o_x.to_f / (@img[0].width * scale_x), o_y.to_f / (@img[0].height * scale_y),
                                   (flip == :horiz ? -scale_x : scale_x), (flip == :vert ? -scale_y : scale_y), color
       else
         x = @x + (flip == :horiz ? -1 : 1) * @img_gap.x - (map ? map.cam.x : 0) + (flip == :horiz ? @w : 0)

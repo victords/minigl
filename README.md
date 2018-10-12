@@ -29,6 +29,6 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.1.1
+## Version 2.1.2
 
-  * Fixed the `TextField`'s selection when scaled.
+  * Fixed `GameObject#draw` when rotated and scaled.
