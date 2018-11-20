@@ -38,6 +38,24 @@ module MiniGL
       @disabled_text_color = disabled_text_color
       @enabled = @visible = true
     end
+
+    private
+
+    def check_anchor(anchor, x, y)
+      if anchor
+        case anchor
+        when /^top_center$|^north$/i then x += (G.window.width - @w) / 2
+        when /^top_right$|^northeast$/i then x = G.window.width - @w - x
+        when /^center_left$|^west$/i then y += (G.window.height - @h) / 2
+        when /^center$/i then x += (G.window.width - @w) / 2; y += (G.window.height - @h) / 2
+        when /^center_right$|^east$/i then x = G.window.width - @w - x; y += (G.window.height - @h) / 2
+        when /^bottom_left$|^southwest$/i then y = G.window.height - @h - y
+        when /^bottom_center$|^south$/i then x += (G.window.width - @w) / 2; y = G.window.height - @h - y
+        when /^bottom_right$|^southeast$/i then x = G.window.width - @w - x; y = G.window.height - @h - y
+        end
+      end
+      [x, y]
+    end
   end
 
   # This class represents a button.
@@ -103,7 +121,7 @@ module MiniGL
     def initialize(x, y = nil, font = nil, text = nil, img = nil,
                    text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0,
                    center_x = true, center_y = true, margin_x = 0, margin_y = 0, width = nil, height = nil,
-                   params = nil, retro = nil, scale_x = 1, scale_y = 1, &action)
+                   params = nil, retro = nil, scale_x = 1, scale_y = 1, anchor = nil, &action)
       if x.is_a? Hash
         y = x[:y]
         font = x[:font]
@@ -123,24 +141,28 @@ module MiniGL
         retro = x.fetch(:retro, nil)
         scale_x = x.fetch(:scale_x, 1)
         scale_y = x.fetch(:scale_y, 1)
+        anchor = x.fetch(:anchor, nil)
         x = x[:x]
       end
 
-      super x, y, font, text, text_color, disabled_text_color
-      @over_text_color = over_text_color
-      @down_text_color = down_text_color
       retro = Res.retro_images if retro.nil?
       @scale_x = scale_x
       @scale_y = scale_y
       @img =
-        if img; Res.imgs img, 1, 4, true, '.png', retro
-        else; nil; end
+          if img; Res.imgs img, 1, 4, true, '.png', retro
+          else; nil; end
       @w =
-        if img; @img[0].width * @scale_x
-        else; width * @scale_x; end
+          if img; @img[0].width * @scale_x
+          else; width * @scale_x; end
       @h =
-        if img; @img[0].height * @scale_y
-        else; height * @scale_y; end
+          if img; @img[0].height * @scale_y
+          else; height * @scale_y; end
+
+      x, y = check_anchor(anchor, x, y)
+
+      super x, y, font, text, text_color, disabled_text_color
+      @over_text_color = over_text_color
+      @down_text_color = down_text_color
       if center_x; @text_x = x + @w / 2 if @w
       else; @text_x = x + margin_x * @scale_x; end
       if center_y; @text_y = y + @h / 2 if @h
@@ -291,7 +313,7 @@ module MiniGL
     def initialize(x, y = nil, font = nil, text = nil, img = nil, checked = false,
                    text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0,
                    center_x = true, center_y = true, margin_x = 0, margin_y = 0, width = nil, height = nil,
-                   params = nil, retro = nil, scale_x = 1, scale_y = 1, &action)
+                   params = nil, retro = nil, scale_x = 1, scale_y = 1, anchor = nil, &action)
       if x.is_a? Hash
         y = x[:y]
         font = x[:font]
@@ -312,11 +334,12 @@ module MiniGL
         retro = x.fetch(:retro, nil)
         scale_x = x.fetch(:scale_x, 1)
         scale_y = x.fetch(:scale_y, 1)
+        anchor = x.fetch(:anchor, nil)
         x = x[:x]
       end
 
       super x, y, font, text, nil, text_color, disabled_text_color, over_text_color, down_text_color,
-            center_x, center_y, margin_x, margin_y, 0, 0, params, retro, scale_x, scale_y, &action
+            center_x, center_y, margin_x, margin_y, 0, 0, params, retro, scale_x, scale_y, anchor, &action
       @img =
         if img; Res.imgs img, 2, 4, true, '.png', retro
         else; nil; end
@@ -434,7 +457,7 @@ module MiniGL
     def initialize(x, y = nil, font = nil, img = nil, cursor_img = nil, disabled_img = nil, margin_x = 0, margin_y = 0,
                    max_length = 100, active = false, text = '', allowed_chars = nil,
                    text_color = 0, disabled_text_color = 0, selection_color = 0, locale = 'en-us',
-                   params = nil, retro = nil, scale_x = 1, scale_y = 1, &on_text_changed)
+                   params = nil, retro = nil, scale_x = 1, scale_y = 1, anchor = nil, &on_text_changed)
       if x.is_a? Hash
         y = x[:y]
         font = x[:font]
@@ -455,16 +478,20 @@ module MiniGL
         retro = x.fetch(:retro, nil)
         scale_x = x.fetch(:scale_x, 1)
         scale_y = x.fetch(:scale_y, 1)
+        anchor = x.fetch(:anchor, nil)
         x = x[:x]
       end
 
-      super x, y, font, text, text_color, disabled_text_color
       retro = Res.retro_images if retro.nil?
       @scale_x = scale_x
       @scale_y = scale_y
       @img = Res.img img, false, false, '.png', retro
       @w = @img.width * @scale_x
       @h = @img.height * @scale_y
+
+      x, y = check_anchor(anchor, x, y)
+
+      super x, y, font, text, text_color, disabled_text_color
       @cursor_img = Res.img(cursor_img, false, false, '.png', retro) if cursor_img
       @disabled_img = Res.img(disabled_img, false, false, '.png', retro) if disabled_img
       @max_length = max_length
@@ -913,7 +940,7 @@ module MiniGL
     # and +fg+ are mandatory.
     def initialize(x, y = nil, w = nil, h = nil, bg = nil, fg = nil,
                    max_value = 100, value = 100, fg_margin_x = 0, fg_margin_y = 0, # fg_left = nil, fg_right = nil,
-                   font = nil, text_color = 0, format = nil, retro = nil, scale_x = 1, scale_y = 1)
+                   font = nil, text_color = 0, format = nil, retro = nil, scale_x = 1, scale_y = 1, anchor = nil)
       if x.is_a? Hash
         y = x[:y]
         w = x[:w]
@@ -930,14 +957,12 @@ module MiniGL
         retro = x.fetch(:retro, nil)
         scale_x = x.fetch(:scale_x, 1)
         scale_y = x.fetch(:scale_y, 1)
+        anchor = x.fetch(:anchor, nil)
         x = x[:x]
       end
 
-      super x, y, font, '', text_color, text_color
       @scale_x = scale_x
       @scale_y = scale_y
-      @w = w * @scale_x
-      @h = h * @scale_y
       retro = Res.retro_images if retro.nil?
       if bg.is_a? Integer
         @bg_color = bg
@@ -952,6 +977,13 @@ module MiniGL
       end
       @fg_margin_x = fg_margin_x * @scale_x
       @fg_margin_y = fg_margin_y * @scale_y
+
+      @w = (@bg ? @bg.width : w) * @scale_x
+      @h = (@bg ? @bg.height : h) * @scale_y
+
+      x, y = check_anchor(anchor, x, y)
+
+      super x, y, font, '', text_color, text_color
       # @fg_left = fg_left
       # @fg_right = fg_right
       @max_value = max_value
@@ -1051,7 +1083,7 @@ module MiniGL
       if @font
         c = (alpha << 24) | @text_color
         @text = @format == '%' ? "#{(@value.to_f / @max_value * 100).round}%" : "#{@value}/#{@max_value}"
-        @font.draw_rel @text, @x + @fg_margin_x + @w / 2, @y + @fg_margin_y + @h / 2, 0, 0.5, 0.5, @scale_x, @scale_y, c
+        @font.draw_rel @text, @x + @w / 2, @y + @h / 2, 0, 0.5, 0.5, @scale_x, @scale_y, c
       end
     end
   end
@@ -1101,7 +1133,7 @@ module MiniGL
     def initialize(x, y = nil, font = nil, img = nil, opt_img = nil, options = nil,
                    option = 0, text_margin = 0, width = nil, height = nil,
                    text_color = 0, disabled_text_color = 0, over_text_color = 0, down_text_color = 0,
-                   retro = nil, scale_x = 1, scale_y = 1, &on_changed)
+                   retro = nil, scale_x = 1, scale_y = 1, anchor = nil, &on_changed)
       if x.is_a? Hash
         y = x[:y]
         font = x[:font]
@@ -1119,10 +1151,9 @@ module MiniGL
         retro = x.fetch(:retro, nil)
         scale_x = x.fetch(:scale_x, 1)
         scale_y = x.fetch(:scale_y, 1)
+        anchor = x.fetch(:anchor, nil)
         x = x[:x]
       end
-
-      super x, y, font, options[option], text_color, disabled_text_color
       @img = img
       @opt_img = opt_img
       @options = options
@@ -1135,12 +1166,16 @@ module MiniGL
                      toggle
                    }
       )
-      
+
       @scale_x = scale_x
       @scale_y = scale_y
       @w = @buttons[0].w
       @h = @buttons[0].h
       @max_h = (@options.size + 1) * @h
+
+      x, y = check_anchor(anchor, x, y)
+      super x, y, font, options[option], text_color, disabled_text_color
+      @buttons[0].set_position(x, y)
 
       @options.each_with_index do |o, i|
         b = Button.new(x, y + (i+1) * @h, font, o, opt_img, text_color, disabled_text_color, over_text_color, down_text_color,
