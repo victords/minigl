@@ -22,7 +22,7 @@ class MyGame < GameWindow
     @btn = Button.new(10, 560, @font1, 'Test', :btn, 0x008000, 0x808080, 0xffffff, 0xff9980, true, true, 0, 4, 0, 0, 'friends', nil, 2, 2) { |x| puts "hello #{x}" }
     @btn.enabled = false
     @chk =
-      ToggleButton.new(x: 40, y: 300, font: @font1, text: 'Click me', img: :check, center_x: false, margin_x: 36, params: 'friends', scale_x: 2.3, scale_y: 1.4) { |c, x|
+      ToggleButton.new(x: 0, y: 30, font: @font1, text: 'Click me', img: :check, center_x: false, margin_x: 36, params: 'friends', anchor: :south) { |c, x|
         puts "hello #{x}, checked: #{c}"
       }
     @txt = TextField.new(x: 0, y: 0, font: @font1, img: :text, margin_x: 15, margin_y: 5, max_length: 16, locale: 'PT-BR', scale_x: 1.2, scale_y: 0.8, anchor: :center_right)
@@ -33,19 +33,21 @@ class MyGame < GameWindow
       puts "mudou de #{a} para #{b}"
     }
 
-    # @anchor_btns = [
-    #   Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :northwest),
-    #   Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :north),
-    #   Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :northeast),
-    #   Button.new(x: 5, y: 0, font: @font1, text: 'Teste', img: :btn, anchor: :west),
-    #   Button.new(x: 0, y: 0, font: @font1, text: 'Teste', img: :btn, anchor: :center),
-    #   Button.new(x: 5, y: 0, font: @font1, text: 'Teste', img: :btn, anchor: :east),
-    #   Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :southwest),
-    #   Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :south),
-    #   Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :southeast),
-    # ]
-
-    @panel = Panel.new(40, 40,720, 520, :text, :tiled, false, 2, 2)
+    @panel = Panel.new(10, 10,720, 520, [
+      Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn),
+      TextField.new(x: 5, y: 40, font: @font1, img: :text, margin_x: 5, margin_y: 5, anchor: :top_left),
+      Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :north),
+      DropDownList.new(x: 0, y: 40, width: 150, height: 25, font: @font1, options: ['olá amigos', 'opção 2', 'terceira'], anchor: :north),
+      Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :northeast),
+      Button.new(x: 5, y: 0, font: @font1, text: 'Teste', img: :btn, anchor: :west),
+      Button.new(x: 0, y: 0, font: @font1, text: 'Teste', img: :btn, anchor: :center),
+      Button.new(x: 5, y: 0, font: @font1, text: 'Teste', img: :btn, anchor: :east),
+      ToggleButton.new(x: 5, y: 40, img: :check, center_x: false, margin_x: 36, anchor: :east),
+      Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :southwest),
+      Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :south),
+      ProgressBar.new(0, 40, 200, 20, :barbg, :barfg, 3456, 70, 2, 2, @font1, 0xff000080, nil, nil, 1, 1, :bottom_center),
+      Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :southeast),
+    ], :text, :tiled, true, 2, 2, :bottom_right)
 
     @eff = Effect.new(100, 100, :check, 2, 4, 10, nil, nil, '1')
 
@@ -73,6 +75,8 @@ class MyGame < GameWindow
     @pb.visible = !@pb.visible if KB.key_pressed? Gosu::KbE
     @ddl.enabled = !@ddl.enabled if KB.key_pressed? Gosu::KbQ
     @ddl.visible = !@ddl.visible if KB.key_pressed? Gosu::KbW
+    @panel.enabled = !@panel.enabled if KB.key_pressed? Gosu::KbN
+    @panel.visible = !@panel.visible if KB.key_pressed? Gosu::KbM
 
     @pb.increase 1 if KB.key_down? Gosu::KbD
     @pb.decrease 1 if KB.key_down? Gosu::KbA
@@ -102,6 +106,8 @@ class MyGame < GameWindow
     @chk.update
     @txt.update
     @ddl.update
+
+    @panel.update
 
     @eff.update
 
@@ -133,9 +139,7 @@ class MyGame < GameWindow
     @txt.draw
     @pb.draw 0x66
 
-    # @anchor_btns.each { |b| b.draw(255, 10) }
-
-    @panel.draw(204, 10, 0xffff66)
+    @panel.draw(204, 10)
 
     @eff.draw
   end

@@ -1,6 +1,27 @@
 require_relative 'global'
 
 module MiniGL
+  module FormUtils
+    def self.check_anchor(anchor, x, y, w, h, area_w = G.window.width, area_h = G.window.height)
+      if anchor
+        case anchor
+        when /^top_center$|^north$/i then anchor_alias = :top_center; x += (area_w - w) / 2
+        when /^top_right$|^northeast$/i then anchor_alias = :top_right; x = area_w - w - x
+        when /^center_left$|^west$/i then anchor_alias = :center_left; y += (area_h - h) / 2
+        when /^center$/i then anchor_alias = :center; x += (area_w - w) / 2; y += (area_h - h) / 2
+        when /^center_right$|^east$/i then anchor_alias = :center_right; x = area_w - w - x; y += (area_h - h) / 2
+        when /^bottom_left$|^southwest$/i then anchor_alias = :bottom_left; y = area_h - h - y
+        when /^bottom_center$|^south$/i then anchor_alias = :bottom_center; x += (area_w - w) / 2; y = area_h - h - y
+        when /^bottom_right$|^southeast$/i then anchor_alias = :bottom_right; x = area_w - w - x; y = area_h - h - y
+        else anchor_alias = :top_left
+        end
+      else
+        anchor_alias = :top_left
+      end
+      [anchor_alias, x, y]
+    end
+  end
+
   # This class is an abstract ancestor for all form components (Button,
   # ToggleButton and TextField).
   class Component
@@ -15,6 +36,8 @@ module MiniGL
 
     # The height of the component
     attr_reader :h
+
+    attr_reader :anchor, :anchor_offset_x, :anchor_offset_y
 
     # Determines whether the control is enabled, i.e., will process user input.
     attr_accessor :enabled
@@ -39,40 +62,26 @@ module MiniGL
       @enabled = @visible = true
     end
 
-    private
+    def update; end
 
-    def check_anchor(anchor, x, y)
-      if anchor
-        case anchor
-        when /^top_center$|^north$/i then x += (G.window.width - @w) / 2
-        when /^top_right$|^northeast$/i then x = G.window.width - @w - x
-        when /^center_left$|^west$/i then y += (G.window.height - @h) / 2
-        when /^center$/i then x += (G.window.width - @w) / 2; y += (G.window.height - @h) / 2
-        when /^center_right$|^east$/i then x = G.window.width - @w - x; y += (G.window.height - @h) / 2
-        when /^bottom_left$|^southwest$/i then y = G.window.height - @h - y
-        when /^bottom_center$|^south$/i then x += (G.window.width - @w) / 2; y = G.window.height - @h - y
-        when /^bottom_right$|^southeast$/i then x = G.window.width - @w - x; y = G.window.height - @h - y
-        end
-      end
-      [x, y]
+    def set_position(x, y)
+      @x = x; @y = y
     end
   end
 
   class Panel
-    def initialize(x, y, w, h, img = nil, img_mode = :normal, retro = nil, scale_x = 1, scale_y = 1, anchor = nil)
-      if anchor
-        case anchor
-        when /^top_center$|^north$/i then x += (G.window.width - w) / 2
-        when /^top_right$|^northeast$/i then x = G.window.width - w - x
-        when /^center_left$|^west$/i then y += (G.window.height - h) / 2
-        when /^center$/i then x += (G.window.width - w) / 2; y += (G.window.height - h) / 2
-        when /^center_right$|^east$/i then x = G.window.width - w - x; y += (G.window.height - h) / 2
-        when /^bottom_left$|^southwest$/i then y = G.window.height - h - y
-        when /^bottom_center$|^south$/i then x += (G.window.width - w) / 2; y = G.window.height - h - y
-        when /^bottom_right$|^southeast$/i then x = G.window.width - w - x; y = G.window.height - h - y
-        end
-      end
+    attr_reader :enabled
+
+    attr_accessor :visible
+
+    def initialize(x, y, w, h, controls = [], img = nil, img_mode = :normal, retro = nil, scale_x = 1, scale_y = 1, anchor = nil)
+      _, x, y = FormUtils.check_anchor(anchor, x, y, w, h)
       @x = x; @y = y; @w = w; @h = h
+      @controls = controls
+      controls.each do |c|
+        _, x, y = FormUtils.check_anchor(c.anchor, c.anchor_offset_x, c.anchor_offset_y, c.w, c.h, @w, @h)
+        c.set_position(@x + x, @y + y)
+      end
 
       if img
         retro = Res.retro_images if retro.nil?
@@ -90,9 +99,22 @@ module MiniGL
           @img = Res.img(img, true, false, '.png', retro)
         end
       end
+
+      @visible = @enabled = true
+    end
+
+    def update
+      @controls.each(&:update)
+    end
+
+    def enabled=(value)
+      @enabled = value
+      @controls.each { |c| c.enabled = value }
     end
 
     def draw(alpha = 255, z_index = 0, color = 0xffffff)
+      return unless @visible
+
       c = (alpha << 24) | color
       if @img
         if @img.is_a?(Array)
@@ -109,6 +131,8 @@ module MiniGL
           @img.draw(@x, @y, z_index, @w.to_f / @img.width, @h.to_f / @img.height)
         end
       end
+
+      @controls.each { |k| k.draw(alpha, z_index, color) }
     end
   end
 
@@ -212,7 +236,8 @@ module MiniGL
           if img; @img[0].height * @scale_y
           else; height * @scale_y; end
 
-      x, y = check_anchor(anchor, x, y)
+      @anchor_offset_x = x; @anchor_offset_y = y
+      @anchor, x, y = FormUtils.check_anchor(anchor, x, y, @w, @h)
 
       super x, y, font, text, text_color, disabled_text_color
       @over_text_color = over_text_color
@@ -282,7 +307,7 @@ module MiniGL
 
     # Executes the button click action.
     def click
-      @action.call @params
+      @action.call @params if @action
     end
 
     # Sets the position of the button in the screen.
@@ -403,6 +428,8 @@ module MiniGL
       @h =
         if img; @img[0].height * @scale_y
         else; height * @scale_y; end
+      _, x, y = FormUtils.check_anchor(anchor, @anchor_offset_x, @anchor_offset_y, @w, @h)
+      set_position(x, y)
       @text_x = x + @w / 2 if center_x
       @text_y = y + @h / 2 if center_y
       @checked = checked
@@ -423,7 +450,7 @@ module MiniGL
     # been changed to checked, or +false+, otherwise.
     def click
       @checked = !@checked
-      @action.call @checked, @params
+      @action.call @checked, @params if @action
     end
 
     # Sets the state of the button to the value given.
@@ -543,7 +570,8 @@ module MiniGL
       @w = @img.width * @scale_x
       @h = @img.height * @scale_y
 
-      x, y = check_anchor(anchor, x, y)
+      @anchor_offset_x = x; @anchor_offset_y = y
+      @anchor, x, y = FormUtils.check_anchor(anchor, x, y, @w, @h)
 
       super x, y, font, text, text_color, disabled_text_color
       @cursor_img = Res.img(cursor_img, false, false, '.png', retro) if cursor_img
@@ -1035,7 +1063,8 @@ module MiniGL
       @w = (@bg ? @bg.width : w) * @scale_x
       @h = (@bg ? @bg.height : h) * @scale_y
 
-      x, y = check_anchor(anchor, x, y)
+      @anchor_offset_x = x; @anchor_offset_y = y
+      @anchor, x, y = FormUtils.check_anchor(anchor, x, y, @w, @h)
 
       super x, y, font, '', text_color, text_color
       # @fg_left = fg_left
@@ -1137,7 +1166,7 @@ module MiniGL
       if @font
         c = (alpha << 24) | @text_color
         @text = @format == '%' ? "#{(@value.to_f / @max_value * 100).round}%" : "#{@value}/#{@max_value}"
-        @font.draw_rel @text, @x + @w / 2, @y + @h / 2, 0, 0.5, 0.5, @scale_x, @scale_y, c
+        @font.draw_rel @text, @x + @w / 2, @y + @h / 2, z_index, 0.5, 0.5, @scale_x, @scale_y, c
       end
     end
   end
@@ -1227,7 +1256,8 @@ module MiniGL
       @h = @buttons[0].h
       @max_h = (@options.size + 1) * @h
 
-      x, y = check_anchor(anchor, x, y)
+      @anchor_offset_x = x; @anchor_offset_y = y
+      @anchor, x, y = FormUtils.check_anchor(anchor, x, y, @w, @h)
       super x, y, font, options[option], text_color, disabled_text_color
       @buttons[0].set_position(x, y)
 
@@ -1270,6 +1300,11 @@ module MiniGL
       toggle if @open
       @buttons[0].enabled = value
       @enabled = value
+    end
+
+    def set_position(x, y)
+      @x = x; @y = y
+      @buttons.each_with_index { |b, i| b.set_position(x, y + i * @h) }
     end
 
     # Draws the drop-down list.
