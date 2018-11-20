@@ -58,6 +58,60 @@ module MiniGL
     end
   end
 
+  class Panel
+    def initialize(x, y, w, h, img = nil, img_mode = :normal, retro = nil, scale_x = 1, scale_y = 1, anchor = nil)
+      if anchor
+        case anchor
+        when /^top_center$|^north$/i then x += (G.window.width - w) / 2
+        when /^top_right$|^northeast$/i then x = G.window.width - w - x
+        when /^center_left$|^west$/i then y += (G.window.height - h) / 2
+        when /^center$/i then x += (G.window.width - w) / 2; y += (G.window.height - h) / 2
+        when /^center_right$|^east$/i then x = G.window.width - w - x; y += (G.window.height - h) / 2
+        when /^bottom_left$|^southwest$/i then y = G.window.height - h - y
+        when /^bottom_center$|^south$/i then x += (G.window.width - w) / 2; y = G.window.height - h - y
+        when /^bottom_right$|^southeast$/i then x = G.window.width - w - x; y = G.window.height - h - y
+        end
+      end
+      @x = x; @y = y; @w = w; @h = h
+
+      if img
+        retro = Res.retro_images if retro.nil?
+        if img_mode == :tiled
+          @img = Res.imgs(img, 3, 3, true, '.png', retro, true)
+          @scale_x = scale_x
+          @scale_y = scale_y
+          @tile_w = @img[0].width * @scale_x
+          @tile_h = @img[0].height * @scale_y
+          @draw_center_x = @w > 2 * @tile_w
+          @draw_center_y = @h > 2 * @tile_h
+          @center_scale_x = (@w - 2 * @tile_w).to_f / @tile_w * @scale_x
+          @center_scale_y = (@h - 2 * @tile_h).to_f / @tile_h * @scale_y
+        else
+          @img = Res.img(img, true, false, '.png', retro)
+        end
+      end
+    end
+
+    def draw(alpha = 255, z_index = 0, color = 0xffffff)
+      c = (alpha << 24) | color
+      if @img
+        if @img.is_a?(Array)
+          @img[0].draw(@x, @y, z_index, @scale_x, @scale_y, c)
+          @img[1].draw(@x + @tile_w, @y, z_index, @center_scale_x, @scale_y, c) if @draw_center_x
+          @img[2].draw(@x + @w - @tile_w, @y, z_index, @scale_x, @scale_y, c)
+          @img[3].draw(@x, @y + @tile_h, z_index, @scale_x, @center_scale_y, c) if @draw_center_y
+          @img[4].draw(@x + @tile_w, @y + @tile_h, z_index, @center_scale_x, @center_scale_y, c) if @draw_center_x && @draw_center_y
+          @img[5].draw(@x + @w - @tile_w, @y + @tile_h, z_index, @scale_x, @center_scale_y, c) if @draw_center_y
+          @img[6].draw(@x, @y + @h - @tile_h, z_index, @scale_x, @scale_y, c)
+          @img[7].draw(@x + @tile_w, @y + @h - @tile_h, z_index, @center_scale_x, @scale_y, c) if @draw_center_x
+          @img[8].draw(@x + @w - @tile_w, @y + @h - @tile_h, z_index, @scale_x, @scale_y, c)
+        else
+          @img.draw(@x, @y, z_index, @w.to_f / @img.width, @h.to_f / @img.height)
+        end
+      end
+    end
+  end
+
   # This class represents a button.
   class Button < Component
     # The current state of the button.

@@ -615,12 +615,12 @@ module MiniGL
       # [retro] Whether the image should be loaded with the 'retro' option set
       #         (see +Gosu::Image+ for details). If the value is omitted, the
       #         +Res.retro_images+ value will be used.
-      def imgs(id, sprite_cols, sprite_rows, global = false, ext = '.png', retro = nil)
+      def imgs(id, sprite_cols, sprite_rows, global = false, ext = '.png', retro = nil, tileable = false)
         a = global ? @global_imgs : @imgs
         return a[id] if a[id]
         s = @prefix + @img_dir + id.to_s.split(@separator).join('/') + ext
         retro = Res.retro_images if retro.nil?
-        imgs = Gosu::Image.load_tiles s, -sprite_cols, -sprite_rows, tileable: false, retro: retro
+        imgs = Gosu::Image.load_tiles s, -sprite_cols, -sprite_rows, tileable: tileable, retro: retro
         a[id] = imgs
       end
 
