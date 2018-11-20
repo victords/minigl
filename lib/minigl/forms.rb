@@ -1,17 +1,17 @@
 require_relative 'global'
 
 module MiniGL
-  module FormUtils
+  module FormUtils # :nodoc:
     def self.check_anchor(anchor, x, y, w, h, area_w = G.window.width, area_h = G.window.height)
       if anchor
         case anchor
-        when /^top_center$|^north$/i then anchor_alias = :top_center; x += (area_w - w) / 2
+        when /^top(_center)?$|^north$/i then anchor_alias = :top_center; x += (area_w - w) / 2
         when /^top_right$|^northeast$/i then anchor_alias = :top_right; x = area_w - w - x
-        when /^center_left$|^west$/i then anchor_alias = :center_left; y += (area_h - h) / 2
+        when /^(center_)?left$|^west$/i then anchor_alias = :center_left; y += (area_h - h) / 2
         when /^center$/i then anchor_alias = :center; x += (area_w - w) / 2; y += (area_h - h) / 2
-        when /^center_right$|^east$/i then anchor_alias = :center_right; x = area_w - w - x; y += (area_h - h) / 2
+        when /^(center_)?right$|^east$/i then anchor_alias = :center_right; x = area_w - w - x; y += (area_h - h) / 2
         when /^bottom_left$|^southwest$/i then anchor_alias = :bottom_left; y = area_h - h - y
-        when /^bottom_center$|^south$/i then anchor_alias = :bottom_center; x += (area_w - w) / 2; y = area_h - h - y
+        when /^bottom(_center)?$|^south$/i then anchor_alias = :bottom_center; x += (area_w - w) / 2; y = area_h - h - y
         when /^bottom_right$|^southeast$/i then anchor_alias = :bottom_right; x = area_w - w - x; y = area_h - h - y
         else anchor_alias = :top_left
         end
@@ -37,7 +37,7 @@ module MiniGL
     # The height of the component
     attr_reader :h
 
-    attr_reader :anchor, :anchor_offset_x, :anchor_offset_y
+    attr_reader :anchor, :anchor_offset_x, :anchor_offset_y # :nodoc:
 
     # Determines whether the control is enabled, i.e., will process user input.
     attr_accessor :enabled
@@ -62,18 +62,52 @@ module MiniGL
       @enabled = @visible = true
     end
 
-    def update; end
+    def update; end # :nodoc:
 
+    # Sets the position of the component.
+    # Parameters:
+    # [x] The new x coordinate.
+    # [y] The new y coordinate.
     def set_position(x, y)
       @x = x; @y = y
     end
   end
 
+  # Represents a container of form components.
   class Panel
+    # Whether the components inside this panel are enabled.
     attr_reader :enabled
 
+    # Gets or sets whether the panel (and thus all components inside it) are visible.
     attr_accessor :visible
 
+    # Creates a new Panel.
+    # Parameters:
+    # [x] The horizontal coordinate of the top-left corner of the panel, or the horizontal offset from the anchor, if provided.
+    # [y] The vertical coordinate of the top-left corner of the panel, or the vertical offset from the anchor, if provided.
+    # [w] The width of the panel, in pixels.
+    # [h] The height of the panel, in pixels.
+    # [controls] An array of <code>Component</code>s that will be initially inside this panel.
+    # [img] Identifier of the image for the panel (see details in +Res::img+).
+    # [img_mode] Mode to scale the image. If +:normal+ (default), the image will be loaded as a single image and scaled to fit the entire size of the panel;
+    #            if +:tiled+, the image will be loaded as a 3x3 spritesheet, where the "corner" images (i.e., indices 0, 2, 6 and 8) will be scaled by the +scale_x+ and +scale_y+ parameters,
+    #            the "border" images (indices 1, 3, 5 and 7) will be stretched in the corresponding direction (indices 1 and 7 will be horizontally stretched and indices 3 and 5, vertically),
+    #            and the "center" image (index 4) will be stretched in both directions, as needed, to fill the width and height of the panel.
+    # [retro] Whether the image should be loaded in retro mode.
+    # [scale_x] The fixed horizontal scale for "corner" and left and right "border" images (if +img_mode+ is +:tiled+).
+    # [scale_y] The fixed vertical scale for "corner" and top and bottom "border" images (if +img_mode+ is +:tiled+).
+    # [anchor] An alias for a predefined position of the window to be used as "anchor", i.e., reference for the positioning of the panel.
+    #          Following are the valid values and a description of the corresponding position if +x+ and +y+ are 0 (these will be offsets from the reference position):
+    #          * +:north+ or +:top+ or +:top_center+: the panel will be horizontally centered and its top will be at the top of the window.
+    #          * +:northeast+ or +:top_right+: the top-right corner of the panel will meet the top-right corner of the window.
+    #          * +:west+ or +:left+ or +:center_left+: the panel will be vertically centered and its left edge will be at the left edge of the window.
+    #          * +:center+: the panel will be horizontally and vertically centered on the window.
+    #          * +:east+ or +:right+ or +:center_right+: the panel will be vertically centered and its right edge will be at the right edge of the window.
+    #          * +:southwest+ or +:bottom_left+: the bottom-left corner of the panel will meet the bottom-left corner of the window.
+    #          * +:south+ or +:bottom+ or +:bottom_center+: the panel will be horizontally centered and its bottom will be at the bottom of the window.
+    #          * +:southeast+ or +:bottom_right+: the bottom-right corner of the panel will meet the bottom-right corner of the window.
+    #          If a value is not provided, the reference is the top-left corner of the screen.
+    #          Components added as children of <code>Panel</code>s use the panel's coordinates as reference instead of the window.
     def initialize(x, y, w, h, controls = [], img = nil, img_mode = :normal, retro = nil, scale_x = 1, scale_y = 1, anchor = nil)
       _, x, y = FormUtils.check_anchor(anchor, x, y, w, h)
       @x = x; @y = y; @w = w; @h = h
@@ -103,15 +137,33 @@ module MiniGL
       @visible = @enabled = true
     end
 
+    # Updates all child components of this panel.
     def update
       @controls.each(&:update)
     end
 
+    # Enables or disables all child components of this panel.
+    # Parameters:
+    # [value] Whether the components should be enabled.
     def enabled=(value)
       @enabled = value
       @controls.each { |c| c.enabled = value }
     end
 
+    # Adds a component to this panel.
+    # Parameters:
+    # [c] The component to add.
+    def add_component(c)
+      _, x, y = FormUtils.check_anchor(c.anchor, c.anchor_offset_x, c.anchor_offset_y, c.w, c.h, @w, @h)
+      c.set_position(@x + x, @y + y)
+      @controls << c
+    end
+
+    # Draws the panel and all its child components.
+    # Parameters:
+    # [alpha] The opacity of the panel (0 = fully transparent, 255 = fully opaque).
+    # [z_index] The z-index to draw the panel.
+    # [color] The color to apply as filter to the panel image and to all child components' images as well.
     def draw(alpha = 255, z_index = 0, color = 0xffffff)
       return unless @visible
 
@@ -190,6 +242,7 @@ module MiniGL
     #         +Res.retro_images+ value will be used.
     # [scale_x] Horizontal scale to draw the component with.
     # [scale_y] Vertical scale to draw the component with.
+    # [anchor] See parameter with the same name in <code>Panel#initialize</code> for details.
     # [action] The block of code executed when the button is clicked (or by
     #          calling the +click+ method).
     #
@@ -528,6 +581,7 @@ module MiniGL
     #         +Res.retro_images+ value will be used.
     # [scale_x] Horizontal scale to draw the component with.
     # [scale_y] Vertical scale to draw the component with.
+    # [anchor] See parameter with the same name in <code>Panel#initialize</code> for details.
     # [on_text_changed] The block of code executed when the text in the text
     #                   field is changed, either by user input or by calling
     #                   +text=+. The new text is passed as a first parameter
@@ -1017,6 +1071,7 @@ module MiniGL
     #         +Res.retro_images+ value will be used.
     # [scale_x] Horizontal scale to draw the component with.
     # [scale_y] Vertical scale to draw the component with.
+    # [anchor] See parameter with the same name in <code>Panel#initialize</code> for details.
     #
     # *Obs.:* This method accepts named parameters, but +x+, +y+, +w+, +h+, +bg+
     # and +fg+ are mandatory.
@@ -1206,6 +1261,7 @@ module MiniGL
     #         +Res.retro_images+ value will be used.
     # [scale_x] Horizontal scale to draw the component with.
     # [scale_y] Vertical scale to draw the component with.
+    # [anchor] See parameter with the same name in <code>Panel#initialize</code> for details.
     # [on_changed] Action performed when the value of the dropdown is changed.
     #              It must be a block with two parameters, which will receive
     #              the old and the new value, respectively.

@@ -36,17 +36,17 @@ class MyGame < GameWindow
     @panel = Panel.new(10, 10,720, 520, [
       Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn),
       TextField.new(x: 5, y: 40, font: @font1, img: :text, margin_x: 5, margin_y: 5, anchor: :top_left),
-      Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :north),
+      Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :top),
       DropDownList.new(x: 0, y: 40, width: 150, height: 25, font: @font1, options: ['olá amigos', 'opção 2', 'terceira'], anchor: :north),
       Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :northeast),
-      Button.new(x: 5, y: 0, font: @font1, text: 'Teste', img: :btn, anchor: :west),
+      Button.new(x: 5, y: 0, font: @font1, text: 'Teste', img: :btn, anchor: :left),
       Button.new(x: 0, y: 0, font: @font1, text: 'Teste', img: :btn, anchor: :center),
-      Button.new(x: 5, y: 0, font: @font1, text: 'Teste', img: :btn, anchor: :east),
+      Button.new(x: 5, y: 0, font: @font1, text: 'Teste', img: :btn, anchor: :right),
       ToggleButton.new(x: 5, y: 40, img: :check, center_x: false, margin_x: 36, anchor: :east),
       Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :southwest),
       Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :south),
-      ProgressBar.new(0, 40, 200, 20, :barbg, :barfg, 3456, 70, 2, 2, @font1, 0xff000080, nil, nil, 1, 1, :bottom_center),
-      Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :southeast),
+      ProgressBar.new(0, 40, 200, 20, :barbg, :barfg, 3456, 70, 2, 2, @font1, 0xff000080, nil, nil, 1, 1, :bottom),
+
     ], :text, :tiled, true, 2, 2, :bottom_right)
 
     @eff = Effect.new(100, 100, :check, 2, 4, 10, nil, nil, '1')
@@ -77,6 +77,8 @@ class MyGame < GameWindow
     @ddl.visible = !@ddl.visible if KB.key_pressed? Gosu::KbW
     @panel.enabled = !@panel.enabled if KB.key_pressed? Gosu::KbN
     @panel.visible = !@panel.visible if KB.key_pressed? Gosu::KbM
+
+    @panel.add_component(Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :southeast)) if KB.key_pressed?(Gosu::KbB)
 
     @pb.increase 1 if KB.key_down? Gosu::KbD
     @pb.decrease 1 if KB.key_down? Gosu::KbA

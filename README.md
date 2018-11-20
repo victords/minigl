@@ -29,6 +29,8 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.1.2
+## Version 2.2.0
 
-  * Fixed `GameObject#draw` when rotated and scaled.
+  * Added the `tileable` option to `Res::imgs`.
+  * Added the `anchor` option to all form components.
+  * Added the `Panel` class, to easily group form components - take a look at the docs!
