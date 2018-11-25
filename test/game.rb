@@ -33,9 +33,10 @@ class MyGame < GameWindow
       puts "mudou de #{a} para #{b}"
     }
 
-    @panel = Panel.new(10, 10,720, 520, [
+    @panel = Panel.new(10, 10, 720, 520, [
       Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn),
-      TextField.new(x: 5, y: 40, font: @font1, img: :text, margin_x: 5, margin_y: 5, anchor: :top_left),
+      Label.new(10, 70, @font1, 'Teste de label', 0x000066, 0x666666),
+      TextField.new(x: 5, y: 40, font: @font1, text: 'Opa', img: :text, margin_x: 5, margin_y: 5, anchor: :top_left),
       Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :top),
       DropDownList.new(x: 0, y: 40, width: 150, height: 25, font: @font1, options: ['olá amigos', 'opção 2', 'terceira'], anchor: :north),
       Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :northeast),
@@ -45,8 +46,7 @@ class MyGame < GameWindow
       ToggleButton.new(x: 5, y: 40, img: :check, center_x: false, margin_x: 36, anchor: :east),
       Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :southwest),
       Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :south),
-      ProgressBar.new(0, 40, 200, 20, :barbg, :barfg, 3456, 70, 2, 2, @font1, 0xff000080, nil, nil, 1, 1, :bottom),
-
+      ProgressBar.new(0, 40, 200, 20, :barbg, :barfg, 3456, 70, 2, 2, @font1, 0xff000080, nil, nil, 1, 1, :bottom)
     ], :text, :tiled, true, 2, 2, :bottom_right)
 
     @eff = Effect.new(100, 100, :check, 2, 4, 10, nil, nil, '1')

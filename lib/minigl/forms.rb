@@ -23,7 +23,7 @@ module MiniGL
   end
 
   # This class is an abstract ancestor for all form components (Button,
-  # ToggleButton and TextField).
+  # ToggleButton, TextField, DropDownList and ProgressBar).
   class Component
     # The horizontal coordinate of the component
     attr_reader :x
@@ -75,6 +75,18 @@ module MiniGL
 
   # Represents a container of form components.
   class Panel
+    # The horizontal position of the panel from the top left corner of the window.
+    attr_reader :x
+
+    # The vertical position of the panel from the top left corner of the window.
+    attr_reader :y
+
+    # The width of the panel in pixels.
+    attr_reader :w
+
+    # The height of the panel in pixels.
+    attr_reader :h
+
     # Whether the components inside this panel are enabled.
     attr_reader :enabled
 
@@ -636,7 +648,9 @@ module MiniGL
       @text_y = y + margin_y * @scale_y
       @selection_color = selection_color
 
-      @nodes = [x + margin_x * @scale_x]
+      @nodes = [@text_x]
+      send(:text=, text, false) if text
+
       @cur_node = 0
       @cursor_visible = false
       @cursor_timer = 0
@@ -840,7 +854,7 @@ module MiniGL
     # [value] The new text to be set. If it's longer than the +max_length+
     #         parameter used in the constructor, it will be truncated to
     #         +max_length+ characters.
-    def text=(value)
+    def text=(value, trigger_changed = true)
       @text = value[0...@max_length]
       @nodes.clear; @nodes << @text_x
       x = @nodes[0]
@@ -852,7 +866,7 @@ module MiniGL
       @anchor1 = nil
       @anchor2 = nil
       set_cursor_visible
-      @on_text_changed.call @text, @params if @on_text_changed
+      @on_text_changed.call @text, @params if trigger_changed && @on_text_changed
     end
 
     # Sets the locale used by the text field to detect keys. Only 'en-us' and
@@ -1405,6 +1419,33 @@ module MiniGL
         @buttons[1..-1].each { |b| b.visible = true }
         @open = true
       end
+    end
+  end
+
+  class Label < Component
+    def initialize(x, y = nil, font = nil, text = nil, text_color = 0, disabled_text_color = 0, scale_x = 1, scale_y = 1, anchor: nil)
+      if x.is_a? Hash
+        y = x[:y]
+        font = x[:font]
+        text = x[:text]
+        text_color = x.fetch(:text_color, 0)
+        disabled_text_color = x.fetch(:disabled_text_color, 0)
+        scale_x = x.fetch(:scale_x, 1)
+        scale_y = x.fetch(:scale_y, 1)
+        anchor = x.fetch(:anchor, nil)
+      end
+
+      @scale_x = scale_x
+      @scale_y = scale_y
+      @w = font.text_width(text) * scale_x
+      @h = font.height * scale_y
+      @anchor, x, y = FormUtils.check_anchor(anchor, x, y, @w, @h)
+      super(x, y, font, text, text_color, disabled_text_color)
+    end
+
+    def draw(alpha = 255, z_index = 0)
+      color = (alpha << 24) | (@enabled ? @text_color : @disabled_text_color)
+      @font.draw(@text, @x, @y, z_index, @scale_x, @scale_y, color)
     end
   end
 end
