@@ -35,7 +35,7 @@ class MyGame < GameWindow
 
     @panel = Panel.new(10, 10, 720, 520, [
       Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn),
-      Label.new(10, 70, @font1, 'Teste de label', 0x000066, 0x666666),
+      Label.new(0, 70, @font1, 'Teste de label', 0x000066, 0x666666, 1, 1, :north),
       TextField.new(x: 5, y: 40, font: @font1, text: 'Opa', img: :text, margin_x: 5, margin_y: 5, anchor: :top_left),
       Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :top),
       DropDownList.new(x: 0, y: 40, width: 150, height: 25, font: @font1, options: ['olá amigos', 'opção 2', 'terceira'], anchor: :north),

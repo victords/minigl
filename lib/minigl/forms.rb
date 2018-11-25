@@ -1403,10 +1403,11 @@ module MiniGL
           G.window.draw_quad b.x, b.y, c,
                              b.x + b.w, b.y, c,
                              b.x + b.w, b.y + b.h, c,
-                             b.x, b.y + b.h, c, z_index if b.visible
+                             b.x, b.y + b.h, c, z_index + 1 if b.visible
         end
       end
-      @buttons.each { |b| b.draw alpha, z_index, color }
+      @buttons[0].draw(alpha, z_index, color)
+      @buttons[1..-1].each { |b| b.draw alpha, z_index + 1, color }
     end
 
     private
@@ -1423,7 +1424,7 @@ module MiniGL
   end
 
   class Label < Component
-    def initialize(x, y = nil, font = nil, text = nil, text_color = 0, disabled_text_color = 0, scale_x = 1, scale_y = 1, anchor: nil)
+    def initialize(x, y = nil, font = nil, text = nil, text_color = 0, disabled_text_color = 0, scale_x = 1, scale_y = 1, anchor = nil)
       if x.is_a? Hash
         y = x[:y]
         font = x[:font]
@@ -1433,17 +1434,19 @@ module MiniGL
         scale_x = x.fetch(:scale_x, 1)
         scale_y = x.fetch(:scale_y, 1)
         anchor = x.fetch(:anchor, nil)
+        x = x[:x]
       end
 
       @scale_x = scale_x
       @scale_y = scale_y
       @w = font.text_width(text) * scale_x
       @h = font.height * scale_y
+      @anchor_offset_x = x; @anchor_offset_y = y
       @anchor, x, y = FormUtils.check_anchor(anchor, x, y, @w, @h)
       super(x, y, font, text, text_color, disabled_text_color)
     end
 
-    def draw(alpha = 255, z_index = 0)
+    def draw(alpha = 255, z_index = 0, color = 0xffffff)
       color = (alpha << 24) | (@enabled ? @text_color : @disabled_text_color)
       @font.draw(@text, @x, @y, z_index, @scale_x, @scale_y, color)
     end
