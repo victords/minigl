@@ -1255,7 +1255,7 @@ module MiniGL
     # Parameters:
     # [x] The x-coordinate of the object.
     # [y] The y-coordinate of the object.
-    # [font] Font to be used by the buttons that compose the drop-donwn list.
+    # [font] Font to be used by the buttons that compose the drop-down list.
     # [img] Image of the main button, i.e., the one at the top, that toggles
     #       visibility of the other buttons (the "option" buttons).
     # [opt_img] Image for the "option" buttons, as described above.
@@ -1423,7 +1423,20 @@ module MiniGL
     end
   end
 
+  # This class represents a label.
   class Label < Component
+    # Creates a new label.
+    #
+    # Parameters:
+    # [x] The x-coordinate of the label.
+    # [y] The x-coordinate of the label.
+    # [font] Font that will be used to draw the label's text.
+    # [text] The label's text.
+    # [text_color] The default text color.
+    # [disabled_text_color] The text color when the label is disabled.
+    # [scale_x] The horizontal scale factor.
+    # [scale_y] The vertical scale factor.
+    # [anchor] See parameter with the same name in <code>Panel#initialize</code> for details.
     def initialize(x, y = nil, font = nil, text = nil, text_color = 0, disabled_text_color = 0, scale_x = 1, scale_y = 1, anchor = nil)
       if x.is_a? Hash
         y = x[:y]
@@ -1446,8 +1459,26 @@ module MiniGL
       super(x, y, font, text, text_color, disabled_text_color)
     end
 
+    # Draws the label.
+    #
+    # Parameters:
+    # [alpha] The opacity with which the label will be drawn. Allowed values
+    #         vary between 0 (fully transparent) and 255 (fully opaque).
+    # [z_index] The z-order to draw the object. Objects with larger z-orders
+    #           will be drawn on top of the ones with smaller z-orders.
+    # [color] Color to apply a filter to the text.
     def draw(alpha = 255, z_index = 0, color = 0xffffff)
-      color = (alpha << 24) | (@enabled ? @text_color : @disabled_text_color)
+      c = @enabled ? @text_color : @disabled_text_color
+      r1 = c >> 16
+      g1 = (c & 0xff00) >> 8
+      b1 = (c & 0xff)
+      r2 = color >> 16
+      g2 = (color & 0xff00) >> 8
+      b2 = (color & 0xff)
+      r1 *= r2; r1 /= 255
+      g1 *= g2; g1 /= 255
+      b1 *= b2; b1 /= 255
+      color = (alpha << 24) | (r1 << 16) | (g1 << 8) | b1
       @font.draw(@text, @x, @y, z_index, @scale_x, @scale_y, color)
     end
   end
