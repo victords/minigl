@@ -29,8 +29,8 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.2.0
+## Version 2.2.1
 
-  * Added the `tileable` option to `Res::imgs`.
-  * Added the `anchor` option to all form components.
-  * Added the `Panel` class, to easily group form components - take a look at the docs!
+  * Added the `Label` class.
+  * Made the `x`, `y`, `w` and `h` of `Panel`s accessible.
+  * Fixed bug in `TextField` with starting text.
