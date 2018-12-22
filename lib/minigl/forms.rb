@@ -196,7 +196,7 @@ module MiniGL
         end
       end
 
-      @controls.each { |k| k.draw(alpha, z_index, color) }
+      @controls.each { |k| k.draw(alpha, z_index, color) if k.visible }
     end
   end
 
