@@ -127,11 +127,11 @@ class MyGame < GameWindow
     @obj3.draw flip: @flip
     @obj4.draw round: true
     @objs.each { |o| o.draw }
-    @writer1.write_line text: 'Testing effect 1', x: 400, y: 260, color: 0xffffff, effect: :border
-    @writer2.write_line 'Second effect test', 400, 280, :center, 0xffffff, 255, :border, 0xff0000, 2
+    @writer1.write_line text: 'Testing <b>effect</b> 1', x: 400, y: 260, color: 0xffffff, effect: :border
+    @writer2.write_line 'Second <i>effect</i> test', 400, 280, :center, 0xffffff, 255, :border, 0xff0000, 2
     @writer2.write_line 'Text with shadow!!', 400, 340, :center, 0xffff00, 255, :shadow, 0, 2, 0x80
-    @writer1.write_breaking "Testing multiple line text.\nThis should draw text "\
-                            'across multiple lines, respecting a limit width. '\
+    @writer1.write_breaking "Testing <b>multiple line</b> text.\nThis should draw text "\
+                            'across multiple lines, <i>respecting</i> a limit <c=0000ff>width</c>. '\
                             'Furthermore, the text must be right-aligned.',
                             780, 450, 300, :right, 0xff0000, 255, 1
 

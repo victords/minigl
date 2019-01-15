@@ -16,7 +16,8 @@ module MiniGL
     # Draws a single line of text.
     #
     # Parameters:
-    # [text] The text to be drawn. No line breaks are allowed.
+    # [text] The text to be drawn. No line breaks are allowed. You can use the
+	#        `<b>` tag for bold, `<i>` for italic and `<c=rrggbb>` for colors.
     # [x] The horizontal reference for drawing the text. If +mode+ is +:left+,
     #     all text will be drawn from this point to the right; if +mode+ is
     #     +:right+, all text will be drawn from this point to the left; and if
@@ -73,26 +74,27 @@ module MiniGL
       if effect
         effect_color = (effect_alpha << 24) | effect_color
         if effect == :border
-          @font.draw_rel text, x - effect_size, y - effect_size, z_index, rel, 0, 1, 1, effect_color
-          @font.draw_rel text, x, y - effect_size, z_index, rel, 0, 1, 1, effect_color
-          @font.draw_rel text, x + effect_size, y - effect_size, z_index, rel, 0, 1, 1, effect_color
-          @font.draw_rel text, x + effect_size, y, z_index, rel, 0, 1, 1, effect_color
-          @font.draw_rel text, x + effect_size, y + effect_size, z_index, rel, 0, 1, 1, effect_color
-          @font.draw_rel text, x, y + effect_size, z_index, rel, 0, 1, 1, effect_color
-          @font.draw_rel text, x - effect_size, y + effect_size, z_index, rel, 0, 1, 1, effect_color
-          @font.draw_rel text, x - effect_size, y, z_index, rel, 0, 1, 1, effect_color
+          @font.draw_markup_rel text, x - effect_size, y - effect_size, z_index, rel, 0, 1, 1, effect_color
+          @font.draw_markup_rel text, x, y - effect_size, z_index, rel, 0, 1, 1, effect_color
+          @font.draw_markup_rel text, x + effect_size, y - effect_size, z_index, rel, 0, 1, 1, effect_color
+          @font.draw_markup_rel text, x + effect_size, y, z_index, rel, 0, 1, 1, effect_color
+          @font.draw_markup_rel text, x + effect_size, y + effect_size, z_index, rel, 0, 1, 1, effect_color
+          @font.draw_markup_rel text, x, y + effect_size, z_index, rel, 0, 1, 1, effect_color
+          @font.draw_markup_rel text, x - effect_size, y + effect_size, z_index, rel, 0, 1, 1, effect_color
+          @font.draw_markup_rel text, x - effect_size, y, z_index, rel, 0, 1, 1, effect_color
         elsif effect == :shadow
-          @font.draw_rel text, x + effect_size, y + effect_size, z_index, rel, 0, 1, 1, effect_color
+          @font.draw_markup_rel text, x + effect_size, y + effect_size, z_index, rel, 0, 1, 1, effect_color
         end
       end
-      @font.draw_rel text, x, y, z_index, rel, 0, 1, 1, color
+      @font.draw_markup_rel text, x, y, z_index, rel, 0, 1, 1, color
     end
 
     # Draws text, breaking lines when needed and when explicitly caused by the
     # "\n" character.
     #
     # Parameters:
-    # [text] The text to be drawn. Line breaks are allowed.
+    # [text] The text to be drawn. Line breaks are allowed. You can use the
+	#        `<b>` tag for bold, `<i>` for italic and `<c=rrggbb>` for colors.
     # [x] The horizontal reference for drawing the text. Works like in
     #     +write_line+ for the +:left+, +:right+ and +:center+ modes. For the
     #     +:justified+ mode, works the same as for +:left+.
@@ -131,17 +133,17 @@ module MiniGL
       line = ''
       line_width = 0
       text.split(' ').each do |word|
-        w = @font.text_width word
+        w = @font.markup_width word
         if line_width + w > width
-          @font.draw_rel line.chop, x, y, z_index, rel, 0, 1, 1, color
+          @font.draw_markup_rel line.chop, x, y, z_index, rel, 0, 1, 1, color
           line = ''
           line_width = 0
           y += @font.height + @line_spacing
         end
         line += "#{word} "
-        line_width += @font.text_width "#{word} "
+        line_width += @font.markup_width "#{word} "
       end
-      @font.draw_rel line.chop, x, y, z_index, rel, 0, 1, 1, color unless line.empty?
+      @font.draw_markup_rel line.chop, x, y, z_index, rel, 0, 1, 1, color unless line.empty?
       y + @font.height + @line_spacing
     end
 
@@ -152,7 +154,7 @@ module MiniGL
       new_x = x
       words = text.split(' ')
       words.each do |word|
-        w = @font.text_width word
+        w = @font.markup_width word
         if new_x + w > x + width
           space = x + width - new_x + space_width
           index = 0
@@ -168,7 +170,7 @@ module MiniGL
 
           new_x = x
         end
-        new_x += @font.text_width(word) + space_width
+        new_x += @font.markup_width(word) + space_width
         spaces[line_index] << space_width
       end
 
@@ -176,8 +178,8 @@ module MiniGL
       spaces.each do |line|
         new_x = x
         line.each do |s|
-          @font.draw words[index], new_x, y, z_index, 1, 1, color
-          new_x += @font.text_width(words[index]) + s
+          @font.draw_markup words[index], new_x, y, z_index, 1, 1, color
+          new_x += @font.markup_width(words[index]) + s
           index += 1
         end
         y += @font.height + @line_spacing

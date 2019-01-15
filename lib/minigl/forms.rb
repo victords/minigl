@@ -416,9 +416,9 @@ module MiniGL
         if @center_x or @center_y
           rel_x = @center_x ? 0.5 : 0
           rel_y = @center_y ? 0.5 : 0
-          @font.draw_rel @text, @text_x, @text_y, z_index, rel_x, rel_y, @scale_x, @scale_y, text_color
+          @font.draw_text_rel @text, @text_x, @text_y, z_index, rel_x, rel_y, @scale_x, @scale_y, text_color
         else
-          @font.draw @text, @text_x, @text_y, z_index, @scale_x, @scale_y, text_color
+          @font.draw_text @text, @text_x, @text_y, z_index, @scale_x, @scale_y, text_color
         end
       end
     end
@@ -943,7 +943,7 @@ module MiniGL
       text_color = (alpha << 24) | (@enabled ? @text_color : @disabled_text_color)
       img = ((@enabled or @disabled_img.nil?) ? @img : @disabled_img)
       img.draw @x, @y, z_index, @scale_x, @scale_y, color
-      @font.draw @text, @text_x, @text_y, z_index, @scale_x, @scale_y, text_color
+      @font.draw_text @text, @text_x, @text_y, z_index, @scale_x, @scale_y, text_color
 
       if @anchor1 and @anchor2
         selection_color = ((alpha / 2) << 24) | @selection_color
@@ -1235,7 +1235,7 @@ module MiniGL
       if @font
         c = (alpha << 24) | @text_color
         @text = @format == '%' ? "#{(@value.to_f / @max_value * 100).round}%" : "#{@value}/#{@max_value}"
-        @font.draw_rel @text, @x + @w / 2, @y + @h / 2, z_index, 0.5, 0.5, @scale_x, @scale_y, c
+        @font.draw_text_rel @text, @x + @w / 2, @y + @h / 2, z_index, 0.5, 0.5, @scale_x, @scale_y, c
       end
     end
   end
@@ -1479,7 +1479,7 @@ module MiniGL
       g1 *= g2; g1 /= 255
       b1 *= b2; b1 /= 255
       color = (alpha << 24) | (r1 << 16) | (g1 << 8) | b1
-      @font.draw(@text, @x, @y, z_index, @scale_x, @scale_y, color)
+      @font.draw_text(@text, @x, @y, z_index, @scale_x, @scale_y, color)
     end
   end
 end
