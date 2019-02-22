@@ -4,6 +4,11 @@ module MiniGL
   # This class provides easy control of a tile map, i.e., a map consisting of
   # a grid of equally sized tiles. It also provides viewport control, through
   # its camera property and methods.
+  # When working with +GameObject+, +Sprite+ and +Effect+ inside a +Map+, you
+  # should provide the map instance as parameter to the +draw+ method of these;
+  # when using Gosu's +Image+, you'll need to manually subtract the coordinates
+  # of the camera from the position of the image, like this:
+  # <code>img.draw(x - map.cam.x, y - map.cam.y, z)</code>
   class Map
     SQRT_2_DIV_2 = Math.sqrt(2) / 2 # :nodoc:
     MINUS_PI_DIV_4 = -Math::PI / 4 # :nodoc:
@@ -87,10 +92,10 @@ module MiniGL
     def get_map_pos(scr_x, scr_y)
       return Vector.new((scr_x + @cam.x) / @tile_size.x, (scr_y + @cam.y) / @tile_size.y) unless @isometric
 
-      # Obtém a posição transformada para as coordenadas isométricas
+      # Gets the position transformed to isometric coordinates
       v = get_isometric_position scr_x, scr_y
 
-      # Depois divide pelo tamanho do quadrado para achar a posição da matriz
+      # divides by the square size to find the position in the matrix
       Vector.new((v.x * @inverse_square_size).to_i, (v.y * @inverse_square_size).to_i)
     end
 
@@ -232,23 +237,23 @@ module MiniGL
     end
 
     def get_isometric_position(scr_x, scr_y)
-      # Escreve a posição em relação a origem (no centro do mapa)
+      # Gets the position relative to the center of the map
       center = get_center
       position = Vector.new scr_x + @cam.x - center.x, scr_y + @cam.y - center.y
 
-      # Multiplica por tile_ratio para obter tiles quadrados
+      # Multiplies by tile_ratio to get square tiles
       position.y *= @tile_ratio
 
-      # O centro do mapa também é deslocado
+      # Moves the center of the map accordingly
       center.y *= @tile_ratio
 
-      # Rotaciona o vetor posição -45°
+      # Rotates the position -45 degrees
       position.rotate! MINUS_PI_DIV_4
 
-      # Retorna a referência da posição para o canto da tela
+      # Returns the reference to the center of the map
       position += center
 
-      # O mapa quadrado está centralizado no centro do losango, precisa retornar ao canto da tela
+      # Returns to the corner of the screen
       position.x -= @isometric_offset_x; position.y -= @isometric_offset_y
       position
     end

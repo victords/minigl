@@ -151,6 +151,7 @@ module MiniGL
 
     # Updates all child components of this panel.
     def update
+      return unless @visible
       @controls.each(&:update)
     end
 

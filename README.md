@@ -29,7 +29,7 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.2.3
+## Version 2.2.4
 
-  * `TextHelper` methods now allow markup (bold, italic and colors).
-  * Removed the deprecation warnings from `TextHelper` and forms components' methods.
+  * Fixed components being updated in invisible `Panel`s.
+  * Clarified the documentation of the `Map` class.
