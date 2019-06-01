@@ -29,7 +29,6 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.2.4
+## Version 2.2.5
 
-  * Fixed components being updated in invisible `Panel`s.
-  * Clarified the documentation of the `Map` class.
+  * Fixed `Sprite#animate_once` and added the possibility of passing a callback.

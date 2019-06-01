@@ -116,6 +116,11 @@ class MyGame < GameWindow
     @objs.each_with_index do |o, i|
       o.move_free(i * 45, 3)
     end
+
+    @obj3.animate_once([1, 2, 3, 4], 15) do
+      puts 'acabou'
+    end
+    @obj3.set_animation 0 if KB.key_pressed? Gosu::KB_0
   end
 
   def draw
