@@ -82,7 +82,10 @@ module MiniGL
     # [interval] The amount of frames between each change in the image index.
     #            See +animate+ for details.
     def animate_once(indices, interval)
-      return if @animate_once_control == 2
+      if @animate_once_control == 2
+        return if indices == @animate_once_indices && interval == @animate_once_interval
+        @animate_once_control = 0
+      end
 
       unless @animate_once_control == 1
         @anim_counter = 0

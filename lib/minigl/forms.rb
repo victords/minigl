@@ -37,6 +37,9 @@ module MiniGL
     # The height of the component
     attr_reader :h
 
+    # The text of the component
+    attr_reader :text
+
     attr_reader :anchor, :anchor_offset_x, :anchor_offset_y # :nodoc:
 
     # Determines whether the control is enabled, i.e., will process user input.
@@ -51,6 +54,8 @@ module MiniGL
     # text in a text field, etc.). More detail can be found in the constructor
     # for each specific component class.
     attr_accessor :params
+
+    attr_accessor :panel # :nodoc:
 
     def initialize(x, y, font, text, text_color, disabled_text_color) # :nodoc:
       @x = x
@@ -127,6 +132,7 @@ module MiniGL
       controls.each do |c|
         _, x, y = FormUtils.check_anchor(c.anchor, c.anchor_offset_x, c.anchor_offset_y, c.w, c.h, @w, @h)
         c.set_position(@x + x, @y + y)
+        c.panel = self
       end
 
       if img
@@ -537,9 +543,6 @@ module MiniGL
 
   # This class represents a text field (input).
   class TextField < Component
-    # The current text inside the text field.
-    attr_reader :text
-
     # The current 'locale' used for detecting the keys. THIS FEATURE IS
     # INCOMPLETE!
     attr_reader :locale
@@ -1458,6 +1461,22 @@ module MiniGL
       @anchor_offset_x = x; @anchor_offset_y = y
       @anchor, x, y = FormUtils.check_anchor(anchor, x, y, @w, @h)
       super(x, y, font, text, text_color, disabled_text_color)
+    end
+
+    # Changes the label's text.
+    #
+    # Parameters:
+    # [new_text] The new text to show in the label.
+    def text=(new_text)
+      @text = new_text
+      @w = @font.text_width(@text) * @scale_x
+      x = @anchor_offset_x; y = @anchor_offset_y
+      _, x, y = FormUtils.check_anchor(@anchor, x, y, @w, @h, panel ? panel.w : G.window.width, panel ? panel.h : G.window.height)
+      if panel
+        set_position(panel.x + x, panel.y + y)
+      else
+        set_position(x, y)
+      end
     end
 
     # Draws the label.

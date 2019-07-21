@@ -29,6 +29,7 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.2.5
+## Version 2.2.6
 
-  * Fixed `Sprite#animate_once` and added the possibility of passing a callback.
+  * Made the `text` readable in all form components.
+  * Added the `text=` method to `Label`.

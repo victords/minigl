@@ -35,7 +35,7 @@ class MyGame < GameWindow
 
     @panel = Panel.new(10, 10, 720, 520, [
       Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn),
-      Label.new(0, 70, @font1, 'Teste de label', 0xcccccc, 0x666666, 1, 1, :north),
+      @lbl = Label.new(0, 70, @font1, 'Teste de label', 0, 0x666666, 1, 1, :north),
       TextField.new(x: 5, y: 40, font: @font1, text: 'Opa', img: :text, margin_x: 5, margin_y: 5, anchor: :top_left),
       Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :top),
       DropDownList.new(x: 0, y: 40, width: 150, height: 25, font: @font1, options: ['olá amigos', 'opção 2', 'terceira'], anchor: :north),
@@ -48,6 +48,8 @@ class MyGame < GameWindow
       Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :south),
       ProgressBar.new(0, 40, 200, 20, :barbg, :barfg, 3456, 70, 2, 2, @font1, 0xff000080, nil, nil, 1, 1, :bottom)
     ], :text, :tiled, true, 2, 2, :bottom_right)
+
+    @lbl2 = Label.new(x: 5, y: 5, font: @font1, text: 'top-right corner label test', anchor: :top_right)
 
     @eff = Effect.new(100, 100, :check, 2, 4, 10, nil, nil, '1')
 
@@ -79,6 +81,8 @@ class MyGame < GameWindow
     @panel.visible = !@panel.visible if KB.key_pressed? Gosu::KbM
 
     @panel.add_component(Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :southeast)) if KB.key_pressed?(Gosu::KbB)
+    @lbl.text = 'Test of changed text' if KB.key_pressed?(Gosu::KB_C)
+    @lbl2.text = 'Shorter text' if KB.key_pressed?(Gosu::KB_X)
 
     @pb.increase 1 if KB.key_down? Gosu::KbD
     @pb.decrease 1 if KB.key_down? Gosu::KbA
@@ -145,6 +149,7 @@ class MyGame < GameWindow
     @chk.draw
     @txt.draw
     @pb.draw 0x66
+    @lbl2.draw
 
     @panel.draw(204, 10)
 
