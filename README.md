@@ -33,3 +33,8 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
 
   * Made the `text` readable in all form components.
   * Added the `text=` method to `Label`.
+
+## Contributing
+
+Contributions are very welcome. Feel free to fork and send pull requests.
+Also, you can support my work by donating bitcoins to this wallet: bc1qsp7mypdqvkt88xtnarmaytt0etxfccxr5pt5tk
