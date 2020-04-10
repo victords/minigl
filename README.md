@@ -5,9 +5,9 @@ top of the [Gosu](http://www.libgosu.org/) gem.
 
 It provides the following features:
 
-  * Resource management (images, sounds, ...)
-  * Input manipulation (keyboard, mouse, ...)
-  * UI (text, buttons, text fields, ...)
+  * Resource management (images, sound effects, songs, tilesets, fonts)
+  * Input manipulation (keyboard, mouse, joystick)
+  * UI (text, buttons, text fields, drop-down lists, progress bars)
   * Basic physics and collision checking
   * Animated objects
 
@@ -29,10 +29,9 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.2.6
+## Version 2.2.7
 
-  * Made the `text` readable in all form components.
-  * Added the `text=` method to `Label`.
+  * Add support for gamepad/joystick buttons in the `KB` class.
 
 ## Contributing
 

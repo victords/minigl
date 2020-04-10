@@ -247,9 +247,7 @@ module MiniGL
     end
   end
 
-  #class JSHelper
-
-  # Exposes methods for controlling keyboard events.
+  # Exposes methods for controlling keyboard and gamepad events.
   module KB
     class << self
       # This is called by <code>GameWindow.initialize</code>. Don't call it
@@ -278,7 +276,27 @@ module MiniGL
           Gosu::KB_PAGE_UP, Gosu::KB_PERIOD, Gosu::KB_RETURN, Gosu::KB_RIGHT,
           Gosu::KB_RIGHT_ALT, Gosu::KB_RIGHT_BRACKET, Gosu::KB_RIGHT_CONTROL,
           Gosu::KB_RIGHT_META, Gosu::KB_RIGHT_SHIFT, Gosu::KB_SEMICOLON,
-          Gosu::KB_SLASH, Gosu::KB_SPACE, Gosu::KB_TAB, Gosu::KB_UP
+          Gosu::KB_SLASH, Gosu::KB_SPACE, Gosu::KB_TAB, Gosu::KB_UP,
+          Gosu::GP_0_BUTTON_0, Gosu::GP_0_BUTTON_1, Gosu::GP_0_BUTTON_2, Gosu::GP_0_BUTTON_3,
+          Gosu::GP_0_BUTTON_4, Gosu::GP_0_BUTTON_5, Gosu::GP_0_BUTTON_6, Gosu::GP_0_BUTTON_7,
+          Gosu::GP_0_BUTTON_8, Gosu::GP_0_BUTTON_9, Gosu::GP_0_BUTTON_10, Gosu::GP_0_BUTTON_11,
+          Gosu::GP_0_BUTTON_12, Gosu::GP_0_BUTTON_13, Gosu::GP_0_BUTTON_14, Gosu::GP_0_BUTTON_15,
+          Gosu::GP_0_DOWN, Gosu::GP_0_LEFT, Gosu::GP_0_RIGHT, Gosu::GP_0_UP,
+          Gosu::GP_1_BUTTON_0, Gosu::GP_1_BUTTON_1, Gosu::GP_1_BUTTON_2, Gosu::GP_1_BUTTON_3,
+          Gosu::GP_1_BUTTON_4, Gosu::GP_1_BUTTON_5, Gosu::GP_1_BUTTON_6, Gosu::GP_1_BUTTON_7,
+          Gosu::GP_1_BUTTON_8, Gosu::GP_1_BUTTON_9, Gosu::GP_1_BUTTON_10, Gosu::GP_1_BUTTON_11,
+          Gosu::GP_1_BUTTON_12, Gosu::GP_1_BUTTON_13, Gosu::GP_1_BUTTON_14, Gosu::GP_1_BUTTON_15,
+          Gosu::GP_1_DOWN, Gosu::GP_1_LEFT, Gosu::GP_1_RIGHT, Gosu::GP_1_UP,
+          Gosu::GP_2_BUTTON_0, Gosu::GP_2_BUTTON_1, Gosu::GP_2_BUTTON_2, Gosu::GP_2_BUTTON_3,
+          Gosu::GP_2_BUTTON_4, Gosu::GP_2_BUTTON_5, Gosu::GP_2_BUTTON_6, Gosu::GP_2_BUTTON_7,
+          Gosu::GP_2_BUTTON_8, Gosu::GP_2_BUTTON_9, Gosu::GP_2_BUTTON_10, Gosu::GP_2_BUTTON_11,
+          Gosu::GP_2_BUTTON_12, Gosu::GP_2_BUTTON_13, Gosu::GP_2_BUTTON_14, Gosu::GP_2_BUTTON_15,
+          Gosu::GP_2_DOWN, Gosu::GP_2_LEFT, Gosu::GP_2_RIGHT, Gosu::GP_2_UP,
+          Gosu::GP_3_BUTTON_0, Gosu::GP_3_BUTTON_1, Gosu::GP_3_BUTTON_2, Gosu::GP_3_BUTTON_3,
+          Gosu::GP_3_BUTTON_4, Gosu::GP_3_BUTTON_5, Gosu::GP_3_BUTTON_6, Gosu::GP_3_BUTTON_7,
+          Gosu::GP_3_BUTTON_8, Gosu::GP_3_BUTTON_9, Gosu::GP_3_BUTTON_10, Gosu::GP_3_BUTTON_11,
+          Gosu::GP_3_BUTTON_12, Gosu::GP_3_BUTTON_13, Gosu::GP_3_BUTTON_14, Gosu::GP_3_BUTTON_15,
+          Gosu::GP_3_DOWN, Gosu::GP_3_LEFT, Gosu::GP_3_RIGHT, Gosu::GP_3_UP,
         ]
         @down = []
         @prev_down = []
