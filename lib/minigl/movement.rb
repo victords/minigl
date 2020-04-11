@@ -504,16 +504,32 @@ module MiniGL
     #                  of the objects being carried.
     # [obst_ramps] Ramps to consider when moving objects from the +obstacles+
     #              array, as described for +obst_obstacles+.
-    def cycle(points, speed, obstacles = nil, obst_obstacles = nil, obst_ramps = nil)
-      @cur_point = 0 if @cur_point.nil?
-      if obstacles
-        move_carrying points[@cur_point], speed, obstacles, obst_obstacles, obst_ramps
-      else
-        move_free points[@cur_point], speed
+    # [stop_time] Optional stop time (in frames) when the object reaches each of
+    #             the points.
+    def cycle(points, speed, obstacles = nil, obst_obstacles = nil, obst_ramps = nil, stop_time = 0)
+      unless @cycle_setup
+        @cur_point = 0 if @cur_point.nil?
+        if obstacles
+          move_carrying points[@cur_point], speed, obstacles, obst_obstacles, obst_ramps
+        else
+          move_free points[@cur_point], speed
+        end
       end
       if @speed.x == 0 and @speed.y == 0
-        if @cur_point == points.length - 1; @cur_point = 0
-        else; @cur_point += 1; end
+        unless @cycle_setup
+          @cycle_timer = 0
+          @cycle_setup = true
+        end
+        if @cycle_timer >= stop_time
+          if @cur_point == points.length - 1
+            @cur_point = 0
+          else
+            @cur_point += 1
+          end
+          @cycle_setup = false
+        else
+          @cycle_timer += 1
+        end
       end
     end
 

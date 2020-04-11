@@ -29,9 +29,9 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.2.7
+## Version 2.2.8
 
-  * Add support for gamepad/joystick buttons in the `KB` class.
+  * Add `stop_time` parameter to the `cycle` method of `Movement` (included in `GameObject`).
 
 ## Contributing
 
