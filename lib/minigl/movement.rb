@@ -360,17 +360,16 @@ module MiniGL
     # [speed] If the first argument is a forces vector, then this should be
     #         +nil+. If it is a point, then this is the constant speed at which
     #         the object will move (provided as a scalar, not a vector).
-    # [obstacles] An array of obstacles to be considered in the collision
-    #             checking, and carried along when colliding from above.
-    #             Obstacles must be instances of Block (or derived classes),
-    #             or objects that <code>include Movement</code>.
-    # [obst_obstacles] Obstacles that should be considered when moving objects
-    #                  from the +obstacles+ array, i.e., these obstacles won't
-    #                  interfere in the elevator's movement, but in the movement
-    #                  of the objects being carried.
-    # [obst_ramps] Ramps to consider when moving objects from the +obstacles+
-    #              array, as described for +obst_obstacles+.
-    def move_carrying(arg, speed, obstacles, obst_obstacles, obst_ramps)
+    # [carried_objs] An array of objects that can potentially be carried by
+    #                this object while it moves. The objects must respond to
+    #                +x+, +y+, +w+ and +h+.
+    # [obstacles] Obstacles that should be considered for collision checking
+    #             with the carried objects, if they include the +Movement+
+    #             module, and with this object too, if moving with forces.
+    # [ramps] Ramps that should be considered for the carried objects, if they
+    #         include the +Movement+ module, and for this object too, if moving
+    #         with forces.
+    def move_carrying(arg, speed, carried_objs, obstacles, ramps)
       if speed
         x_d = arg.x - @x; y_d = arg.y - @y
         distance = Math.sqrt(x_d**2 + y_d**2)
@@ -382,18 +381,11 @@ module MiniGL
 
         @speed.x = 1.0 * x_d * speed / distance
         @speed.y = 1.0 * y_d * speed / distance
-      else
-        arg += G.gravity
-        @speed.x += arg.x / @mass; @speed.y += arg.y / @mass
-        @speed.x = 0 if @speed.x.abs < G.min_speed.x
-        @speed.y = 0 if @speed.y.abs < G.min_speed.y
-        @speed.x = (@speed.x <=> 0) * @max_speed.x if @speed.x.abs > @max_speed.x
-        @speed.y = (@speed.y <=> 0) * @max_speed.y if @speed.y.abs > @max_speed.y
+        x_aim = @x + @speed.x; y_aim = @y + @speed.y
       end
 
-      x_aim = @x + @speed.x; y_aim = @y + @speed.y
       passengers = []
-      obstacles.each do |o|
+      carried_objs.each do |o|
         if @x + @w > o.x && o.x + o.w > @x
           foot = o.y + o.h
           if foot.round(6) == @y.round(6) || @speed.y < 0 && foot < @y && foot > y_aim
@@ -415,25 +407,30 @@ module MiniGL
           @y = y_aim
         end
       else
-        @x = x_aim; @y = y_aim
+        move(arg, obstacles, ramps)
       end
 
       forces = Vector.new @x - prev_x, @y - prev_y
       prev_g = G.gravity.clone
       G.gravity.x = G.gravity.y = 0
       passengers.each do |p|
-        prev_speed = p.speed.clone
-        prev_forces = p.stored_forces.clone
-        prev_bottom = p.bottom
-        p.speed.x = p.speed.y = 0
-        p.stored_forces.x = p.stored_forces.y = 0
-        p.instance_exec { @bottom = nil }
-        p.move forces * p.mass, obst_obstacles, obst_ramps
-        p.speed.x = prev_speed.x
-        p.speed.y = prev_speed.y
-        p.stored_forces.x = prev_forces.x
-        p.stored_forces.y = prev_forces.y
-        p.instance_exec(prev_bottom) { |b| @bottom = b }
+        if p.class.included_modules.include?(Movement)
+          prev_speed = p.speed.clone
+          prev_forces = p.stored_forces.clone
+          prev_bottom = p.bottom
+          p.speed.x = p.speed.y = 0
+          p.stored_forces.x = p.stored_forces.y = 0
+          p.instance_exec { @bottom = nil }
+          p.move(forces * p.mass, obstacles, ramps)
+          p.speed.x = prev_speed.x
+          p.speed.y = prev_speed.y
+          p.stored_forces.x = prev_forces.x
+          p.stored_forces.y = prev_forces.y
+          p.instance_exec(prev_bottom) { |b| @bottom = b }
+        else
+          p.x += forces.x
+          p.y += forces.y
+        end
       end
       G.gravity = prev_g
     end
