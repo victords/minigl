@@ -29,9 +29,10 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.2.9
+## Version 2.3.0
 
-  * Fixed `Movement#move_carrying` collision checking.
+  * Added the `ImageFont` class.
+  * Added scale and line spacing options to `TextHelper` methods.
 
 ## Contributing
 
