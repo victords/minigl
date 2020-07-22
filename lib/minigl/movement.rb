@@ -382,6 +382,9 @@ module MiniGL
         @speed.x = 1.0 * x_d * speed / distance
         @speed.y = 1.0 * y_d * speed / distance
         x_aim = @x + @speed.x; y_aim = @y + @speed.y
+      else
+        x_aim = @x + @speed.x + G.gravity.x + arg.x
+        y_aim = @y + @speed.y + G.gravity.y + arg.y
       end
 
       passengers = []

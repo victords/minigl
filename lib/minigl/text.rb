@@ -1,7 +1,8 @@
 module MiniGL
   # This class represents a font and exposes most of the methods from +Gosu::Font+,
   # but allows the font to be created from an image, allowing for better customization
-  # and also using the +retro+ option.
+  # and also using the +retro+ option. Moreover, this class can be passed to the
+  # +TextHelper+ constructor as if it was a +Gosu::Font+.
   #
   # The image used to load the font must meet these criteria:
   # * The characters should be laid out in lines of the same height in pixels.
@@ -53,6 +54,8 @@ module MiniGL
     end
 
     # Returns the width, in pixels, of a given string written by this font.
+    # Note: Markup is not supported, this method is named this way to match
+    # <code>Gosu::Font</code>'s signature.
     #
     # Parameters:
     # [text] The string to be measured
@@ -61,17 +64,15 @@ module MiniGL
     end
 
     # See <code>Gosu::Font#draw_markup_rel</code> for details.
+    # Note: Markup is not supported, this method is named this way to match
+    # <code>Gosu::Font</code>'s signature.
     def draw_markup_rel(text, x, y, z, rel_x, rel_y, scale_x, scale_y, color)
       text = text.to_s unless text.is_a?(String)
-      if rel_x == 0.5
-        x -= scale_x * markup_width(text) / 2
-      elsif rel_x == 1
-        x -= scale_x * markup_width(text)
+      if rel_x != 0
+        x -= scale_x * markup_width(text) * rel_x
       end
-      if rel_y == 0.5
-        y -= scale_y * @height / 2
-      elsif rel_y == 1
-        y -= scale_x * @height
+      if rel_y != 0
+        y -= scale_y * @height * rel_y
       end
       text.each_char do |c|
         if c == ' '
@@ -86,6 +87,8 @@ module MiniGL
     end
 
     # See <code>Gosu::Font#draw_markup</code> for details.
+    # Note: Markup is not supported, this method is named this way to match
+    # <code>Gosu::Font</code>'s signature.
     def draw_markup(text, x, y, z, scale_x, scale_y, color)
       draw_markup_rel(text, x, y, z, 0, 0, scale_x, scale_y, color)
     end
@@ -101,9 +104,12 @@ module MiniGL
     # Creates a TextHelper.
     #
     # Parameters:
-    # [font] A <code>Gosu::Font</code> that will be used to draw the text.
-    # [line_spacing] When drawing multiple lines, the distance, in pixels,
-    #                between each line.
+    # [font] A <code>Gosu::Font</code> or <code>ImageFont</code> that will
+    #        be used to draw the text.
+    # [line_spacing] When drawing multiple lines, the default distance, in
+    #                pixels, between each line.
+    # [scale_x] The default horizontal scale of the font.
+    # [scale_y] The default vertical scale of the font.
     def initialize(font, line_spacing = 0, scale_x = 1, scale_y = 1)
       @font = font
       @line_spacing = line_spacing
@@ -115,7 +121,7 @@ module MiniGL
     #
     # Parameters:
     # [text] The text to be drawn. No line breaks are allowed. You can use the
-	#        `<b>` tag for bold, `<i>` for italic and `<c=rrggbb>` for colors.
+    #        `<b>` tag for bold, `<i>` for italic and `<c=rrggbb>` for colors.
     # [x] The horizontal reference for drawing the text. If +mode+ is +:left+,
     #     all text will be drawn from this point to the right; if +mode+ is
     #     +:right+, all text will be drawn from this point to the left; and if
@@ -141,6 +147,10 @@ module MiniGL
     #                provide less than 255.
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
+    # [scale_x] The horizontal scaling of the text. If +nil+, this instance's
+    #           +@scale_x+ value will be used.
+    # [scale_y] The vertical scaling of the text. If +nil+, this instance's
+    #           +@scale_y+ value will be used.
     #
     # *Obs.:* This method accepts named parameters, but +text+, +x+ and +y+ are
     # mandatory.
@@ -211,6 +221,12 @@ module MiniGL
     #         transparent) to 255 (fully opaque).
     # [z_index] The z-order to draw the object. Objects with larger z-orders
     #           will be drawn on top of the ones with smaller z-orders.
+    # [scale_x] The horizontal scaling of the text. If +nil+, this instance's
+    #           +@scale_x+ value will be used.
+    # [scale_y] The vertical scaling of the text. If +nil+, this instance's
+    #           +@scale_y+ value will be used.
+    # [line_spacing] The spacing between lines, in pixels. If +nil+, this
+    #                instance's +@line_spacing+ value will be used.
     def write_breaking(text, x, y, width, mode = :left, color = 0, alpha = 0xff, z_index = 0, scale_x = nil, scale_y = nil, line_spacing = nil)
       line_spacing = @line_spacing if line_spacing.nil?
       scale_x = @scale_x if scale_x.nil?
