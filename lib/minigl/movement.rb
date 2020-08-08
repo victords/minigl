@@ -365,11 +365,14 @@ module MiniGL
     #                +x+, +y+, +w+ and +h+.
     # [obstacles] Obstacles that should be considered for collision checking
     #             with the carried objects, if they include the +Movement+
-    #             module, and with this object too, if moving with forces.
+    #             module, and with this object too, if moving with forces and
+    #             the +ignore_collision+ flag is false.
     # [ramps] Ramps that should be considered for the carried objects, if they
     #         include the +Movement+ module, and for this object too, if moving
-    #         with forces.
-    def move_carrying(arg, speed, carried_objs, obstacles, ramps)
+    #         with forces and +ignore_collision+ is false.
+    # [ignore_collision] Set to true to make this object ignore collision even
+    #                    when moving with forces.
+    def move_carrying(arg, speed, carried_objs, obstacles, ramps, ignore_collision = false)
       if speed
         x_d = arg.x - @x; y_d = arg.y - @y
         distance = Math.sqrt(x_d**2 + y_d**2)
@@ -410,7 +413,7 @@ module MiniGL
           @y = y_aim
         end
       else
-        move(arg, obstacles, ramps)
+        move(arg, ignore_collision ? [] : obstacles, ignore_collision ? [] : ramps)
       end
 
       forces = Vector.new @x - prev_x, @y - prev_y
