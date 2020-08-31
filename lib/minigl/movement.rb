@@ -513,6 +513,8 @@ module MiniGL
       unless @cycle_setup
         @cur_point = 0 if @cur_point.nil?
         if obstacles
+          obst_obstacles = [] if obst_obstacles.nil?
+          obst_ramps = [] if obst_ramps.nil?
           move_carrying points[@cur_point], speed, obstacles, obst_obstacles, obst_ramps
         else
           move_free points[@cur_point], speed
