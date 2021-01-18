@@ -111,7 +111,7 @@ module MiniGL
     # [obj] The object to check intersection with. It must have the +x+, +y+,
     #       +w+ and +h+ accessible attributes determining its bounding box.
     def intersect?(obj)
-      obj.x + obj.w > @x && obj.x < @x + @w && obj.y > get_y(obj) && obj.y <= @y + @h - obj.h
+      obj.x + obj.w > @x && obj.x < @x + @w && obj.y > get_y(obj) && obj.y < @y + @h
     end
 
     # :nodoc:

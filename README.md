@@ -29,9 +29,9 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.3.3
+## Version 2.3.4
 
-  * Fix bug in `Movement#cycle`.
+  * Attempt to fix bug: objects going through ramps sometimes.
 
 ## Contributing
 
