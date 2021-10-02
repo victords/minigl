@@ -66,6 +66,10 @@ module MiniGL
     # from left to right when +false+).
     attr_reader :left
 
+    # Whether the ramp is vertically inverted, i.e., the face that is parallel
+    # to the x-axis faces up and the sloped face faces down.
+    attr_reader :inverted
+
     attr_reader :ratio # :nodoc:
     attr_reader :factor # :nodoc:
 
@@ -85,12 +89,16 @@ module MiniGL
     #     highest).
     # [left] Whether the height of the ramp increases from left to right. Use
     #        +false+ for a ramp that goes down from left to right.
-    def initialize(x, y, w, h, left)
+    # [inverted] Whether the ramp is vertically inverted, i.e., the face that
+    #            is parallel to the x-axis faces up and the sloped face faces
+    #            down.
+    def initialize(x, y, w, h, left, inverted = false)
       @x = x
       @y = y
       @w = w
       @h = h
       @left = left
+      @inverted = inverted
       @ratio = @h.to_f / @w
       @factor = @w / Math.sqrt(@w**2 + @h**2)
     end
@@ -101,6 +109,7 @@ module MiniGL
     # [obj] The object to check contact with. It must have the +x+, +y+, +w+
     #       and +h+ accessible attributes determining its bounding box.
     def contact?(obj)
+      return false if @inverted
       obj.x + obj.w > @x && obj.x < @x + @w && obj.x.round(6) == get_x(obj).round(6) && obj.y.round(6) == get_y(obj).round(6)
     end
 
@@ -111,44 +120,44 @@ module MiniGL
     # [obj] The object to check intersection with. It must have the +x+, +y+,
     #       +w+ and +h+ accessible attributes determining its bounding box.
     def intersect?(obj)
-      obj.x + obj.w > @x && obj.x < @x + @w && obj.y > get_y(obj) && obj.y < @y + @h
+      obj.x + obj.w > @x && obj.x < @x + @w &&
+        (@inverted ? obj.y < get_y(obj) && obj.y + obj.h > @y : obj.y > get_y(obj) && obj.y < @y + @h)
     end
 
     # :nodoc:
     def check_can_collide(m)
-      y = get_y(m) + m.h
+      y = get_y(m) + (@inverted ? 0 : m.h)
       @can_collide = m.x + m.w > @x && @x + @w > m.x && m.y < y && m.y + m.h > y
     end
 
     def check_intersection(obj)
-      if @can_collide and intersect? obj
-        counter = @left && obj.prev_speed.x > 0 || !@left && obj.prev_speed.x < 0
-        if obj.prev_speed.y > 0 && counter
-          dx = get_x(obj) - obj.x
-          s = (obj.prev_speed.y.to_f / obj.prev_speed.x).abs
-          dx /= s + @ratio
-          obj.x += dx
-        end
-        obj.y = get_y obj
-        if counter && obj.bottom != self
-          obj.speed.x *= @factor
-        end
-        obj.speed.y = 0
+      return unless @can_collide && intersect?(obj)
+
+      counter = @left && obj.prev_speed.x > 0 || !@left && obj.prev_speed.x < 0
+      if counter && (@inverted ? obj.prev_speed.y < 0 : obj.prev_speed.y > 0)
+        dx = get_x(obj) - obj.x
+        s = (obj.prev_speed.y.to_f / obj.prev_speed.x).abs
+        dx /= s + @ratio
+        obj.x += dx
       end
+      if counter && obj.bottom != self
+        obj.speed.x *= @factor
+      end
+
+      obj.speed.y = 0
+      obj.y = get_y(obj)
     end
 
     def get_x(obj)
-      return obj.x if @left && obj.x + obj.w > @x + @w
-      return @x + (1.0 * (@y + @h - obj.y - obj.h) * @w / @h) - obj.w if @left
-      return obj.x if obj.x < @x
-      @x + (1.0 * (obj.y + obj.h - @y) * @w / @h)
+      return obj.x if @left && obj.x + obj.w > @x + @w || !@left && obj.x < @x
+      offset = (@inverted ? obj.y - @y : @y + @h - obj.y - obj.h).to_f * @w / @h
+      @left ? @x + offset - obj.w : @x + @w - offset
     end
 
     def get_y(obj)
-      return @y - obj.h if @left && obj.x + obj.w > @x + @w
-      return @y + (1.0 * (@x + @w - obj.x - obj.w) * @h / @w) - obj.h if @left
-      return @y - obj.h if obj.x < @x
-      @y + (1.0 * (obj.x - @x) * @h / @w) - obj.h
+      return @y + (@inverted ? @h : -obj.h) if @left && obj.x + obj.w > @x + @w || !@left && obj.x < @x
+      offset = (@left ? @x + @w - obj.x - obj.w : obj.x - @x).to_f * @h / @w
+      @inverted ? @y + @h - offset : @y + offset - obj.h
     end
   end
 
@@ -340,11 +349,6 @@ module MiniGL
       @x += @speed.x
       @y += @speed.y
 
-      # Keeping contact with ramp
-      # if @speed.y == 0 and @speed.x.abs <= G.ramp_contact_threshold and @bottom.is_a? Ramp
-      #   @y = @bottom.get_y(self)
-      #   puts 'aqui'
-      # end
       ramps.each do |r|
         r.check_intersection self
       end

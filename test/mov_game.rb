@@ -13,7 +13,7 @@ class MyGame < GameWindow
       Block.new(0, 600, 800, 1, false),
       Block.new(-1, 0, 1, 600, false),
       Block.new(800, 0, 1, 600, false),
-      Block.new(300, 430, 50, 50),
+      Block.new(300, 430, 250, 50),
       # Block.new(375, 550, 50, 50, true),
       # Block.new(150, 200, 20, 300, false),
       # Block.new(220, 300, 100, 20, true),
@@ -26,6 +26,12 @@ class MyGame < GameWindow
       Ramp.new(500, 500, 150, 100, true),
       Ramp.new(650, 300, 150, 200, true),
       Ramp.new(650, 500, 150, 100, true),
+      Ramp.new(0, 100, 100, 100, false, true),
+      Ramp.new(100, 0, 150, 100, false, true),
+      Ramp.new(700, 100, 100, 100, true, true),
+      Ramp.new(550, 0, 150, 100, true, true),
+      # Ramp.new(250, 250, 75, 75, false, true),
+      Ramp.new(525, 250, 75, 200, true, true),
     ]
 
     # @cycle = [Vector.new(100, 530), Vector.new(650, 500)]
@@ -67,9 +73,9 @@ class MyGame < GameWindow
                 o.x, o.y + o.h, 0xffffffff, 0
     end
     @ramps.each do |r|
-      draw_triangle r.left ? r.x + r.w : r.x, r.y, 0xffffffff,
-                    r.x + r.w, r.y + r.h, 0xffffffff,
-                    r.x, r.y + r.h, 0xffffffff, 0
+      draw_triangle r.left ? r.x + r.w : r.x, r.inverted ? r.y + r.h : r.y, 0xffffffff,
+                    r.x + r.w, r.inverted ? r.y : r.y + r.h, 0xffffffff,
+                    r.x, r.inverted ? r.y : r.y + r.h, 0xffffffff, 0
     end
   end
 end
