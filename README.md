@@ -14,6 +14,14 @@ It provides the following features:
 More functionalities are coming. Feel free to contribute! You can send feedback
 to victordavidsantos@gmail.com.
 
+## Made with MiniGL
+
+Below are two full games built with MiniGL, both available for free download and also open source.
+* [Super Bombinhas](https://victords.itch.io/super-bombinhas) ([source](https://github.com/victords/super-bombinhas))
+* [ConnecMan](https://victords.itch.io/connecman) ([source](https://github.com/victords/connecman))
+
+*Super Bombinhas* is also available on [Steam](https://store.steampowered.com/app/1553840).
+
 ## Installing
 
 MiniGL was built on top of the Gosu gem. This gem has its own dependencies for
