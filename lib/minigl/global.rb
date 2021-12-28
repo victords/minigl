@@ -397,6 +397,11 @@ module MiniGL
         @down.clear
         @dbl_click.clear
 
+        if @click
+          @click[:action].call
+          @click = nil
+        end
+
         @dbl_click_timer.each do |k, v|
           if v < G.double_click_delay; @dbl_click_timer[k] += 1
           else; @dbl_click_timer.delete k; end
@@ -473,6 +478,13 @@ module MiniGL
       def over?(x, y = nil, w = nil, h = nil)
         return @x >= x.x && @x < x.x + x.w && @y >= x.y && @y < x.y + x.h if x.is_a? Rectangle
         @x >= x && @x < x + w && @y >= y && @y < y + h
+      end
+
+      # :nodoc:
+      def add_click(z_index, action)
+        return if @click && @click[:z_index] > z_index
+
+        @click = { z_index: z_index, action: action }
       end
     end
   end

@@ -32,11 +32,12 @@ class MyGame < GameWindow
     @ddl = DropDownList.new(0, 10, @font1, nil, nil, ['olá amigos', 'opção 2', 'terceira'], 0, 3, 150, 25, 0, 0x808080, 0xffffff, 0xffff00, nil, 2, 2.5, :north) { |a, b|
       puts "mudou de #{a} para #{b}"
     }
+    @btn2 = Button.new(x: 0, y: 80, font: @font1, text: 'Below', img: :btn, anchor: :north) { puts 'Below the dropdown' }
 
     @panel = Panel.new(10, 10, 720, 520, [
-      Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn),
+      TextField.new(x: 5, y: 5, font: @font1, text: 'Opa', img: :text, margin_x: 5, margin_y: 5, anchor: :top_left),
+      Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn) { puts 'top left' },
       @lbl = Label.new(0, 70, @font1, 'Teste de label', 0, 0x666666, 1, 1, :north),
-      TextField.new(x: 5, y: 40, font: @font1, text: 'Opa', img: :text, margin_x: 5, margin_y: 5, anchor: :top_left),
       Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :top),
       DropDownList.new(x: 0, y: 40, width: 150, height: 25, font: @font1, options: ['olá amigos', 'opção 2', 'terceira'], anchor: :north),
       Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :northeast),
@@ -44,7 +45,7 @@ class MyGame < GameWindow
       Button.new(x: 0, y: 0, font: @font1, text: 'Teste', img: :btn, anchor: :center),
       Button.new(x: 5, y: 0, font: @font1, text: 'Teste', img: :btn, anchor: :right),
       ToggleButton.new(x: 5, y: 40, img: :check, center_x: false, margin_x: 36, anchor: :east),
-      Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :southwest),
+      Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :southwest) { @lbl.visible = !@lbl.visible },
       Button.new(x: 0, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :south),
       ProgressBar.new(0, 40, 200, 20, :barbg, :barfg, 3456, 70, 2, 2, @font1, 0xff000080, nil, nil, 1, 1, :bottom)
     ], :text, :tiled, true, 2, 2, :bottom_right)
@@ -80,7 +81,11 @@ class MyGame < GameWindow
     @panel.enabled = !@panel.enabled if KB.key_pressed? Gosu::KbN
     @panel.visible = !@panel.visible if KB.key_pressed? Gosu::KbM
 
-    @panel.add_component(Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :southeast)) if KB.key_pressed?(Gosu::KbB)
+    if KB.key_pressed?(Gosu::KbB)
+      @panel.add_component(Button.new(x: 5, y: 5, font: @font1, text: 'Teste', img: :btn, anchor: :southeast) {
+        puts 'new button added'
+      })
+    end
     @lbl.text = 'Test of changed text' if KB.key_pressed?(Gosu::KB_C)
     @lbl2.text = 'Shorter text' if KB.key_pressed?(Gosu::KB_X)
 
@@ -112,6 +117,7 @@ class MyGame < GameWindow
     @chk.update
     @txt.update
     @ddl.update
+    @btn2.update
 
     @panel.update
 
@@ -145,6 +151,7 @@ class MyGame < GameWindow
                             780, 450, 300, :right, 0xff0000, 255, 1
 
     @ddl.draw 0x80, 1, 0xff8080
+    @btn2.draw
     @btn.draw 0xcc, 1, 0x33ff33
     @chk.draw
     @txt.draw

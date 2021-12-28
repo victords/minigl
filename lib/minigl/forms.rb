@@ -98,6 +98,9 @@ module MiniGL
     # Gets or sets whether the panel (and thus all components inside it) are visible.
     attr_accessor :visible
 
+    # The components contained in this panel.
+    attr_reader :controls
+
     # Creates a new Panel.
     # Parameters:
     # [x] The horizontal coordinate of the top-left corner of the panel, or the horizontal offset from the anchor, if provided.
@@ -348,8 +351,10 @@ module MiniGL
           @img_index = 0
           @state = :up
         elsif mouse_press
-          @img_index = 2
-          @state = :down
+          Mouse.add_click(@z_index || 0, lambda do
+            @img_index = 2
+            @state = :down
+          end)
         else
           @img_index = 1
         end
@@ -360,7 +365,7 @@ module MiniGL
         elsif mouse_rel
           @img_index = 1
           @state = :over
-          click
+          Mouse.add_click(@z_index || 0, method(:perform_action))
         else
           @img_index = 2
         end
@@ -379,7 +384,7 @@ module MiniGL
 
     # Executes the button click action.
     def click
-      @action.call @params if @action
+      perform_action
     end
 
     # Sets the position of the button in the screen.
@@ -404,6 +409,7 @@ module MiniGL
     #           will be drawn on top of the ones with smaller z-orders.
     # [color] Color to apply a filter to the image.
     def draw(alpha = 0xff, z_index = 0, color = 0xffffff)
+      @z_index = z_index
       return unless @visible
 
       color = (alpha << 24) | color
@@ -434,6 +440,12 @@ module MiniGL
       @enabled = value
       @state = :up
       @img_index = 3
+    end
+
+    private
+
+    def perform_action
+      @action.call @params if @action
     end
   end
 
@@ -517,20 +529,12 @@ module MiniGL
       @img_index += 1 if @checked
     end
 
-    # Executes the button click action, and toggles its state. The +action+
-    # block always receives as a first parameter +true+, if the button has
-    # been changed to checked, or +false+, otherwise.
-    def click
-      @checked = !@checked
-      @action.call @checked, @params if @action
-    end
-
     # Sets the state of the button to the value given.
     #
     # Parameters:
     # [value] The state to be set (+true+ for checked, +false+ for unchecked).
     def checked=(value)
-      click if value != @checked
+      @action.call(value, @params) if @action && value != @checked
       @checked = value
     end
 
@@ -539,6 +543,13 @@ module MiniGL
       @state = :up
       @img_index = @checked ? 7 : 6
     end
+
+    private
+
+    def perform_action
+      @checked = !@checked
+      @action.call(@checked, @params) if @action
+    end
   end
 
   # This class represents a text field (input).
@@ -546,6 +557,9 @@ module MiniGL
     # The current 'locale' used for detecting the keys. THIS FEATURE IS
     # INCOMPLETE!
     attr_reader :locale
+
+    # Whether the text field is focused (accepting input)
+    attr_reader :focused
 
     # Creates a new text field.
     #
@@ -566,9 +580,9 @@ module MiniGL
     # [margin_x] The x offset, from the field x-coordinate, to draw the text.
     # [margin_y] The y offset, from the field y-coordinate, to draw the text.
     # [max_length] The maximum length of the text inside the field.
-    # [active] Whether the text field must be focused by default. If +false+,
-    #          focus can be granted by clicking inside the text field or by
-    #          calling the +focus+ method.
+    # [focused] Whether the text field must be focused by default. If +false+,
+    #           focus can be granted by clicking inside the text field or by
+    #           calling the +focus+ method.
     # [text] The starting text. Must not be +nil+.
     # [allowed_chars] A string containing all characters that can be typed
     #                 inside the text field. The complete set of supported
@@ -606,7 +620,7 @@ module MiniGL
     # *Obs.:* This method accepts named parameters, but +x+, +y+, +font+ and
     # +img+ are mandatory.
     def initialize(x, y = nil, font = nil, img = nil, cursor_img = nil, disabled_img = nil, margin_x = 0, margin_y = 0,
-                   max_length = 100, active = false, text = '', allowed_chars = nil,
+                   max_length = 100, focused = false, text = '', allowed_chars = nil,
                    text_color = 0, disabled_text_color = 0, selection_color = 0, locale = 'en-us',
                    params = nil, retro = nil, scale_x = 1, scale_y = 1, anchor = nil, &on_text_changed)
       if x.is_a? Hash
@@ -618,7 +632,7 @@ module MiniGL
         margin_x = x.fetch(:margin_x, 0)
         margin_y = x.fetch(:margin_y, 0)
         max_length = x.fetch(:max_length, 100)
-        active = x.fetch(:active, false)
+        focused = x.fetch(:focused, false)
         text = x.fetch(:text, '')
         allowed_chars = x.fetch(:allowed_chars, nil)
         text_color = x.fetch(:text_color, 0)
@@ -647,7 +661,7 @@ module MiniGL
       @cursor_img = Res.img(cursor_img, false, false, '.png', retro) if cursor_img
       @disabled_img = Res.img(disabled_img, false, false, '.png', retro) if disabled_img
       @max_length = max_length
-      @active = active
+      @focused = focused
       @text_x = x + margin_x * @scale_x
       @text_y = y + margin_y * @scale_y
       @selection_color = selection_color
@@ -690,14 +704,14 @@ module MiniGL
 
       ################################ Mouse ################################
       if Mouse.over? @x, @y, @w, @h
-        if not @active and Mouse.button_pressed? :left
-          focus
+        if not @focused and Mouse.button_pressed? :left
+          Mouse.add_click(@z_index || 0, method(:focus))
         end
       elsif Mouse.button_pressed? :left
         unfocus
       end
 
-      return unless @active
+      return unless @focused
 
       if Mouse.double_click? :left
         if @nodes.size > 1
@@ -708,11 +722,7 @@ module MiniGL
         end
         set_cursor_visible
       elsif Mouse.button_pressed? :left
-        set_node_by_mouse
-        @anchor1 = @cur_node
-        @anchor2 = nil
-        @double_clicked = false
-        set_cursor_visible
+        Mouse.add_click(@z_index || 0, method(:focus))
       elsif Mouse.button_down? :left
         if @anchor1 and not @double_clicked
           set_node_by_mouse
@@ -902,7 +912,12 @@ module MiniGL
 
     # Grants focus to the text field, so that it allows keyboard input.
     def focus
-      @active = true
+      @focused = true
+      set_node_by_mouse
+      @anchor1 = @cur_node
+      @anchor2 = nil
+      @double_clicked = false
+      set_cursor_visible
     end
 
     # Removes focus from the text field, so that no keyboard input will be
@@ -911,7 +926,7 @@ module MiniGL
       @anchor1 = @anchor2 = nil
       @cursor_visible = false
       @cursor_timer = 0
-      @active = false
+      @focused = false
     end
 
     # Sets the position of the text field in the screen.
@@ -941,6 +956,7 @@ module MiniGL
     # [disabled_color] Color to apply a filter to the image when the field is
     #                  disabled.
     def draw(alpha = 0xff, z_index = 0, color = 0xffffff, disabled_color = 0x808080)
+      @z_index = z_index
       return unless @visible
 
       color = (alpha << 24) | ((@enabled or @disabled_img) ? color : disabled_color)
@@ -1249,6 +1265,9 @@ module MiniGL
   class DropDownList < Component
     # The selected value in the drop-down list. This is one of the +options+.
     attr_reader :value
+
+    # Whether the list of options is currently visible.
+    attr_reader :open
 
     # An array containing all the options (each of them +String+s) that can be
     # selected in the drop-down list.
