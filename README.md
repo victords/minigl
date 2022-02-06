@@ -17,10 +17,10 @@ to victordavidsantos@gmail.com.
 ## Made with MiniGL
 
 Below are two full games built with MiniGL, both available for free download and also open source.
-* [Super Bombinhas](https://victords.itch.io/super-bombinhas) ([source](https://github.com/victords/super-bombinhas))
-* [ConnecMan](https://victords.itch.io/connecman) ([source](https://github.com/victords/connecman))
+* [Super Bombinhas](https://github.com/victords/super-bombinhas)
+* [ConnecMan](https://github.com/victords/connecman)
 
-*Super Bombinhas* is also available on [Steam](https://store.steampowered.com/app/1553840).
+If you create a project using MiniGL, feel free to open a PR to include it in this list.
 
 ## Installing
 
