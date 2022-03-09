@@ -304,6 +304,14 @@ module MiniGL
     # This is +true+ when the effect's lifetime has already passed.
     attr_reader :dead
 
+    # The lifetime of the effect, in updates, i.e., how many calls to +update+
+    # must happen before the effect is marked as +dead+, since its creation.
+    attr_reader :lifetime
+
+    # The number of times +update+ has been called for this effect, while it
+    # was still active (not +dead+).
+    attr_reader :elapsed_time
+
     # Creates a new Effect.
     #
     # Parameters:
@@ -352,7 +360,7 @@ module MiniGL
       end
 
       super x, y, img, sprite_cols, sprite_rows
-      @timer = 0
+      @elapsed_time = 0
       if indices
         @indices = indices
       else
@@ -369,15 +377,21 @@ module MiniGL
 
     # Updates the effect, animating and counting its remaining lifetime.
     def update
-      unless @dead
-        animate @indices, @interval
-        @timer += 1
-        @dead = true if @timer == @lifetime
-      end
+      return if @dead
+
+      animate(@indices, @interval)
+      @elapsed_time += 1
+      @dead = true if @elapsed_time == @lifetime
     end
 
     def draw(map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, z_index = 0)
       super unless @dead
+    end
+
+    # The remaining number of calls to +update+ until the effect is marked
+    # +dead+.
+    def time_left
+      @lifetime - @elapsed_time
     end
   end
 end

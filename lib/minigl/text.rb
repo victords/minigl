@@ -11,8 +11,17 @@ module MiniGL
   #   if a character fits in the current line it must not be placed in the next
   #   one. In the last line there can be any amount of free space at the end.
   class ImageFont
+    # A string containing the characters supported by this font.
+    attr_reader :chars
+
     # The height of this font in pixels.
     attr_reader :height
+
+    # The width of the white space character in this font, in pixels.
+    attr_reader :space_width
+
+    # The spacing between characters, in pixels (can be a decimal number).
+    attr_reader :char_spacing
 
     # Creates an +ImageFont+.
     #
@@ -26,16 +35,19 @@ module MiniGL
     #          as they appear in the +chars+ string.
     # [height] The height of the lines in the image (see description above).
     # [space_width] The width of the white space character in this font.
+    # [char_spacing] The spacing between non-white-space characters when writing text with
+    #                this font. It can be a decimal number, useful when scaling the text up.
     # [global] Parameter that will be passed to +Res.img+ when loading the image.
     # [ext] Parameter that will be passed to +Res.img+ when loading the image.
     # [retro] Parameter that will be passed to +Res.img+ when loading the image.
-    def initialize(img_path, chars, widths, height, space_width, global = true, ext = '.png', retro = nil)
+    def initialize(img_path, chars, widths, height, space_width, char_spacing = 0, global = true, ext = '.png', retro = nil)
       retro = Res.retro_images if retro.nil?
       img = Res.img(img_path, global, false, ext, retro)
       @chars = chars
       @images = []
       @height = height
       @space_width = space_width
+      @char_spacing = char_spacing
       wa = widths.is_a?(Array)
       if wa && widths.length != chars.length
         raise 'Wrong widths array size!'
@@ -60,7 +72,17 @@ module MiniGL
     # Parameters:
     # [text] The string to be measured
     def markup_width(text)
-      text.chars.reduce(0) { |w, c| if c == ' '; w += @space_width; else; i = @chars.index(c); w += i ? @images[i].width : 0; end }
+      w = 0
+      text.chars.each_with_index do |c, i|
+        if c == ' '
+          w += @space_width
+        else
+          idx = @chars.index(c)
+          w += idx ? @images[idx].width : 0
+          w += @char_spacing if i < text.chars.size - 1
+        end
+      end
+      w
     end
 
     # See <code>Gosu::Font#draw_markup_rel</code> for details.
@@ -82,7 +104,7 @@ module MiniGL
         i = @chars.index(c)
         next if i.nil?
         @images[i].draw(x, y, z, scale_x, scale_y, color)
-        x += scale_x * @images[i].width
+        x += (scale_x * (@images[i].width + @char_spacing)).round
       end
     end
 

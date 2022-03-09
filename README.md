@@ -37,10 +37,10 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.3.7
+## Version 2.3.8
 
-  * Exposed the `Panel#controls`, `TextField#focused` and `DropDownList#open` properties.
-  * Fixed a bug when clicking overlapping buttons: only the click action of the button with highest z-index (or last updated if z-indexes are the same) will be triggered. **WARNING**: the click callback will only be executed if `Mouse.update` is called after the click happened. If you call `Mouse.update` every frame (which is recommended), there's nothing to worry about.
+  * Exposed `Effect`'s `lifetime`, `elapsed_time` and `time_left` properties.
+  * Added the `char_spacing` parameter to the `ImageFont` class and exposed some existing properties.
 
 ## Contributing
 
