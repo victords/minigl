@@ -317,12 +317,12 @@ module MiniGL
       super x, y, font, text, text_color, disabled_text_color
       @over_text_color = over_text_color
       @down_text_color = down_text_color
-      if center_x; @text_x = x + @w / 2 if @w
-      else; @text_x = x + margin_x * @scale_x; end
-      if center_y; @text_y = y + @h / 2 if @h
-      else; @text_y = y + margin_y * @scale_y; end
       @center_x = center_x
       @center_y = center_y
+      @margin_x = margin_x
+      @margin_y = margin_y
+      set_position(x, y)
+
       @action = action
       @params = params
 
@@ -393,10 +393,10 @@ module MiniGL
     # [x] The new x-coordinate for the button.
     # [y] The new y-coordinate for the button.
     def set_position(x, y)
-      if @center_x; @text_x = x + @w / 2
-      else; @text_x += x - @x; end
-      if @center_y; @text_y = y + @h / 2
-      else; @text_y += y - @y; end
+      @text_x = @center_x ? x + @w / 2 : x
+      @text_y = @center_y ? y + @h / 2 : y
+      @text_x += @margin_x
+      @text_y += @margin_y
       @x = x; @y = y
     end
 
@@ -445,7 +445,7 @@ module MiniGL
     private
 
     def perform_action
-      @action.call @params if @action
+      @action.call(@params) if @action
     end
   end
 
@@ -514,8 +514,6 @@ module MiniGL
         else; height * @scale_y; end
       _, x, y = FormUtils.check_anchor(anchor, @anchor_offset_x, @anchor_offset_y, @w, @h)
       set_position(x, y)
-      @text_x = x + @w / 2 if center_x
-      @text_y = y + @h / 2 if center_y
       @checked = checked
     end
 

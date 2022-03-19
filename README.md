@@ -37,10 +37,10 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.3.8
+## Version 2.3.9
 
-  * Exposed `Effect`'s `lifetime`, `elapsed_time` and `time_left` properties.
-  * Added the `char_spacing` parameter to the `ImageFont` class and exposed some existing properties.
+  * Fixed click detection for very short clicks.
+  * Allow combining `center` and `margin` for `Button` text.
 
 ## Contributing
 

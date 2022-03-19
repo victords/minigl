@@ -19,7 +19,7 @@ class MyGame < GameWindow
     @font2 = Res.font :font1, 50
     @writer1 = TextHelper.new @font1, 5
     @writer2 = TextHelper.new @font2, 5
-    @btn = Button.new(10, 560, @font1, 'Test', :btn, 0x008000, 0x808080, 0xffffff, 0xff9980, true, true, 0, 4, 0, 0, 'friends', nil, 2, 2) { |x| puts "hello #{x}" }
+    @btn = Button.new(10, 560, @font1, 'Test', :btn, 0x008000, 0x808080, 0xffffff, 0xff9980, true, false, -10, 4, 0, 0, 'friends', nil, 2, 2) { |x| puts "hello #{x}" }
     @btn.enabled = false
     @chk =
       ToggleButton.new(x: 0, y: 30, font: @font1, text: 'Click me', img: :check, center_x: false, margin_x: 36, params: 'friends', anchor: :south) { |c, x|

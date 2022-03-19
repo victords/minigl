@@ -245,6 +245,16 @@ module MiniGL
     def toggle_fullscreen
       self.fullscreen = !fullscreen?
     end
+
+    def button_down(id)
+      super
+      Mouse.register_button_down(id)
+    end
+
+    def button_up(id)
+      super
+      Mouse.register_button_up(id)
+    end
   end
 
   # Exposes methods for controlling keyboard and gamepad events.
@@ -387,6 +397,7 @@ module MiniGL
       def initialize
         @down = {}
         @prev_down = {}
+        @next_down = {}
         @dbl_click = {}
         @dbl_click_timer = {}
       end
@@ -394,7 +405,8 @@ module MiniGL
       # Updates the mouse position and the state of all buttons.
       def update
         @prev_down = @down.clone
-        @down.clear
+        @down = @next_down.clone
+        @next_down.delete_if { |_, v| v.zero? }
         @dbl_click.clear
 
         if @click
@@ -403,19 +415,19 @@ module MiniGL
         end
 
         @dbl_click_timer.each do |k, v|
-          if v < G.double_click_delay; @dbl_click_timer[k] += 1
-          else; @dbl_click_timer.delete k; end
+          if v < G.double_click_delay
+            @dbl_click_timer[k] += 1
+          else
+            @dbl_click_timer.delete(k)
+          end
         end
 
-        k1 = [Gosu::MsLeft, Gosu::MsMiddle, Gosu::MsRight]
-        k2 = [:left, :middle, :right]
-        (0..2).each do |i|
-          if G.window.button_down? k1[i]
-            @down[k2[i]] = true
-            @dbl_click[k2[i]] = true if @dbl_click_timer[k2[i]]
-            @dbl_click_timer.delete k2[i]
-          elsif @prev_down[k2[i]]
-            @dbl_click_timer[k2[i]] = 0
+        %i[left middle right].each do |key|
+          if @down[key]
+            @dbl_click[key] = true if @dbl_click_timer[key]
+            @dbl_click_timer.delete(key)
+          elsif @prev_down[key]
+            @dbl_click_timer[key] = 0
           end
         end
 
@@ -485,6 +497,31 @@ module MiniGL
         return if @click && @click[:z_index] > z_index
 
         @click = { z_index: z_index, action: action }
+      end
+
+      # :nodoc:
+      def register_button_down(id)
+        key = key_from_id(id)
+        @next_down[key] = 1 if key
+      end
+
+      # :nodoc:
+      def register_button_up(id)
+        key = key_from_id(id)
+        @next_down[key] = 0 if key && @next_down[key]
+      end
+
+      private
+
+      def key_from_id(id)
+        case id
+        when Gosu::MS_LEFT
+          :left
+        when Gosu::MS_RIGHT
+          :right
+        when Gosu::MS_MIDDLE
+          :middle
+        end
       end
     end
   end
