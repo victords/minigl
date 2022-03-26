@@ -19,6 +19,7 @@ to victordavidsantos@gmail.com.
 Below are two full games built with MiniGL, both available for free download and also open source.
 * [Super Bombinhas](https://github.com/victords/super-bombinhas)
 * [ConnecMan](https://github.com/victords/connecman)
+* [SokoAdventure](https://github.com/victords/sokoadventure)
 
 If you create a project using MiniGL, feel free to open a PR to include it in this list.
 
