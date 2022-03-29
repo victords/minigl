@@ -38,10 +38,9 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.3.9
+## Version 2.4.0
 
-  * Fixed click detection for very short clicks.
-  * Allow combining `center` and `margin` for `Button` text.
+  * Added the `Localization` class! Check out [the documentation](http://www.rubydoc.info/gems/minigl/MiniGL/Localization) to learn more.
 
 ## Contributing
 

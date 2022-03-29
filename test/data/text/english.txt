@@ -1,0 +1,6 @@
+str1	Common string.
+str2	String with \$ dollar sign.
+str3	$ should be replaced.
+str4	Should replace both $ and $.
+str5	String with \\ backslash.
+str6	String with\line breaks.\

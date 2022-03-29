@@ -1,0 +1,6 @@
+str1	String comum.
+str2	String com \$ cifrão.
+str3	$ deve ser substituído.
+str4	Deve substituir $ e $.
+str5	String com \\ barra invertida.
+str6	String com\quebras de linha.\
