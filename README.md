@@ -16,14 +16,14 @@ to victordavidsantos@gmail.com.
 
 ## Made with MiniGL
 
-Below are two full games built with MiniGL, both available for free download and also open source.
+Below are some games built with MiniGL, all available for free download and also open source.
 * [Super Bombinhas](https://github.com/victords/super-bombinhas)
 * [ConnecMan](https://github.com/victords/connecman)
 * [SokoAdventure](https://github.com/victords/sokoadventure)
 * [Spheres](https://github.com/victords/spheres)
 * [Willy the droid](https://github.com/gavr-games/willy_the_droid)
 
-Download some of the games above in my [itch.io page](https://victords.itch.io).
+Download Super Bombinhas, ConnecMan, SokoAdventure and Spheres in my [itch.io page](https://victords.itch.io).
 
 If you create a project using MiniGL, feel free to open a PR to include it in this list.
 
