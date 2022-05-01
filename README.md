@@ -21,8 +21,9 @@ Below are two full games built with MiniGL, both available for free download and
 * [ConnecMan](https://github.com/victords/connecman)
 * [SokoAdventure](https://github.com/victords/sokoadventure)
 * [Spheres](https://github.com/victords/spheres)
+* [Willy the droid](https://github.com/gavr-games/willy_the_droid)
 
-Download all of the games above in my [itch.io page](https://victords.itch.io).
+Download some of the games above in my [itch.io page](https://victords.itch.io).
 
 If you create a project using MiniGL, feel free to open a PR to include it in this list.
 
