@@ -42,9 +42,10 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.4.0
+## Version 2.4.1
 
-  * Added the `Localization` class! Check out [the documentation](http://www.rubydoc.info/gems/minigl/MiniGL/Localization) to learn more.
+  * Expose `Sprite`'s `img` attribute.
+  * Fix `Effect#draw`'s `z_index` parameter.
 
 ## Contributing
 

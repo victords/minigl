@@ -3,6 +3,9 @@ require_relative 'movement'
 module MiniGL
   # This class represents an (optionally animated) image inside the game screen.
   class Sprite
+    # The list of images of this sprite (i.e. the spritesheet).
+    attr_reader :img
+
     # The index of the current sprite in the spritesheet being drawn.
     attr_reader :img_index
 
@@ -384,7 +387,7 @@ module MiniGL
       @dead = true if @elapsed_time == @lifetime
     end
 
-    def draw(map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, z_index = 0)
+    def draw(map = nil, scale_x = 1, scale_y = 1, alpha = 0xff, color = 0xffffff, angle = nil, flip = nil, z_index = 0, round = false)
       super unless @dead
     end
 
