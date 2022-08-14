@@ -50,4 +50,4 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
 ## Contributing
 
 Contributions are very welcome. Feel free to fork and send pull requests.
-Also, you can support my work by donating bitcoins to this wallet: bc1qsp7mypdqvkt88xtnarmaytt0etxfccxr5pt5tk
+Also, you can support my work by purchasing any of my games on [itch.io](https://victords.itch.io) or [Super Bombinhas on Steam](https://store.steampowered.com/app/1553840).
