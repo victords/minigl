@@ -6,7 +6,7 @@ class MyGame < GameWindow
     super 800, 600, false
 
     # @img = Res.img :img1
-    @obj1 = GameObject.new 75, 75, 60, 60, :square3, Vector.new(-75, -75)
+    @obj1 = GameObject.new 75, 75, 40, 40, :square3, Vector.new(-50, -50)
     @obj2 = Sprite.new 400, 0, :img1
     @obj3 = GameObject.new 4, 50, 24, 24, :check, Vector.new(-4, -4), 2, 4
     @obj3.set_animation 1
@@ -137,7 +137,7 @@ class MyGame < GameWindow
     clear 0xabcdef
 
     # @img.draw_rot 400, 100, 0, @angle, 1, 1
-    @obj1.draw color: 0x33ff33, angle: (@angle == 0 ? nil : @angle), scale_x: 1.5, scale_y: 1.5
+    @obj1.draw color: 0x33ff33, angle: (@angle == 0 ? nil : @angle), scale_x: 1.5
     @obj2.draw angle: (@angle == 0 ? nil : @angle), scale_x: 0.5, scale_y: 1.4
     @obj3.draw flip: @flip
     @obj4.draw round: true

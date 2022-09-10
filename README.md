@@ -42,10 +42,9 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.4.1
+## Version 2.4.2
 
-  * Expose `Sprite`'s `img` attribute.
-  * Fix `Effect#draw`'s `z_index` parameter.
+  * Fix `GameObject#draw` with scale and non-zero image gap.
 
 ## Contributing
 
