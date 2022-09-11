@@ -365,7 +365,7 @@ module MiniGL
         elsif mouse_rel
           @img_index = 1
           @state = :over
-          Mouse.add_click(@z_index || 0, method(:perform_action))
+          enqueue_action
         else
           @img_index = 2
         end
@@ -443,6 +443,10 @@ module MiniGL
     end
 
     private
+
+    def enqueue_action
+      Mouse.add_click(@z_index || 0, method(:perform_action))
+    end
 
     def perform_action
       @action.call(@params) if @action
@@ -524,7 +528,7 @@ module MiniGL
 
       super
       @img_index *= 2
-      @img_index += 1 if @checked
+      @img_index += 1 if @checked && !@toggling || !@checked && @toggling
     end
 
     # Sets the state of the button to the value given.
@@ -544,8 +548,14 @@ module MiniGL
 
     private
 
+    def enqueue_action
+      super
+      @toggling = true
+    end
+
     def perform_action
       @checked = !@checked
+      @toggling = false
       @action.call(@checked, @params) if @action
     end
   end
