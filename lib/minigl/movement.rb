@@ -40,6 +40,10 @@ module MiniGL
     def bounds
       Rectangle.new @x, @y, @w, @h
     end
+
+    def to_s
+      "Block(#{@x}, #{@y}, #{@w}, #{@h}#{@passable ? ", passable" : ''})"
+    end
   end
 
   # Represents a ramp, i.e., an inclined structure which allows walking over
@@ -301,48 +305,28 @@ module MiniGL
           end
         else
           # Diagonal
-          x_aim = @x + @speed.x + (rt ? @w : 0); x_lim_def = x_aim
-          y_aim = @y + @speed.y + (dn ? @h : 0); y_lim_def = y_aim
+          x_aim = @x + @speed.x + (rt ? @w : 0); x_lim_def = [x_aim, nil]
+          y_aim = @y + @speed.y + (dn ? @h : 0); y_lim_def = [y_aim, nil]
           coll_list.each do |c|
-            if c.passable; x_lim = x_aim
-            elsif rt; x_lim = c.x
-            else; x_lim = c.x + c.w
-            end
-            if dn; y_lim = c.y
-            elsif c.passable; y_lim = y_aim
-            else; y_lim = c.y + c.h
-            end
+            find_limits(c, x_aim, y_aim, x_lim_def, y_lim_def, up, rt, dn, lf)
+          end
 
-            if c.passable
-              y_lim_def = y_lim if dn && @y + @h <= y_lim && y_lim < y_lim_def
-            elsif (rt && @x + @w > x_lim) || (lf && @x < x_lim)
-              # Can't limit by x, will limit by y
-              y_lim_def = y_lim if (dn && y_lim < y_lim_def) || (up && y_lim > y_lim_def)
-            elsif (dn && @y + @h > y_lim) || (up && @y < y_lim)
-              # Can't limit by y, will limit by x
-              x_lim_def = x_lim if (rt && x_lim < x_lim_def) || (lf && x_lim > x_lim_def)
+          if x_lim_def[0] != x_aim && y_lim_def[0] != y_aim
+            x_time = (x_lim_def[0] - @x - (lf ? 0 : @w)).to_f / @speed.x
+            y_time = (y_lim_def[0] - @y - (up ? 0 : @h)).to_f / @speed.y
+            if x_time < y_time
+              stop_at_x(x_lim_def[0], lf)
+              move_bounds = Rectangle.new(@x, up ? @y + @speed.y : @y, @w, @h + @speed.y.abs)
+              stop_at_y(y_lim_def[0], up) if move_bounds.intersect?(y_lim_def[1].bounds)
             else
-              x_time = 1.0 * (x_lim - @x - (@speed.x < 0 ? 0 : @w)) / @speed.x
-              y_time = 1.0 * (y_lim - @y - (@speed.y < 0 ? 0 : @h)) / @speed.y
-              if x_time > y_time
-                # Will limit by x
-                x_lim_def = x_lim if (rt && x_lim < x_lim_def) || (lf && x_lim > x_lim_def)
-              elsif (dn && y_lim < y_lim_def) || (up && y_lim > y_lim_def)
-                y_lim_def = y_lim
-              end
+              stop_at_y(y_lim_def[0], up)
+              move_bounds = Rectangle.new(lf ? @x + @speed.x : @x, @y, @w + @speed.x.abs, @h)
+              stop_at_x(x_lim_def[0], lf) if move_bounds.intersect?(x_lim_def[1].bounds)
             end
-          end
-          if x_lim_def != x_aim
-            @speed.x = 0
-            if lf; @x = x_lim_def
-            else; @x = x_lim_def - @w
-            end
-          end
-          if y_lim_def != y_aim
-            @speed.y = 0
-            if up; @y = y_lim_def
-            else; @y = y_lim_def - @h
-            end
+          elsif x_lim_def[0] != x_aim
+            stop_at_x(x_lim_def[0], lf)
+          elsif y_lim_def[0] != y_aim
+            stop_at_y(y_lim_def[0], up)
           end
         end
       end
@@ -605,6 +589,69 @@ module MiniGL
         limit = c.y + c.h if !c.passable && c.y + c.h > limit
       end
       limit
+    end
+
+    def find_limits(obj, x_aim, y_aim, x_lim_def, y_lim_def, up, rt, dn, lf)
+      x_lim =
+        if obj.passable
+          x_aim
+        elsif rt
+          obj.x
+        else
+          obj.x + obj.w
+        end
+
+      y_lim =
+        if dn
+          obj.y
+        elsif obj.passable
+          y_aim
+        else
+          obj.y + obj.h
+        end
+
+      x_v = x_lim_def[0]; y_v = y_lim_def[0]
+      if obj.passable
+        if dn && @y + @h <= y_lim && y_lim < y_v
+          y_lim_def[0] = y_lim
+          y_lim_def[1] = obj
+        end
+      elsif (rt && @x + @w > x_lim) || (lf && @x < x_lim)
+        # Can't limit by x, will limit by y
+        if (dn && y_lim < y_v) || (up && y_lim > y_v)
+          y_lim_def[0] = y_lim
+          y_lim_def[1] = obj
+        end
+      elsif (dn && @y + @h > y_lim) || (up && @y < y_lim)
+        # Can't limit by y, will limit by x
+        if (rt && x_lim < x_v) || (lf && x_lim > x_v)
+          x_lim_def[0] = x_lim
+          x_lim_def[1] = obj
+        end
+      else
+        x_time = (x_lim - @x - (lf ? 0 : @w)).to_f / @speed.x
+        y_time = (y_lim - @y - (up ? 0 : @h)).to_f / @speed.y
+        if x_time > y_time
+          # Will limit by x
+          if (rt && x_lim < x_v) || (lf && x_lim > x_v)
+            x_lim_def[0] = x_lim
+            x_lim_def[1] = obj
+          end
+        elsif (dn && y_lim < y_v) || (up && y_lim > y_v)
+          y_lim_def[0] = y_lim
+          y_lim_def[1] = obj
+        end
+      end
+    end
+
+    def stop_at_x(x, moving_left)
+      @speed.x = 0
+      @x = moving_left ? x : x - @w
+    end
+
+    def stop_at_y(y, moving_up)
+      @speed.y = 0
+      @y = moving_up ? y : y - @h
     end
   end
 end

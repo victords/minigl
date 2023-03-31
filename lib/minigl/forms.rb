@@ -730,7 +730,7 @@ module MiniGL
         end
         set_cursor_visible
       elsif Mouse.button_pressed? :left
-        Mouse.add_click(@z_index || 0, method(:focus))
+        Mouse.add_click(@z_index || 0, method(:focus_and_set_anchor))
       elsif Mouse.button_down? :left
         if @anchor1 and not @double_clicked
           set_node_by_mouse
@@ -922,7 +922,6 @@ module MiniGL
     def focus
       @focused = true
       set_node_by_mouse
-      @anchor1 = @cur_node
       @anchor2 = nil
       @double_clicked = false
       set_cursor_visible
@@ -1005,6 +1004,11 @@ module MiniGL
     end
 
   private
+
+    def focus_and_set_anchor
+      focus
+      @anchor1 = @cur_node
+    end
 
     def set_cursor_visible
       @cursor_visible = true

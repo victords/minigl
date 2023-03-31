@@ -271,18 +271,20 @@ module MiniGL
       end
 
       color = (alpha << 24) | color
+      img_gap_scale_x = scale_image_gap? ? scale_x : 1
+      img_gap_scale_y = scale_image_gap? ? scale_y : 1
       if angle
         center_x = @x + @w * 0.5
         center_y = @y + @h * 0.5
-        o_x = center_x - @x - @img_gap.x * scale_x
-        o_y = center_y - @y - @img_gap.y * scale_y
-        @img[@img_index].draw_rot @x + (flip == :horiz ? -1 : 1) * (@img_gap.x * scale_x + o_x) - (map ? map.cam.x : 0),
-                                  @y + (flip == :vert ? -1 : 1) * (@img_gap.y * scale_y + o_y) - (map ? map.cam.y : 0),
+        o_x = center_x - @x - @img_gap.x * img_gap_scale_x
+        o_y = center_y - @y - @img_gap.y * img_gap_scale_y
+        @img[@img_index].draw_rot @x + (flip == :horiz ? -1 : 1) * (@img_gap.x * img_gap_scale_x + o_x) - (map ? map.cam.x : 0),
+                                  @y + (flip == :vert ? -1 : 1) * (@img_gap.y * img_gap_scale_y + o_y) - (map ? map.cam.y : 0),
                                   z_index, angle, o_x.to_f / (@img[0].width * scale_x), o_y.to_f / (@img[0].height * scale_y),
                                   (flip == :horiz ? -scale_x : scale_x), (flip == :vert ? -scale_y : scale_y), color
       else
-        x = @x + (flip == :horiz ? -1 : 1) * @img_gap.x * scale_x - (map ? map.cam.x : 0) + (flip == :horiz ? @w : 0)
-        y = @y + (flip == :vert ? -1 : 1) * @img_gap.y * scale_y - (map ? map.cam.y : 0) + (flip == :vert ? @h : 0)
+        x = @x + (flip == :horiz ? -1 : 1) * @img_gap.x * img_gap_scale_x - (map ? map.cam.x : 0) + (flip == :horiz ? @w : 0)
+        y = @y + (flip == :vert ? -1 : 1) * @img_gap.y * img_gap_scale_y - (map ? map.cam.y : 0) + (flip == :vert ? @h : 0)
         @img[@img_index].draw (round ? x.round : x), (round ? y.round : y),
                               z_index, (flip == :horiz ? -scale_x : scale_x),
                               (flip == :vert ? -scale_y : scale_y), color
@@ -296,6 +298,12 @@ module MiniGL
       r = Rectangle.new @x.round + @img_gap.x, @y.round + @img_gap.y, @img[0].width, @img[0].height
       return Rectangle.new(0, 0, G.window.width, G.window.height).intersect? r if map.nil?
       map.cam.intersect? r
+    end
+
+    # override this if you don't want the image_gap to be scaled when drawing
+    # the object scaled.
+    def scale_image_gap?
+      true
     end
   end
 
