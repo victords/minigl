@@ -7,6 +7,7 @@ module MiniGL
       duration: 30,
       shape: nil,
       img: nil,
+      spread: 0,
       scale: 1,
       angle: nil,
       rotation: nil,
@@ -69,8 +70,10 @@ module MiniGL
       @timer += 1
       if @timer >= @emission_time
         @options[:emission_rate].times do
-          @particles << Particle.new(x: @x,
-                                     y: @y,
+          x = @options[:area] ? @x + rand * @options[:area].x : @x + @options[:spread] * (rand - 0.5)
+          y = @options[:area] ? @y + rand * @options[:area].y : @y + @options[:spread] * (rand - 0.5)
+          @particles << Particle.new(x:,
+                                     y:,
                                      duration: @options[:duration],
                                      shape: @options[:shape],
                                      img: @options[:img],
