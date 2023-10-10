@@ -11,8 +11,10 @@ module MiniGL
       scale: 1,
       angle: nil,
       rotation: nil,
+      speed: nil,
       color: 0xffffff,
       alpha: 255,
+      round_position: true,
     }.freeze
 
     PARTICLE_OPTIONS = %i[
@@ -23,12 +25,14 @@ module MiniGL
       scale_inflection
       angle
       rotation
+      speed
       color
       alpha
       alpha_change
       alpha_min
       alpha_max
       alpha_inflection
+      round_position
     ].freeze
 
     def initialize(x:, y:, **options)
@@ -114,7 +118,20 @@ module MiniGL
         @options = DEFAULT_OPTIONS.merge(options)
         @elapsed_time = 0
 
-        @angle = @options[:angle]
+        if @options[:angle].is_a?(Range)
+          @angle = rand(@options[:angle])
+        elsif @options[:angle].is_a?(Numeric)
+          @angle = @options[:angle]
+        end
+
+        if @options[:speed].is_a?(Hash)
+          speed_x = @options[:speed][:x].is_a?(Range) ? rand(@options[:speed][:x]) : (@options[:speed][:x] || 0)
+          speed_y = @options[:speed][:y].is_a?(Range) ? rand(@options[:speed][:y]) : (@options[:speed][:y] || 0)
+          @speed = Vector.new(speed_x, speed_y)
+        elsif @options[:speed].is_a?(Vector)
+          @speed = @options[:speed]
+        end
+
         init_variable_property(:scale)
         init_variable_property(:alpha)
       end
@@ -161,9 +178,9 @@ module MiniGL
           @angle -= 360 if @angle >= 360
         end
 
-        if @options[:speed]
-          @x += @options[:speed].x
-          @y += @options[:speed].y
+        if @speed
+          @x += @speed.x
+          @y += @speed.y
         end
 
         update_variable_property(:scale) if @options[:scale_change]
@@ -178,6 +195,10 @@ module MiniGL
       def draw(map, z_index)
         x = @x - (map&.cam&.x || 0)
         y = @y - (map&.cam&.y || 0)
+        if @options[:round_position]
+          x = x.round
+          y = y.round
+        end
         color = (@alpha << 24) | @options[:color]
         if @img
           if @angle
