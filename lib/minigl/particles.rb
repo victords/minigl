@@ -9,11 +9,19 @@ module MiniGL
       img: nil,
       spread: 0,
       scale: 1,
+      scale_change: nil,
+      scale_min: 0,
+      scale_max: 1,
+      scale_inflection: 0.5,
       angle: nil,
       rotation: nil,
       speed: nil,
       color: 0xffffff,
       alpha: 255,
+      alpha_change: nil,
+      alpha_min: 0,
+      alpha_max: 255,
+      alpha_inflection: 0.5,
       round_position: true,
     }.freeze
 
@@ -50,6 +58,7 @@ module MiniGL
       set_emission_time
       @timer = @emission_time
       @emitting = true
+      self
     end
 
     def stop
@@ -102,20 +111,13 @@ module MiniGL
     end
 
     class Particle
-      DEFAULT_OPTIONS = {
-        angle: nil,
-        rotation: nil,
-        speed: nil,
-        color: 0xffffff,
-      }.freeze
-
       def initialize(x:, y:, duration:, shape: nil, img: nil, **options)
         @x = x
         @y = y
         @duration = duration
         @shape = shape
         @img = img
-        @options = DEFAULT_OPTIONS.merge(options)
+        @options = DEFAULT_OPTIONS.slice(*PARTICLE_OPTIONS).merge(options)
         @elapsed_time = 0
 
         if @options[:angle].is_a?(Range)
@@ -158,7 +160,7 @@ module MiniGL
         when :shrink
           instance_variable_set(ivar_name, max - (@elapsed_time.to_f / @duration) * (max - min))
         when :alternate
-          inflection_point = ((@options["#{name}_inflection".to_sym] || 0.5) * @duration).round
+          inflection_point = (@options["#{name}_inflection".to_sym] * @duration).round
           if @elapsed_time >= inflection_point
             instance_variable_set(ivar_name, min + (@duration - @elapsed_time).to_f / (@duration - inflection_point) * (max - min))
           else
@@ -210,6 +212,14 @@ module MiniGL
           case @shape
           when :square
             G.window.draw_rect(@x - @scale * 0.5, @y - @scale * 0.5, @scale, @scale, color, z_index)
+          when :triangle_up
+            G.window.draw_triangle(@x - @scale * 0.5, @y + @scale * 0.433, color,
+                                   @x + @scale * 0.5, @y + @scale * 0.433, color,
+                                   @x, @y - @scale * 0.433, color, z_index)
+          when :triangle_down
+            G.window.draw_triangle(@x - @scale * 0.5, @y - @scale * 0.433, color,
+                                   @x + @scale * 0.5, @y - @scale * 0.433, color,
+                                   @x, @y + @scale * 0.433, color, z_index)
           end
         end
       end
