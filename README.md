@@ -10,6 +10,7 @@ It provides the following features:
   * UI (text, buttons, text fields, drop-down lists, progress bars)
   * Basic physics and collision checking
   * Animated objects
+  * Particle systems
 
 More functionalities are coming. Feel free to contribute! You can send feedback
 to victordavidsantos@gmail.com.
@@ -38,13 +39,13 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
 
 ## Documentation
 
-  * The library is 100% RDoc-documented [here](http://www.rubydoc.info/gems/minigl).
+  * The library is 100% RDoc-documented [here](https://www.rubydoc.info/gems/minigl).
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.4.3
+## Version 2.5.0
 
-  * Fixed a collision checking bug in `Movement#move`.
+  * Added `Particles` (particle system) class. Run `test/particles_game.rb` to check its capabilities!
 
 ## Contributing
 
