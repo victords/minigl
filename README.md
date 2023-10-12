@@ -47,6 +47,10 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
 
   * Added `Particles` (particle system) class. Run `test/particles_game.rb` to check its capabilities!
 
+### Version 2.5.1
+
+  Patch fixing the required Ruby version (>= 3.1).
+
 ## Contributing
 
 Contributions are very welcome. Feel free to fork and send pull requests.

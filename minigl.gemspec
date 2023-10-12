@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name                  = 'minigl'
-  s.version               = '2.5.0'
+  s.version               = '2.5.1'
   s.date                  = '2023-10-12'
   s.summary               = 'MiniGL'
   s.description           = 'A minimal 2D Game Library built on top of the Gosu gem.'
@@ -10,6 +10,6 @@ Gem::Specification.new do |s|
   s.test_files            = Dir['test/*.rb', 'test/*.png', 'test/data/*/*', 'test/data/*/*/*']
   s.license               = 'MIT'
   s.homepage              = 'https://github.com/victords/minigl'
-  s.required_ruby_version = '>= 2.0'
+  s.required_ruby_version = '>= 3.1'
   s.add_runtime_dependency 'gosu', '>= 0.11', '< 2.0'
 end
