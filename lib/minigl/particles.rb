@@ -1,59 +1,79 @@
 module MiniGL
   # A particle system.
   class Particles
-    DEFAULT_OPTIONS = {
-      emission_rate: 1,
-      emission_interval: 60,
-      duration: 30,
-      shape: nil,
-      img: nil,
-      spread: 0,
-      scale: 1,
-      scale_change: nil,
-      scale_min: 0,
-      scale_max: 1,
-      scale_inflection: 0.5,
-      angle: nil,
-      rotation: nil,
-      speed: nil,
-      color: 0xffffff,
-      alpha: 255,
-      alpha_change: nil,
-      alpha_min: 0,
-      alpha_max: 255,
-      alpha_inflection: 0.5,
-      round_position: true,
-    }.freeze
-
-    PARTICLE_OPTIONS = %i[
-      scale
-      scale_change
-      scale_min
-      scale_max
-      scale_inflection
-      angle
-      rotation
-      speed
-      color
-      alpha
-      alpha_change
-      alpha_min
-      alpha_max
-      alpha_inflection
-      round_position
-    ].freeze
-
-    def initialize(x:, y:, **options)
+    # Create a new particle system.
+    # Options:
+    # - x: x-coordinate of the origin of the particle system. If +source+ is
+    #   set, it has precedence.
+    # - y: y-coordinate of the origin of the particle system. If +source+ is
+    #   set, it has precedence.
+    # - source: if set, must be an object that responds to +x+ and +y+. The
+    #   position of the particle system will be updated to this object's
+    #   position on initialization and every time +update+ is called.
+    # - emission_interval (Integer|Range): interval in frames between each
+    #   particle emission. It can be a fixed value or a range, in which case
+    #   the interval will be a random value within that range (a new value
+    #   before each emission). Default: 10.
+    # - emission_rate (Integer|Range): how many particles will be emitted at a
+    #   time. It can be a fixed value or a range, in which case a random number
+    #   of particles in that range will be emitted each time. Default: 1.
+    # - duration (Integer): how many frames each particle will live. Default: 30.
+    # - shape (Symbol|nil): one of +:square+, +:triangle_up+, or
+    #   +:triangle_down+, to emit basic shapes (if the +img+ option is set, it
+    #   has precedence). Shape particles don't support rotation. Either this or
+    #   +img+ must be set.
+    # - img (Gosu::Image|nil): image of the particle, has precedence over
+    #   +shape+. Either this or +shape+ must be set.
+    # - scale (Numeric): fixed scale of each particle, ignored if +scale_change+
+    #   is set to a valid value. Default: 1.
+    # - scale_change (Symbol|nil): one of +:grow+, +:shrink+, or +:alternate+,
+    #   indicates how the scale of the particle will change over time. +:grow+
+    #   will cause the scale to change from +scale_min+ to +scale_max+;
+    #   +:shrink+ will cause the scale to change from +scale_max+ to
+    #   +scale_min+; +:alternate+ will cause the scale to first go from
+    #   +scale_min+ to +scale_max+, in <code>scale_inflection * duration</code>
+    #   frames, and then back to +scale_min+ in the remaining frames. All
+    #   changes are linear over time.
+    # - scale_min (Numeric): minimum scale, to be used together with
+    #   +scale_change+. Default: 0.
+    # - scale_max (Numeric): maximum scale, to be used together with
+    #   +scale_change+. Default: 1.
+    # - scale_inflection (Numeric): should be a number between 0 and 1, to be
+    #   used with +scale_change+ set to +:alternate+. Default: 0.5.
+    # - alpha (Numeric): fixed alpha of each particle, ignored if +alpha_change+
+    #   is set to a valid value. Default: 255.
+    # - alpha_change, alpha_min, alpha_max, alpha_inflection: behave the same
+    #   way as the corresponding properties for +scale+. Default +alpha_max+ is
+    #   255.
+    # - angle (Numeric|Range|nil): initial rotation angle of each particle in
+    #   degrees. Can be a fixed value or a range, in which case the initial
+    #   rotation will be a random value within that range. Default: nil (no
+    #   rotation).
+    # - rotation(Numeric|nil): how much each particle will rotate each frame,
+    #   in degrees. Default: nil (no rotation).
+    # - speed (Vector|Hash|nil): specifies how the particle will move each
+    #   frame. It can be a +Vector+, in which case the particle will move a
+    #   fixed amount (corresponding to the +x+ and +y+ values of the vector)
+    #   or a +Hash+ with +:x+ and +:y+ keys, in this case the value can be
+    #   fixed or a range, for random movement. Default: nil (no movement).
+    # - color (Integer): color to tint the particles, in the 0xRRGGBB format.
+    #   Default: 0xffffff (white, no tinting).
+    # - round_position (Boolean): only draw particles in integer positions.
+    #   Default: true.
+    def initialize(**options)
       raise "Particles must have either a shape or an image!" if options[:shape].nil? && options[:img].nil?
 
-      @x = x
-      @y = y
       @options = DEFAULT_OPTIONS.merge(options)
+      @x = @options[:source]&.x || @options[:x] || 0
+      @y = @options[:source]&.y || @options[:y] || 0
 
       @particles = []
       @emitting = false
     end
 
+    # Starts emitting particles. This returns +self+, so you can create, start,
+    # and assign a particle system to a variable like this:
+    # <code>@p_system = Particles.new(...).start</code>
     def start
       set_emission_time
       @timer = @emission_time
@@ -61,18 +81,25 @@ module MiniGL
       self
     end
 
+    # Stops emitting new particles. The existing particles will still be kept
+    # alive until they hit +duration+ frames.
     def stop
       @emitting = false
     end
 
+    # Returns a boolean indicating whether this particle system is currently
+    # emitting particles.
     def emitting?
       @emitting
     end
 
+    # Returns the current particle count.
     def count
       @particles.size
     end
 
+    # Updates the particle system. This should be called in the +update+ loop
+    # of the game.
     def update
       @particles.each do |particle|
         particle.update
@@ -80,9 +107,15 @@ module MiniGL
       end
       return unless @emitting
 
+      if @options[:source]
+        @x = @options[:source].x
+        @y = @options[:source].y
+      end
+
       @timer += 1
       if @timer >= @emission_time
-        @options[:emission_rate].times do
+        count = @options[:emission_rate].is_a?(Range) ? rand(@options[:emission_rate]) : @options[:emission_rate]
+        count.times do
           x = @options[:area] ? @x + rand * @options[:area].x : @x + @options[:spread] * (rand - 0.5)
           y = @options[:area] ? @y + rand * @options[:area].y : @y + @options[:spread] * (rand - 0.5)
           @particles << Particle.new(x:,
@@ -97,6 +130,11 @@ module MiniGL
       end
     end
 
+    # Draws the particles.
+    # Parameters:
+    # - map (Map|nil): a map whose camera will be used to determine the
+    #   position of particles in the screen.
+    # - z_index (Integer): z-index to draw the particles. Default: 0.
     def draw(map = nil, z_index = 0)
       @particles.each do |particle|
         particle.draw(map, z_index)
@@ -105,12 +143,59 @@ module MiniGL
 
     private
 
-    def set_emission_time
+    # :nodoc:
+    DEFAULT_OPTIONS = {
+      x: 0,
+      y: 0,
+      source: nil,
+      emission_interval: 10,
+      emission_rate: 1,
+      duration: 30,
+      shape: nil,
+      img: nil,
+      spread: 0,
+      scale: 1,
+      scale_change: nil,
+      scale_min: 0,
+      scale_max: 1,
+      scale_inflection: 0.5,
+      alpha: 255,
+      alpha_change: nil,
+      alpha_min: 0,
+      alpha_max: 255,
+      alpha_inflection: 0.5,
+      angle: nil,
+      rotation: nil,
+      speed: nil,
+      color: 0xffffff,
+      round_position: true,
+    }.freeze
+
+    # :nodoc:
+    PARTICLE_OPTIONS = %i[
+      scale
+      scale_change
+      scale_min
+      scale_max
+      scale_inflection
+      alpha
+      alpha_change
+      alpha_min
+      alpha_max
+      alpha_inflection
+      angle
+      rotation
+      speed
+      color
+      round_position
+    ].freeze
+
+    def set_emission_time # :nodoc:
       interval = @options[:emission_interval]
       @emission_time = interval.is_a?(Range) ? rand(interval) : interval
     end
 
-    class Particle
+    class Particle # :nodoc:
       def initialize(x:, y:, duration:, shape: nil, img: nil, **options)
         @x = x
         @y = y
