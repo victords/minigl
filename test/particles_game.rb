@@ -3,21 +3,14 @@ require_relative '../lib/minigl'
 include MiniGL
 
 class MyGame < GameWindow
-  class Source
-    attr_accessor :x, :y
-
-    def initialize(x, y)
-      @x = x
-      @y = y
-    end
-  end
-
   def initialize
     super(800, 600, false)
-    @source = Source.new(100, 100)
+    @source = Sprite.new(100, 100, :btn)
     @particles_systems = [
       Particles.new(
         source: @source,
+        source_offset_x: 50,
+        source_offset_y: 120,
         img: Res.img(:square),
         duration: 30,
         spread: 50,
@@ -59,10 +52,15 @@ class MyGame < GameWindow
       end
     end
 
+    if KB.key_pressed?(Gosu::KB_Q)
+      @particles_systems[1].move_to(50, 500)
+    end
+
     @particles_systems.each(&:update)
   end
 
   def draw
+    @source.draw
     @particles_systems.each(&:draw)
   end
 end

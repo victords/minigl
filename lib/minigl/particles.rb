@@ -3,13 +3,18 @@ module MiniGL
   class Particles
     # Create a new particle system.
     # Options:
-    # - x: x-coordinate of the origin of the particle system. If +source+ is
-    #   set, it has precedence.
-    # - y: y-coordinate of the origin of the particle system. If +source+ is
-    #   set, it has precedence.
+    # - x (Numeric): x-coordinate of the origin of the particle system. If
+    #   +source+ is set, it has precedence.
+    # - y (Numeric): y-coordinate of the origin of the particle system. If
+    #   +source+ is set, it has precedence.
     # - source: if set, must be an object that responds to +x+ and +y+. The
-    #   position of the particle system will be updated to this object's
-    #   position on initialization and every time +update+ is called.
+    #   position of the particle system will be updated to <code>(source.x
+    #   + source_offset_x, source.y + source_offset_y)</code> on initialization
+    #   and every time +update+ is called.
+    # - source_offset_x (Numeric): horizontal offset relative to the +source+
+    #   where the particle system will be positioned. Default: 0.
+    # - source_offset_y (Numeric): vertical offset relative to the +source+
+    #   where the particle system will be positioned. Default: 0.
     # - emission_interval (Integer|Range): interval in frames between each
     #   particle emission. It can be a fixed value or a range, in which case
     #   the interval will be a random value within that range (a new value
@@ -64,8 +69,8 @@ module MiniGL
       raise "Particles must have either a shape or an image!" if options[:shape].nil? && options[:img].nil?
 
       @options = DEFAULT_OPTIONS.merge(options)
-      @x = @options[:source]&.x || @options[:x] || 0
-      @y = @options[:source]&.y || @options[:y] || 0
+      @x = (@options[:source]&.x || @options[:x]) + @options[:source_offset_x]
+      @y = (@options[:source]&.y || @options[:y]) + @options[:source_offset_y]
 
       @particles = []
       @emitting = false
@@ -85,6 +90,12 @@ module MiniGL
     # alive until they hit +duration+ frames.
     def stop
       @emitting = false
+    end
+
+    # Changes particle system origin to <code>(x, y)</code>.
+    def move_to(x, y)
+      @x = x
+      @y = y
     end
 
     # Returns a boolean indicating whether this particle system is currently
@@ -108,8 +119,8 @@ module MiniGL
       return unless @emitting
 
       if @options[:source]
-        @x = @options[:source].x
-        @y = @options[:source].y
+        @x = @options[:source].x + @options[:source_offset_x]
+        @y = @options[:source].y + @options[:source_offset_y]
       end
 
       @timer += 1
@@ -148,6 +159,8 @@ module MiniGL
       x: 0,
       y: 0,
       source: nil,
+      source_offset_x: 0,
+      source_offset_y: 0,
       emission_interval: 10,
       emission_rate: 1,
       duration: 30,

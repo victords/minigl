@@ -43,9 +43,9 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.5.1
+## Version 2.5.2
 
-  * Added `Particles` (particle system) class. Run `test/particles_game.rb` to check its capabilities!
+  * Added `source_offset_x` and `source_offset_y` initialization options and `move_to` method to `Particles`.
 
 ## Contributing
 
