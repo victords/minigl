@@ -43,9 +43,9 @@ After installing the Gosu dependencies, you can just `gem install minigl`.
   * The [wiki](https://github.com/victords/minigl/wiki) is a work in progress with tutorials and examples.
   * Test package and examples aren't complete!
 
-## Version 2.5.2
+## Version 2.5.3
 
-  * Added `source_offset_x` and `source_offset_y` initialization options and `move_to` method to `Particles`.
+  * Fixed small collision bug in `Movement#move`.
 
 ## Contributing
 

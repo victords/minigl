@@ -526,7 +526,7 @@ module MiniGL
       end
     end
 
-  private
+    private
 
     def check_contact(obst, ramps)
       prev_bottom = @bottom
@@ -578,7 +578,7 @@ module MiniGL
     def find_down_limit(coll_list)
       limit = @y + @h + @speed.y
       coll_list.each do |c|
-        limit = c.y if c.y < limit && c.y >= @y + @h
+        limit = c.y if c.y < limit && (!c.passable || c.y >= @y + @h)
       end
       limit
     end
